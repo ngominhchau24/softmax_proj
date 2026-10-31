@@ -1,0 +1,24 @@
+{
+  "signal": [
+    { "name": "clk",       "wave": "p..........." },
+    ["input",
+      { "name": "in_valid", "wave": "01..01.0...." },
+      { "name": "u_in",     "wave": "x===x==x....", "data": ["a", "b", "c", "d", "e"] },
+      { "name": "m_in",     "wave": "x=..x=.x....", "data": ["M0", "M1"] },
+      { "name": "in_en",    "wave": "x1.0x1.x...." }
+    ],
+    {},
+    ["pipe",
+      { "name": "s1_vld_q", "wave": "0.1..01.0..." },
+      { "name": "s2_vld_q", "wave": "0..1..01.0.." }
+    ],
+    {},
+    ["output",
+      { "name": "out_valid", "wave": "0...1..01.0." },
+      { "name": "e_out",     "wave": "x...===x==x.", "data": ["E(a)", "E(b)", "0", "E(d)", "E(e)"] }
+    ]
+  ],
+  "head": { "text": "smx_exp2: EXP2_LAT = 3, 1 element/cycle, lane c masked (in_en = 0 -> e_out = 0)" },
+  "foot": { "text": "E(x) = exp2_neg(u_x - (M << 16)) from model/softmax_ref.py" },
+  "config": { "hscale": 1 }
+}
