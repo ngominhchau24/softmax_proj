@@ -7,7 +7,7 @@ Trạng thái: `TODO` → `DRAFT` → `REVIEW` → `APPROVED` → `RTL` → `UT-
 
 | # | Block | Vai trò | Phụ thuộc | Trạng thái | Ghi chú |
 |---|---|---|---|---|---|
-| 1 | `smx_exp2` | d = u − M·2¹⁶ → E (PWL + shift) | smx_pkg | TODO | lõi số học khó nhất, làm trước |
+| 1 | `smx_exp2` | d = u − M·2¹⁶ → E (PWL + shift) | smx_pkg | RTL | 2026-10-31 APPROVED → RTL; chờ chạy `tb/run_smx_exp2.sh` + `syn/map_check.sh smx_exp2 N_SEG=4,8,16` |
 | 2 | `smx_scale` | u = q·K, c = ⌈u⌉ | — | TODO | |
 | 3 | `smx_maxtree` | Mg, cập nhật M | smx_scale | TODO | vòng phản hồi M |
 | 4 | `smx_sumacc` | cây cộng + tích luỹ có renorm | smx_exp2, smx_maxtree | TODO | đường găng timing |

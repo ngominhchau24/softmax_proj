@@ -35,6 +35,10 @@ syn/*_assignment_defaults.qdf
 *.sopcinfo
 **/.qsys_edit/
 
+# Generated test vectors and logs (model/gen_vectors.py), throwaway map checks
+tb/vectors/*/
+syn/map_check/
+
 # ModelSim / Questa
 work/
 transcript

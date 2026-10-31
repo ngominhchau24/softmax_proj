@@ -168,6 +168,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-10-31: Chốt D18 — target workload duy nhất là DeiT-Tiny (Chau duyệt). Cân nhắc 7 phương án (DeiT-Tiny, ViT tự train CIFAR-10, DistilBERT SST-2, BERT/I-BERT, GPT-2 decode, Swin-T, KWT); chọn DeiT-Tiny vì khớp v1.0 nguyên trạng (không mask, L = 197), có mốc I-ViT. Viết `docs/spec/target-workload.md`; thêm DeiT [13] vào tham khảo survey. Requirements và VERSION không đổi. Đóng câu hỏi nguồn vector demo.
 
+- 2026-10-31: `smx_exp2` APPROVED (`docs/spec/blocks/smx_exp2.md`, Q1–Q8): một lane, pipeline 3 tầng (`EXP2_LAT`), M cùng chu kỳ với u, mask lane trong block, N_SEG tham số hoá 4/8/16. Kiểm cấu trúc SV bằng Quartus 18.1 Lite (probe). Viết RTL, testbench, `model/gen_vectors.py`, `tb/run_smx_exp2.sh`, `syn/map_check.sh`; thêm `EXP2_LAT` và bảng PWL N = 4/16 vào `smx_pkg`. Chưa chạy mô phỏng.
+
 ## 11. Tài liệu tham khảo chính
 
 Danh sách đầy đủ ở `docs/research/softmax-survey.md` mục 7. Cốt lõi: Milakov & Gimelshein 2018 (online normalizer); Kim et al., I-BERT, ICML 2021; Stevens et al., Softermax, DAC 2021; Li & Gu, I-ViT/Shiftmax, ICCV 2023; Wei et al., SoftGen, ASAP 2020; Wang et al., log-sum-exp, APCCAS 2018; Wang et al., SOLE, 2025. Tài liệu nền accelerator (Kung 1982, TPU 2017, Eyeriss 2016, Sze 2017, Jacob 2018) ở `docs/archive/gemm-sa-proposal.md` mục tham khảo.

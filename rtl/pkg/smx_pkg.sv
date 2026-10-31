@@ -23,6 +23,9 @@ package smx_pkg;
   localparam int OUT_SH     = 32;    // y = (E*Rcp + 2^31) >> 32
   localparam int Y_W        = 8;     // output uint8
 
+  // ---- block latencies (cycles from in_valid to out_valid) ----
+  localparam int EXP2_LAT   = 3;     // smx_exp2 (docs/spec/blocks/smx_exp2.md)
+
   // ---- derived ----
   localparam int LANE_IDX_W = $clog2(P);
   localparam int L_W        = $clog2(L_MAX) + 1;  // LEN register width (1..L_MAX)
@@ -40,6 +43,14 @@ package smx_pkg;
   localparam logic [15:0] XBUF_BASE     = 16'h2000;
   localparam logic [15:0] YBUF_BASE     = 16'h4000;
   localparam logic [15:0] SPAN          = 16'h6000;
+
+  // ---- PWL table for N_SEG = 4 (generated: python3 model/softmax_ref.py --gen-pwl 4) ----
+  localparam logic [15:0] PWL_C_N4 [4] = '{16'd32768, 16'd38968, 16'd46341, 16'd55109};
+  localparam logic [15:0] PWL_M_N4 [4] = '{16'd6200, 16'd7373, 16'd8768, 16'd10427};
+
+  // ---- PWL table for N_SEG = 16 (generated: python3 model/softmax_ref.py --gen-pwl 16) ----
+  localparam logic [15:0] PWL_C_N16 [16] = '{16'd32768, 16'd34219, 16'd35734, 16'd37316, 16'd38968, 16'd40693, 16'd42495, 16'd44376, 16'd46341, 16'd48393, 16'd50535, 16'd52773, 16'd55109, 16'd57549, 16'd60097, 16'd62757};
+  localparam logic [15:0] PWL_M_N16 [16] = '{16'd1451, 16'd1515, 16'd1582, 16'd1652, 16'd1725, 16'd1802, 16'd1881, 16'd1965, 16'd2052, 16'd2143, 16'd2237, 16'd2336, 16'd2440, 16'd2548, 16'd2661, 16'd2779};
 
   // ---- PWL table for N_SEG = 8 (generated: python3 model/softmax_ref.py --gen-pwl 8) ----
   localparam logic [15:0] PWL_C_N8 [8] = '{16'd32768, 16'd35734, 16'd38968, 16'd42495,
