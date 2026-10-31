@@ -13,13 +13,13 @@
   - **Thành viên khác:** verification (testbench, coverage, dùng golden model làm scoreboard) và implement lên kit: wrapper Avalon mỏng `smx_avalon`, `smx_hw.tcl`, hệ thống Platform Designer, script demo System Console (xem `docs/spec/integration-notes.md`).
   - Hệ quả: đầu ra quan trọng nhất là **spec giao diện đóng băng sớm + golden model bit-exact + RTL sạch**.
 - **Hạn nộp:** ≈ 2026-12-21 (ngày chính xác `[CHƯA CHỐT]`).
-- **Demo:** chứng minh design chạy đúng trên board (nạp vector → chạy → đọc → so golden model, kèm CYCLE_CNT). Không chạy trọn một mạng. Đường chính: **JTAG + System Console, hệ thống không HPS, không cần Linux** (D16).
+- **Demo:** chứng minh design chạy đúng trên board (nạp vector → chạy → đọc → so golden model, kèm CYCLE_CNT). Workload mục tiêu là DeiT-Tiny (D18): board chạy softmax của một layer theo kiểu hardware-in-the-loop trên vài ảnh; độ chính xác toàn mạng đo bằng golden model trên PC (`docs/spec/target-workload.md`). Không chạy trọn mạng trên FPGA. Đường chính: **JTAG + System Console, hệ thống không HPS, không cần Linux** (D16).
 
 ## 2. Yêu cầu của môn
 
 | # | Yêu cầu | Cách đáp ứng |
 |---|---|---|
-| R1 | Accelerator cho phép toán bên trong mạng AI | Softmax theo hàng trong self-attention của Transformer |
+| R1 | Accelerator cho phép toán bên trong mạng AI | Softmax theo hàng trong self-attention của Transformer; target DeiT-Tiny (D18) |
 | R2 | > 1000 LUTs sau tổng hợp, tính cả DSP | Đọc Fitter Resource Usage Quartus (ALUT + DSP); kỳ vọng vài nghìn ALUT + 12–24 DSP |
 | R3 | Deploy trên kit DE10 | DE10-Standard, tích hợp vào GHRD Terasic |
 
@@ -91,6 +91,7 @@ sw/        ví dụ mã HPS (driver /dev/mem) — tham khảo cho nhóm implemen
 - D15 Bus: Avalon-MM slave 32 bit, có byteenable, readLatency 2, không waitrequest/burst; conduit trạng thái cho LED. Cắm được vào cả hệ thống JTAG master lẫn GHRD.
 - D16 Đường demo chính: JTAG + System Console, hệ thống không HPS; GHRD + Linux là mở rộng tuỳ chọn.
 - D17 Phân vai: Chau làm `smx_core` (gồm CSR + buffer, cổng `acc_*`), **ưu tiên lõi trước**; wrapper `smx_avalon`, `_hw.tcl`, Platform Designer, script demo thuộc nhóm implement.
+- D18 Target workload duy nhất: softmax trong MHSA của **DeiT-Tiny** (`deit_tiny_patch16_224`, ImageNet-1k; L = 197, 3 head × 12 layer). Chỉ softmax là integer, phần còn lại FP32 trên host; scale S theo (layer, head). Đánh giá E1–E3 và phương án đã loại: `docs/spec/target-workload.md`. Không đổi requirements v1.0.
 
 **Chốt v1.0 (Chau duyệt 2026-10-31)** — chi tiết trong `docs/requirements.md` và `docs/spec/architecture.md`
 - B1 Đầu vào INT8 có dấu, đầu ra UINT8 scale 1/256.
@@ -129,6 +130,9 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 | A4 | X/Y tách riêng | [TL] SoftGen [6]: đánh đổi diện tích–tính linh hoạt khi lưu dữ liệu trung gian; [TK] ưu tiên khả năng debug |
 | A5 | Tham số P, quét 4/8/16 | [TL] SoftGen [6]: generator tham số hoá để khám phá không gian thiết kế; [TK] |
 | — | Ước lượng ~16 DSP, ~176 chu kỳ/hàng, rủi ro timing vòng tích luỹ | [TK] chưa đo; thay bằng số liệu Quartus/mô phỏng khi có |
+| D18 | DeiT-Tiny: 197 token, 3 head, 12 layer, ~5M tham số | [TL] DeiT [13] — cần đối chiếu; [ĐC] trọng số `timm` |
+| D18 | Không cần mask, có mốc integer-only trên cùng mô hình | [TL] I-ViT [4] báo cáo DeiT-T; [TK] ViT không dùng attention mask → khớp B6 |
+| D18 | ~98 chu kỳ/hàng, ~58k chu kỳ và ~231 KiB JTAG mỗi layer mỗi ảnh | [TK] suy từ ước lượng `architecture.md` mục 3; đo bằng `CYCLE_CNT` và băng thông JTAG thật |
 
 ## 8. Kế hoạch
 
@@ -140,7 +144,7 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 | 5 | 11-16 → 11-22 | RTL lõi | `smx_ctrl`, `smx_csr`, buffer, datapath 2 lượt; `smx_core` khớp golden trên vector ngẫu nhiên qua cổng `acc_*` |
 | 6 | 11-23 → 11-29 | Tổng hợp lõi | project `syn/` cho `smx_core`, timing ≥ 100 MHz, báo cáo tài nguyên, quét P (nhóm implement song song làm wrapper + hệ thống JTAG) |
 | 7 | 11-30 → 12-06 | Tích hợp | sửa lỗi từ verify, hỗ trợ nhóm implement chạy trên board |
-| 8 | 12-07 → 12-13 | Đo đạc | quét P, N_SEG, L; số liệu tài nguyên/Fmax/latency; so sánh thuật toán |
+| 8 | 12-07 → 12-13 | Đo đạc | quét P, N_SEG, L; số liệu tài nguyên/Fmax/latency; so sánh thuật toán; đánh giá DeiT-Tiny E1–E3 (`target-workload.md` mục 5) |
 | 9 | 12-14 → 12-21 | Báo cáo + demo | phần kiến trúc và phân tích |
 
 ## 9. Câu hỏi còn mở
@@ -150,7 +154,7 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 - [ ] Ngày nộp chính xác, có báo cáo giữa kỳ không?
 - [ ] Nhóm verify dùng ModelSim Starter hay Questa?
 - [ ] Bản GHRD/hệ thống nhóm implement dùng có sẵn JTAG to Avalon Master Bridge không (nếu tự dựng hệ thống tối giản thì thêm IP này).
-- [ ] Nhóm implement cần nguồn vector demo nào: ngẫu nhiên, hay điểm attention trích từ một mô hình nhỏ (ví dụ một lớp BERT/ViT đã lượng tử hoá)?
+- [x] Nguồn vector demo: điểm attention trích từ DeiT-Tiny (D18, 2026-10-31). Câu hỏi mở còn lại của workload (tập dữ liệu, cách hiệu chuẩn S, layer demo, băng thông JTAG): `docs/spec/target-workload.md` mục 8.
 
 ## 10. Nhật ký
 
@@ -161,6 +165,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 - 2026-10-31: Chau duyệt B1–B7, A1–A5 → requirements **v1.0** (đóng băng giao diện, HW_PARAM VERSION = 0x10). Thêm bảng nguồn cho từng quyết định (mục 7.1).
 
 - 2026-10-31: Thiết lập quy trình thiết kế có cổng duyệt (research → architecture → block doc → duyệt → RTL + unit test → tích hợp → tổng hợp): mẫu `docs/spec/blocks/_TEMPLATE.md`, bảng trạng thái `docs/spec/blocks/README.md`, lệnh `/block-doc`, `/block-rtl`. Gộp `smx_xbuf/ybuf` thành một module `smx_buf` dùng hai lần.
+
+- 2026-10-31: Chốt D18 — target workload duy nhất là DeiT-Tiny (Chau duyệt). Cân nhắc 7 phương án (DeiT-Tiny, ViT tự train CIFAR-10, DistilBERT SST-2, BERT/I-BERT, GPT-2 decode, Swin-T, KWT); chọn DeiT-Tiny vì khớp v1.0 nguyên trạng (không mask, L = 197), có mốc I-ViT. Viết `docs/spec/target-workload.md`; thêm DeiT [13] vào tham khảo survey. Requirements và VERSION không đổi. Đóng câu hỏi nguồn vector demo.
 
 ## 11. Tài liệu tham khảo chính
 

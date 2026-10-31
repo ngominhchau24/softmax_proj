@@ -182,3 +182,4 @@ Mỗi lane: bộ trừ 9 bit, bộ nhân scale, bộ dịch ~24 bit, PWL (ROM nh
 10. "Approximate Attention Weighting for Sustainable FPGA-Based Vision Transformer Inference", arXiv:2607.01798, 2026. https://www.emergentmind.com/papers/2607.01798
 11. "Recent Developments in Transformer Inference Deployment on FPGA Platforms: A Survey", arXiv:2609.01212, 2026. https://arxiv.org/pdf/2609.01212
 12. B. Yuan, "Efficient hardware architecture of softmax layer in deep neural network", SOCC 2016 (tham khảo qua [6]).
+13. H. Touvron, M. Cord, M. Douze, F. Massa, A. Sablayrolles, H. Jégou, "Training data-efficient image transformers & distillation through attention" (DeiT), ICML 2021. https://arxiv.org/abs/2012.12877 — mô hình target của project (D18, `docs/spec/target-workload.md`).

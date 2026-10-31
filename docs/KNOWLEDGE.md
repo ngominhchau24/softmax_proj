@@ -7,6 +7,7 @@
 - BTL môn Cấu trúc phần cứng cho giải thuật học máy, nhóm 6. Hạn ≈ **2026-12-21**.
 - IP Avalon-MM slave 32 bit trên DE10-Standard (Cyclone V 5CSXFC6D6F31C6), Quartus Prime Lite 18.1.
 - Tính softmax theo hàng cho điểm attention INT8 → UINT8 (scale 1/256).
+- **Target workload (D18): DeiT-Tiny** — softmax trong MHSA, L = 197, 3 head × 12 layer, một hàng = một query của một head, một lần chạy = một head (một K). Chỉ softmax là integer, phần còn lại FP32 trên host. Độ chính xác toàn mạng đo bằng golden model; board chạy một layer hardware-in-the-loop. Chi tiết: `docs/spec/target-workload.md`.
 - **Chau** làm lõi `smx_core` (CSR, X_BUF, Y_BUF, controller, datapath). **Ưu tiên lõi trước.** Wrapper `smx_avalon`, `ip/smx_hw.tcl`, Platform Designer và script System Console thuộc nhóm implement — không tự viết.
 - Verification do nhóm khác làm, dùng golden model làm scoreboard.
 - Không đưa GEMM, convolution hay "activation accelerator" vào trọng tâm (trùng nhóm 1, 2, 5, 7, 8, 9).
@@ -83,7 +84,7 @@ Môi trường Python: `source ~/venvs/ml/bin/activate` (xem `setup` ở thư m�
 - Ngày nộp chính xác; có báo cáo giữa kỳ không?
 - Nhóm verify dùng ModelSim Starter hay Questa?
 - Nhóm implement có dùng JTAG to Avalon Master Bridge trong hệ thống không?
-- Nguồn vector demo: ngẫu nhiên hay điểm attention từ một mô hình nhỏ đã lượng tử hoá?
+- Workload DeiT-Tiny: tập dữ liệu đánh giá, cách hiệu chuẩn S, layer chạy trên board (`target-workload.md` mục 8).
 
 ## 9. Đọc tài liệu gốc khi nào
 
@@ -91,4 +92,5 @@ Môi trường Python: `source ~/venvs/ml/bin/activate` (xem `setup` ở thư m�
 - `docs/requirements.md`: REQ-* đầy đủ, bản đồ thanh ghi chi tiết, kịch bản verify (REQ-VER-02).
 - `docs/spec/architecture.md`: sơ đồ top, FSM, điểm găng timing.
 - `docs/spec/integration-notes.md`: bàn giao cho nhóm implement.
+- `docs/spec/target-workload.md`: DeiT-Tiny — ánh xạ lên smx, lượng tử hoá điểm, kế hoạch đánh giá E1–E3, phương án đã loại.
 - `docs/research/softmax-survey.md`: lý do chọn kiến trúc. `docs/archive/` không dùng làm định hướng.
