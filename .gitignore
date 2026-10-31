@@ -16,3 +16,33 @@ datasets/
 # Output tạm
 *.log
 .DS_Store
+
+# Quartus
+syn/db/
+syn/incremental_db/
+syn/output_files/
+syn/qdb/
+syn/*.qws
+syn/*_assignment_defaults.qdf
+*.sof
+*.rbf
+*.smsg
+*.summary
+*.rpt
+!syn/reports/*.rpt
+
+# Platform Designer generated
+*.sopcinfo
+**/.qsys_edit/
+
+# ModelSim / Questa
+work/
+transcript
+vsim.wlf
+*.vstf
+modelsim.ini
+
+# Harness và file gốc cục bộ (không đưa lên git)
+CLAUDE.md
+.claude/
+instruction/

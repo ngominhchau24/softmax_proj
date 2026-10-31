@@ -1,0 +1,11 @@
+\section{Kết luận và hướng phát triển}
+
+\subsection{Kết luận}
+
+Đề tài đã xác định được thuật toán softmax nguyên thuần cho attention, với đặc tả số học bit-exact, golden model kiểm được và giao diện đóng băng ở phiên bản 1.0. Lựa chọn cơ số 2, IntMax, PWL 8 đoạn và tính lại $E$ ở lượt hai là các điểm mấu chốt giúp datapath không cần hàm log và chỉ có một phép chia mỗi hàng.
+
+Phần hiện thực RTL và đánh giá tài nguyên đang tiến hành theo lộ trình đã đặt. Kết quả đến thời điểm này là thiết kế và đặc tả, chưa có số liệu tổng hợp hay mô phỏng.
+
+\subsection{Hướng phát triển}
+
+Các hướng tiếp theo gồm: hoàn thành RTL và unit test cho từng khối; tích hợp \texttt{smx\_core} và kiểm thử qua cổng \texttt{acc\_*}; tổng hợp để đo tài nguyên và Fmax; quét $P$ và $N_{\text{SEG}}$; và chạy trên board qua System Console. Mở rộng tuỳ chọn gồm masking và hàm sigmoid, GELU khi lõi đã hoàn thiện.

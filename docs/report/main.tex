@@ -1,0 +1,79 @@
+% Báo cáo BTL — smx: Integer-Only Softmax Accelerator
+% Biên dịch bằng XeLaTeX (hỗ trợ tiếng Việt và font Times New Roman):
+%   cd docs/report && xelatex main.tex && xelatex main.tex
+
+\documentclass[12pt,a4paper]{article}
+
+% ---------- Lề trang ----------
+\usepackage[left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+
+% ---------- Font: Times New Roman (fallback Liberation Serif, cùng metric) ----------
+\usepackage{fontspec}
+\IfFontExistsTF{Times New Roman}
+  {\setmainfont{Times New Roman}}
+  {\setmainfont{Liberation Serif}}
+
+% ---------- Cỡ chữ 13pt (class article không có sẵn 13pt) ----------
+\makeatletter
+\renewcommand\normalsize{%
+  \@setfontsize\normalsize{13pt}{16pt}%
+  \abovedisplayskip=11pt plus 2pt minus 4pt
+  \belowdisplayskip=\abovedisplayskip
+}
+\makeatother
+\normalsize
+
+% ---------- Giãn dòng 1.5, đoạn: before 6pt, after 0 ----------
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{1.25cm}
+
+% ---------- Tiện ích ----------
+\usepackage{graphicx}
+\graphicspath{{../figures/}}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+% Tiêu đề chương (\section) và mục (\subsection)
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont\centering}
+  {Chương \thesection.}{0.5em}{\MakeUppercase}
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont}
+  {\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{6pt}{0pt}
+
+\begin{document}
+
+% ---------- Trang bìa ----------
+\begin{titlepage}
+\begin{center}
+\textbf{BÁO CÁO BÀI TẬP LỚN}\\[0.3em]
+Môn: Cấu trúc phần cứng cho giải thuật học máy\\[0.3em]
+Nhóm 6\\[3em]
+\textbf{THIẾT KẾ VÀ HIỆN THỰC FPGA BỘ TĂNG TỐC SOFTMAX NGUYÊN THUẦN\\CHO ATTENTION TRANSFORMER}\\[0.3em]
+\textit{Design and FPGA Implementation of an Integer-Only Softmax Accelerator for Transformer Attention}\\[4em]
+Sinh viên thực hiện: [Họ và tên]\\[1em]
+Giảng viên hướng dẫn: [Họ và tên]\\[4em]
+Thành phố Hồ Chí Minh, 2026
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\input{chapters/01-gioi-thieu}
+\input{chapters/02-co-so-khao-sat}
+\input{chapters/03-dac-ta-so-hoc}
+\input{chapters/04-kien-truc}
+\input{chapters/05-thiet-ke-khoi}
+\input{chapters/06-kiem-thu}
+\input{chapters/07-tong-hop-danh-gia}
+\input{chapters/08-ket-luan}
+
+\input{chapters/99-tai-lieu-tham-khao}
+
+\end{document}

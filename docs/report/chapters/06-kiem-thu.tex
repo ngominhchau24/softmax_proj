@@ -1,0 +1,25 @@
+\section{Kế hoạch kiểm thử}
+
+\subsection{Golden model làm scoreboard}
+
+Golden model \texttt{softmax\_row} là chuẩn so sánh. Mọi kết quả RTL phải khớp bit-exact trên từng hàng. Vector kiểm thử được sinh từ golden model và lưu trong thư mục \texttt{tb/vectors/}.
+
+\subsection{Kịch bản tối thiểu}
+
+Các kịch bản bắt buộc gồm:
+\begin{itemize}
+  \item Độ dài $L = 1$, $L = P$, $L = P \pm 1$ và $L = L_{\max}$.
+  \item Số hàng $R = 1$ và $R = R_{\max}$.
+  \item Hệ số $K = 0$, $K = 1$ và $K = 65535$.
+  \item Hàng toàn $-128$, toàn $127$, đồng nhất, và one-hot ở cực trị.
+  \item Hàng có max nằm ở nhóm cuối, để kiểm tra phép dịch hiệu chỉnh.
+  \item Vector ngẫu nhiên.
+\end{itemize}
+
+\subsection{Khẳng định}
+
+Các khẳng định đề xuất cho nhóm verification gồm: lệnh START khi BUSY bị bỏ qua; DONE chỉ lên sau khi BUSY xuống; LEN hoặc ROWS ngoài khoảng làm ERR lên; không có X hoặc Z trên đường đọc khi \texttt{readdatavalid}.
+
+\subsection{Kết quả kiểm thử}
+
+Chưa có kết quả mô phỏng tại thời điểm viết báo cáo. Kết quả từng khối sẽ được ghi sau khi unit test chạy trên ModelSim hoặc Questa.

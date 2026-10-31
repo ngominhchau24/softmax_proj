@@ -1,0 +1,31 @@
+\section{Tổng hợp và đánh giá}
+
+\subsection{Mục tiêu đánh giá}
+
+Đánh giá gồm bốn nhóm số liệu: tài nguyên (ALUT, DSP, M10K), tần số tối đa (Fmax), độ trễ mỗi hàng và số chu kỳ đo được qua \texttt{CYCLE\_CNT}. Ngoài ra có thể quét tham số $P$ và $N_{\text{SEG}}$.
+
+\subsection{Tài nguyên và tần số}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Chỉ số & Mục tiêu & Kết quả \\
+\midrule
+ALUT + DSP   & $> 1000$ & [Chưa đo] \\
+Số DSP       & 12--24   & [Chưa đo] \\
+Fmax         & $\ge 100$ MHz & [Chưa đo] \\
+Độ trễ mỗi hàng ($L = 512$, $P = 8$) & $\le 192$ chu kỳ & [Chưa đo] \\
+\bottomrule
+\end{tabular}
+\caption{Mục tiêu và kết quả tổng hợp (điền sau khi có báo cáo Quartus).}
+\label{tab:synth}
+\end{table}
+
+\subsection{Quét tham số}
+
+Mục tiêu quét gồm $P \in \{4, 8, 16\}$ và $N_{\text{SEG}} \in \{4, 8, 16\}$, cùng độ dài $L$ thay đổi. Kết quả sẽ được trình bày bằng bảng và đồ thị lưu trong \texttt{docs/figures/}.
+
+\subsection{Đánh giá ban đầu}
+
+Các số liệu về sai số đã có từ golden model, được nêu ở Chương 3. Các số liệu về tài nguyên, tần số và độ trễ chỉ là ước lượng thiết kế và sẽ được thay bằng số đo thật.

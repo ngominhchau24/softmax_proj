@@ -1,0 +1,30 @@
+\section{Cơ sở lý thuyết và khảo sát}
+
+\subsection{Softmax theo hàng}
+
+Với một hàng $x = (x_0, \dots, x_{L-1})$, softmax cho
+\begin{equation}
+  y_i = \frac{e^{x_i}}{\sum_{k=0}^{L-1} e^{x_k}}, \qquad i = 0, \dots, L-1.
+\end{equation}
+Để ổn định số học thường trừ đi giá trị lớn nhất trước khi lấy mũ. Trên phần cứng, hai khó khăn chính là hàm mũ và phép chia.
+
+\subsection{Chuẩn hoá trực tuyến}
+
+Milakov và Gimelshein \cite{milakov2018} đề xuất tính max và tổng mũ trong cùng một lượt quét, cập nhật tổng khi max thay đổi bằng hệ số $e^{M_{\text{cũ}}-M_{\text{mới}}}$. Thuật toán này giảm số lượt quét từ ba xuống hai, với điều kiện có cách hiệu chỉnh hệ số đó.
+
+\subsection{Các hướng softmax nguyên thuần}
+
+I-BERT \cite{kim2021ibert} đưa toàn bộ suy luận Transformer về số nguyên, dùng đa thức xấp xỉ cho hàm mũ. Softermax \cite{stevens2021softermax} dùng cơ số 2, max nguyên và PWL cho $2^{F}$. I-ViT và Shiftmax \cite{li2023ivit} dùng dịch bit để hiệu chỉnh hệ số. SoftGen \cite{wei2020softgen} là bộ sinh tham số hoá, cho thấy tính lại phép trừ trên bộ nhớ on-chip giữ diện tích ổn định. SOLE \cite{wang2025sole} và các nghiên cứu log-sum-exp \cite{wang2018lse} khảo sát thêm các dạng xấp xỉ khác.
+
+\subsection{Lựa chọn của đề tài}
+
+Từ khảo sát, đề tài chọn:
+\begin{itemize}
+  \item Cơ số 2 với hệ số $K = S \cdot \log_2 e$ do phần mềm tính sẵn, nên phần cứng không cần biết $S$ và không cần hàm log.
+  \item IntMax để max lấy trên $\lceil u \rceil$, khiến hiệu chỉnh tổng chỉ là phép dịch.
+  \item PWL 8 đoạn cho $2^{F}$, đủ để sai số xấp xỉ nằm dưới sai số lượng tử hoá đầu ra.
+  \item Một bộ chia tuần tự cho mỗi hàng, mỗi phần tử chỉ một phép nhân.
+  \item Tính lại $E$ ở lượt hai từ bộ đệm đầu vào, thay vì lưu trung gian.
+\end{itemize}
+
+Chi tiết từng lựa chọn và nguồn gốc số liệu được ghi trong bảng nguồn của tài liệu thiết kế. Các số liệu đo bằng golden model được đánh dấu riêng với các số liệu ước lượng thiết kế.

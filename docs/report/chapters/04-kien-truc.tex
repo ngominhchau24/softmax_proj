@@ -1,0 +1,59 @@
+\section{Kiến trúc hệ thống}
+
+\subsection{Sơ đồ tổng thể}
+
+Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi lộ ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*} với độ trễ đọc cố định 2 chu kỳ và không có stall.
+
+Luồng dữ liệu của một hàng:
+\begin{enumerate}
+  \item Lượt 1 đọc $X$ theo nhóm 8 phần tử, qua nhân $K$, IntMax, $E(d)$ và cây cộng, để ra $\mathit{sum}$ và $M$.
+  \item Bộ chia tính $\mathit{Rcp}$ từ $\mathit{sum}$.
+  \item Lượt 2 đọc lại $X$, tính lại $E$, nhân với $\mathit{Rcp}$, làm tròn, bão hoà và ghi vào $Y$.
+\end{enumerate}
+
+\subsection{Giao diện}
+
+IP là Avalon-MM slave dữ liệu 32 bit, địa chỉ theo word, không burst và không \texttt{waitrequest}. Độ trễ đọc là 2 chu kỳ. Phần mềm poll bit \texttt{DONE}, không dùng ngắt. Có conduit trạng thái gồm \texttt{status\_busy}, \texttt{status\_done} và \texttt{status\_err} để nối LED khi demo.
+
+Hai kiểu hệ thống được hỗ trợ:
+\begin{itemize}
+  \item Đường demo chính: không dùng HPS, master là JTAG to Avalon Master Bridge, điều khiển từ PC bằng System Console.
+  \item Đường tuỳ chọn: GHRD Terasic, master là cầu HPS-to-FPGA.
+\end{itemize}
+
+\subsection{Bản đồ thanh ghi}
+
+Bảng \ref{tab:regmap} tóm tắt bản đồ thanh ghi, offset tính theo byte.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+Offset & Tên & Truy cập & Nội dung \\
+\midrule
+0x0000 & CTRL      & W   & Bit 0: START (tự xoá) \\
+0x0004 & STATUS    & R   & BUSY, DONE, ERR \\
+0x0008 & LEN       & R/W & Độ dài hàng $L$, 1..512 \\
+0x000C & ROWS      & R/W & Số hàng $R$, 1..16 \\
+0x0010 & SCALE\_K  & R/W & Hệ số $K$ (UQ0.16) \\
+0x0014 & CYCLE\_CNT & R  & Số chu kỳ từ START đến DONE \\
+0x0018 & HW\_PARAM & R   & $P$, $\log_2 L_{\max}$, $R_{\max}$, $\log_2 N_{\text{SEG}}$, VERSION \\
+0x2000--0x3FFF & X\_BUF & R/W & INT8, hàng $r$ phần tử $i$ tại byte $r \cdot 512 + i$ \\
+0x4000--0x5FFF & Y\_BUF & R   & UINT8, cùng bố trí \\
+\bottomrule
+\end{tabular}
+\caption{Bản đồ thanh ghi của IP (rút gọn từ đặc tả).}
+\label{tab:regmap}
+\end{table}
+
+\subsection{Trình tự phần mềm}
+
+Phần mềm thực hiện các bước sau: tính $K$ và ghi vào \texttt{SCALE\_K}; ghi $R$ hàng vào X\_BUF; ghi \texttt{LEN} và \texttt{ROWS}; ghi START; poll STATUS đến khi DONE; đọc Y\_BUF và có thể đọc CYCLE\_CNT để đo.
+
+% Hình minh hoạ: đặt file PDF/SVG trong docs/figures/ rồi bỏ comment.
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[width=0.9\textwidth]{arch_top.pdf}
+%   \caption{Sơ đồ khối tổng thể của smx.}
+%   \label{fig:arch}
+% \end{figure}

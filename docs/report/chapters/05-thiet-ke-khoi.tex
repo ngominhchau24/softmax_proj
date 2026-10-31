@@ -1,0 +1,37 @@
+\section{Thiết kế các khối}
+
+Lõi được chia thành mười khối, thiết kế theo thứ tự phụ thuộc. Mỗi khối sẽ có một tài liệu thiết kế riêng và phải được duyệt trước khi viết RTL. Trạng thái tại thời điểm viết báo cáo được tóm tắt trong Bảng \ref{tab:blocks}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{clll}
+\toprule
+\# & Khối & Vai trò & Trạng thái \\
+\midrule
+1  & \texttt{smx\_exp2}    & $d \to E$, PWL và dịch & TODO \\
+2  & \texttt{smx\_scale}   & $u = q \cdot K$, $c = \lceil u \rceil$ & TODO \\
+3  & \texttt{smx\_maxtree} & $M_g$ và cập nhật $M$ & TODO \\
+4  & \texttt{smx\_sumacc}  & Cây cộng và tích luỹ có dịch & TODO \\
+5  & \texttt{smx\_divider} & $\lfloor 2^{40} / \mathit{sum} \rfloor$ tuần tự & TODO \\
+6  & \texttt{smx\_norm}    & $E \cdot \mathit{Rcp}$, làm tròn, bão hoà & TODO \\
+7  & \texttt{smx\_buf}     & Hai bank 32 bit, byte-enable & TODO \\
+8  & \texttt{smx\_csr}     & Thanh ghi, START/DONE/ERR & TODO \\
+9  & \texttt{smx\_ctrl}    & FSM hàng và lượt & TODO \\
+10 & \texttt{smx\_core}    & Nối các khối & TODO \\
+\bottomrule
+\end{tabular}
+\caption{Danh sách khối và trạng thái thiết kế.}
+\label{tab:blocks}
+\end{table}
+
+\subsection{Khối số học}
+
+Khối \texttt{smx\_exp2} là khối phức tạp nhất về số học, vì phải khớp bit-exact với bảng PWL và phép dịch. Khối \texttt{smx\_sumacc} nằm trên đường găng về timing vì có vòng phản hồi qua $M$ và $\mathit{sum}$. Khối \texttt{smx\_divider} là bộ chia tuần tự radix-2, ước lượng khoảng 28 chu kỳ mỗi hàng.
+
+\subsection{Khối lưu trữ và điều khiển}
+
+Hai bộ đệm X và Y dùng chung một module \texttt{smx\_buf}, mỗi bộ gồm hai bank 32 bit $\times$ 1024. Khối \texttt{smx\_ctrl} điều khiển thứ tự hàng, lượt, địa chỉ và mặt nạ lane.
+
+\subsection{Kết quả thiết kế}
+
+Chưa có kết quả RTL và mô phỏng tại thời điểm viết báo cáo. Các số liệu tài nguyên và độ trễ sẽ được điền sau khi có báo cáo từ Quartus và mô phỏng thật.

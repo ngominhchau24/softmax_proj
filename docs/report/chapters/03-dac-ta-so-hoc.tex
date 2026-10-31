@@ -1,0 +1,54 @@
+\section{Đặc tả thuật toán và số học}
+
+Các công thức dưới đây khớp với golden model \texttt{model/softmax\_ref.py}. Khi có mâu thuẫn, golden model là nguồn chân lý.
+
+\subsection{Đầu vào và hệ số $K$}
+
+Đầu vào $q$ là INT8 có dấu. Giá trị thực là $x = S \cdot q$, với $S$ là scale lượng tử hoá của điểm attention. Hệ số
+\begin{equation}
+  K = \operatorname{round}(S \cdot \log_2 e \cdot 2^{16}),
+\end{equation}
+là số nguyên không dấu 16 bit (UQ0.16), được phần mềm tính và ghi vào thanh ghi \texttt{SCALE\_K}. Ràng buộc $0 < S < 0{,}693$ để $K$ vừa 16 bit.
+
+\subsection{Số mũ cơ số 2}
+
+Với $u_k = q_k \cdot K$ (25 bit, Q8.16) và $c_k = \lceil u_k / 2^{16} \rceil$ (9 bit có dấu), hàm $E(d)$ với $d \le 0$ được tính như sau. Đặt $I = d \gg 16$, $F = d \,\&\, \text{0xFFFF}$, chỉ số đoạn $\mathit{idx} = F \gg 13$ và phần dư $r = F \,\&\, \text{0x1FFF}$ với $N_{\text{SEG}} = 8$. Khi đó
+\begin{align}
+  E_0 &= C[\mathit{idx}] + \left((\tilde{M}[\mathit{idx}] \cdot r) \gg 13\right), \\
+  E   &= \begin{cases} 0, & -I > 15, \\ E_0 \gg (-I), & \text{ngược lại,} \end{cases}
+\end{align}
+trong đó $E_0$ là số UQ1.15 16 bit, $C[i] = \operatorname{round}(2^{i/N} \cdot 2^{15})$ và $\tilde{M}[i] = \operatorname{round}((2^{(i+1)/N} - 2^{i/N}) \cdot 2^{15})$. Hai bảng này được sinh bằng \texttt{python3 model/softmax\_ref.py --gen-pwl 8}.
+
+\subsection{Lượt 1: chuẩn hoá trực tuyến với IntMax}
+
+Duyệt các nhóm $g = 0, 1, \dots$ gồm $P = 8$ phần tử liên tiếp theo thứ tự tăng dần. Với nhóm $g$, $M_g = \max_k c_k$. Cập nhật
+\begin{align}
+  M_{\text{mới}} &= \begin{cases} M_g, & g = 0, \\ \max(M, M_g), & g > 0, \end{cases} \\
+  \mathit{sum} &\leftarrow \left(\mathit{sum} \gg (M_{\text{mới}} - M)\right) + \sum_{k \in g} E(u_k - M_{\text{mới}} \cdot 2^{16}), \\
+  M &\leftarrow M_{\text{mới}}.
+\end{align}
+Thứ tự nhóm và phép dịch cắt bỏ là một phần của đặc tả, vì chúng ảnh hưởng đến kết quả bit-exact.
+
+\subsection{Nghịch đảo}
+
+Sau lượt 1, $\mathit{sum} \ge 2^{14}$ và
+\begin{equation}
+  \mathit{Rcp} = \left\lfloor \frac{2^{40}}{\mathit{sum}} \right\rfloor,
+\end{equation}
+là số không dấu 27 bit. Phép chia này được thực hiện bằng bộ chia radix-2 tuần tự.
+
+\subsection{Lượt 2: chuẩn hoá đầu ra}
+
+Với mỗi $k < L$, tính lại $e = E(u_k - M \cdot 2^{16})$, trong đó $M$ là giá trị cuối của lượt 1, rồi
+\begin{equation}
+  y_k = \min\left(255, \; \frac{e \cdot \mathit{Rcp} + 2^{31}}{2^{32}}\right),
+\end{equation}
+với phép chia là dịch phải số học. Giá trị thực của đầu ra là $y_k / 256$. Trường hợp xác suất bằng 1 không biểu diễn được và được bão hoà về 255.
+
+\subsection{Sai số}
+
+Golden model được kiểm trên hàng ngẫu nhiên $L = 128$ với $S \in \{0{,}02;\, 0{,}0625;\, 0{,}2\}$. Sai số tuyệt đối tối đa so với softmax float64 khoảng $0{,}00195$ đến $0{,}0020$ với $N_{\text{SEG}} = 8$, tức bằng nửa LSB đầu ra. Sai số của xấp xỉ PWL theo số đoạn là $0{,}376\%$, $0{,}094\%$ và $0{,}025\%$ với 4, 8 và 16 đoạn. Với 8 đoạn, sai số xấp xỉ đã nằm dưới sàn lượng tử hoá UINT8, nên lượng tử hoá là yếu tố chi phối.
+
+\subsection{Giới hạn độ dài và độ chính xác}
+
+Độ dài hàng tối đa $L_{\max} = 512$. Số hàng tối đa $R_{\max} = 16$. Các giá trị này xuất hiện trong thanh ghi \texttt{HW\_PARAM} để phần mềm kiểm tra.
