@@ -5,3 +5,4 @@
 ../rtl/core/smx_scale.sv
 ../rtl/core/smx_sumacc.sv
 ../rtl/core/smx_divider.sv
+../rtl/core/smx_maxtree.sv
