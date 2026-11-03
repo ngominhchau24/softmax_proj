@@ -1,0 +1,17 @@
+{
+  "signal": [
+    { "name": "clk",     "wave": "p........." },
+    ["write",
+      { "name": "wr_en",   "wave": "0.1.0....." },
+      { "name": "wr_addr", "wave": "x.=.x.....", "data": ["A"] },
+      { "name": "wr_data", "wave": "x.=.x.....", "data": ["D"] }
+    ],
+    ["read",
+      { "name": "rd_addr", "wave": "x=.==.=x..", "data": ["B", "A", "C", "B"] },
+      { "name": "rd_data", "wave": "x.=.==.=x.", "data": ["mem[B]", "D (new)", "mem[C]", "mem[B]"] }
+    ]
+  ],
+  "head": { "text": "smx_buf: BUF_LAT = 1; a word written in cycle 2 is read back with rd_addr = A in cycle 3 and appears on rd_data in cycle 4" },
+  "foot": { "text": "rd_data[b] is registered: address in cycle n, data in cycle n+1; same-cycle read of the address being written is not specified" },
+  "config": { "hscale": 1 }
+}
