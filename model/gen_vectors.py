@@ -6,9 +6,14 @@ All arithmetic comes from model/softmax_ref.py (imported). This file only picks
 stimulus and writes files; it must never re-implement the arithmetic.
 
 Usage (from the repo root):
-  python3 model/gen_vectors.py exp2 [--n-seg 8] [--out DIR] [--seed 1] [--t1-step 1]
+  python3 model/gen_vectors.py <block> [--p 8] [--n-seg 8] [--out DIR] [--seed 1]
 
-exp2 writes DIR/t1.hex .. t4.hex (default DIR = tb/vectors/smx_exp2/n<N_SEG>),
+<block> is exp2 (below) or any model/vec_<block>.py, found automatically. Such a
+module defines gen(args), and optionally add_args(parser) for extra options; it
+imports softmax_ref for all arithmetic.
+The default DIR is tb/vectors/smx_<block>/p<P>_n<N_SEG>. DIR/.done is written last.
+
+exp2 also takes [--t1-step 1], and writes DIR/t1.hex .. t4.hex,
 test sets T1..T4 of docs/spec/blocks/smx_exp2.md section 8:
   t1  exhaustive d in [-17*2^16, 0], each d split into a random legal (u, M)
   t2  random (q, K, M) over the full legal range, with ~30 % bubbles (valid = 0)
@@ -18,6 +23,8 @@ Line format, hex, two's complement at port width:  valid en u[24:0] m[8:0] e[15:
 Lines starting with '#' are comments.
 """
 import argparse
+import glob
+import importlib
 import os
 import random
 import sys
@@ -124,15 +131,37 @@ def gen_exp2(n_seg, out, seed, t1_step):
     print(f"wrote {out}: " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 
 
+def add_common(p):
+    p.add_argument("--p", type=int, default=8, choices=(4, 8, 16))
+    p.add_argument("--n-seg", type=int, default=8, choices=(4, 8, 16))
+    p.add_argument("--out", default=None)
+    p.add_argument("--seed", type=int, default=1)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="block", required=True)
     p = sub.add_parser("exp2", help="vectors for tb/tb_smx_exp2.sv")
-    p.add_argument("--n-seg", type=int, default=8, choices=(4, 8, 16))
-    p.add_argument("--out", default=None)
-    p.add_argument("--seed", type=int, default=1)
+    add_common(p)
     p.add_argument("--t1-step", type=int, default=1,
                    help="stride over d in T1 (1 = exhaustive; larger = quick run)")
+    # Import only the requested module, so a broken sibling cannot stop other blocks
+    here = os.path.dirname(os.path.abspath(__file__))
+    mod = None
+    for path in sorted(glob.glob(os.path.join(here, "vec_*.py"))):
+        name = os.path.basename(path)[len("vec_"):-len(".py")]
+        p = sub.add_parser(name, help=f"vectors for tb/tb_smx_{name}.sv")
+        add_common(p)
+        if len(sys.argv) > 1 and sys.argv[1] == name:
+            mod = importlib.import_module(f"vec_{name}")
+            if hasattr(mod, "add_args"):
+                mod.add_args(p)
     a = ap.parse_args()
+    a.out = a.out or f"tb/vectors/smx_{a.block}/p{a.p}_n{a.n_seg}"
     if a.block == "exp2":
-        gen_exp2(a.n_seg, a.out or f"tb/vectors/smx_exp2/n{a.n_seg}", a.seed, a.t1_step)
+        gen_exp2(a.n_seg, a.out, a.seed, a.t1_step)
+    else:
+        os.makedirs(a.out, exist_ok=True)
+        mod.gen(a)
+    with open(os.path.join(a.out, ".done"), "w") as f:
+        f.write("done\n")

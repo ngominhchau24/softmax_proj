@@ -85,24 +85,38 @@ def softmax_row(q, K, P=8, n_seg=8, trace=False):
 
     M = None
     s = 0
+    groups = []                     # per-group intermediates, for block-level test vectors
     for g0 in range(0, L, P):
         grp = range(g0, min(g0 + P, L))
         Mg = max(c[k] for k in grp)
         Mnew = Mg if M is None else max(M, Mg)
-        if M is not None:
-            s = s >> (Mnew - M)
-        s += sum(exp2_neg(u[k] - (Mnew << U_FRAC), n_seg, table) for k in grp)
+        dM = 0 if M is None else Mnew - M
+        e_grp = [exp2_neg(u[k] - (Mnew << U_FRAC), n_seg, table) for k in grp]
+        s = group_sum(s, dM, e_grp, M is None)
         M = Mnew
+        groups.append({"Mg": Mg, "M": M, "dM": dM, "E": e_grp, "sum": s})
         if trace:
             print(f"group {g0 // P}: Mg={Mg} M={M} sum={s}")
 
-    R = (1 << RECIP_SHIFT) // s
-    y = []
-    for k in range(L):
-        e = exp2_neg(u[k] - (M << U_FRAC), n_seg, table)
-        v = (e * R + (1 << (OUT_SHIFT - 1))) >> OUT_SHIFT
-        y.append(min(OUT_MAX, v))
-    return y, {"M": M, "sum": s, "R": R}
+    R = reciprocal(s)
+    e_final = [exp2_neg(u[k] - (M << U_FRAC), n_seg, table) for k in range(L)]
+    y = [norm_out(e, R) for e in e_final]
+    return y, {"M": M, "sum": s, "R": R, "u": u, "c": c, "groups": groups, "E": e_final}
+
+
+def group_sum(s, dM, e_grp, first):
+    """One accumulator step of pass 1: (s >> dM) + sum(E), with s ignored on the first group."""
+    return sum(e_grp) if first else (s >> dM) + sum(e_grp)
+
+
+def reciprocal(s):
+    """Rcp = floor(2^RECIP_SHIFT / sum), REQ-ARI-06."""
+    return (1 << RECIP_SHIFT) // s
+
+
+def norm_out(e, R):
+    """y = min(255, (E*Rcp + 2^31) >> 32), REQ-ARI-07 and REQ-ARI-08."""
+    return min(OUT_MAX, (e * R + (1 << (OUT_SHIFT - 1))) >> OUT_SHIFT)
 
 
 def k_from_scale(S):

@@ -173,6 +173,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-03: Thêm flow mô phỏng `sim/` theo cách tổ chức của repo `risc_v` (milestone 2/3): `Makefile`, `compile.f` = `rtl.f` + `tb.f` + `testcase.f`, chọn test bằng `testname`; thay `tb/run_smx_exp2.sh`. Giữ nguyên bố cục `rtl/`, `tb/`. Khác `risc_v`: test fail thì `make` trả lỗi (kiểm `TB_RESULT: PASS`), và chỉ ghi wave khi `WAVE=1`. `smx_exp2` đạt UT-PASS ở N_SEG = 4, 8, 16 trên ModelSim ASE 10.5b. `syn/map_check.sh smx_exp2 N_SEG=4,8,16` đạt (N_SEG = 8: 93 ALUT, 94 thanh ghi, 1 DSP mỗi lane, chỉ Analysis & Synthesis; chưa có số Fitter/Fmax). Ghi cách dùng flow vào `docs/KNOWLEDGE.md` mục 7.
 
+- 2026-11-03: Chau yêu cầu xây các block còn lại bằng nhiều agent, cả tài liệu lẫn RTL, tự thống nhất phần liên block và lưu việc chưa quyết được. Tạo `docs/spec/cross-block.md` (hợp đồng port, latency, FSM, `CYCLE_CNT`), hai reviewer độc lập phản biện bằng mô hình chu kỳ và probe Quartus; `docs/spec/open-decisions.md` là danh sách cho Chau xem. Tài liệu các block mới chưa được duyệt. `SUM_W` 26 → 25; `smx_pkg` thêm latency các block, `ROW_OVERHEAD`, `DM_W`, bỏ `LANE_IDX_W`, `SEG_W`. `softmax_ref.py` thêm số trung gian và tách hàm, số học không đổi (6000 hàng trùng bản cũ). `sim/` hỗ trợ quét P.
+
 ## 11. Tài liệu tham khảo chính
 
 Danh sách đầy đủ ở `docs/research/softmax-survey.md` mục 7. Cốt lõi: Milakov & Gimelshein 2018 (online normalizer); Kim et al., I-BERT, ICML 2021; Stevens et al., Softermax, DAC 2021; Li & Gu, I-ViT/Shiftmax, ICCV 2023; Wei et al., SoftGen, ASAP 2020; Wang et al., log-sum-exp, APCCAS 2018; Wang et al., SOLE, 2025. Tài liệu nền accelerator (Kung 1982, TPU 2017, Eyeriss 2016, Sze 2017, Jacob 2018) ở `docs/archive/gemm-sa-proposal.md` mục tham khảo.

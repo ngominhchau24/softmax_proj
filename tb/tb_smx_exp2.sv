@@ -5,11 +5,12 @@
 // latency (T1..T5 of docs/spec/blocks/smx_exp2.md section 8). Then checks reset
 // in the middle of a stream (T6). Prints "TB_RESULT: PASS" or "TB_RESULT: FAIL".
 //
-// Plusargs: +VECDIR=<dir> (default tb/vectors/smx_exp2/n<N_SEG>)
+// Plusargs: +VECDIR=<dir> (default tb/vectors/smx_exp2/p<P>_n<N_SEG>)
 `timescale 1ns/1ps
 
 module tb_smx_exp2;
 
+  parameter int P     = smx_pkg::P;  // unused, every testbench takes P and N_SEG
   parameter int N_SEG = smx_pkg::N_SEG;
 
   localparam int LAT     = smx_pkg::EXP2_LAT;
@@ -170,7 +171,7 @@ module tb_smx_exp2;
 
   initial begin
     if (!$value$plusargs("VECDIR=%s", vecdir))
-      vecdir = $sformatf("tb/vectors/smx_exp2/n%0d", N_SEG);
+      vecdir = $sformatf("tb/vectors/smx_exp2/p%0d_n%0d", P, N_SEG);
     $display("tb_smx_exp2: N_SEG=%0d EXP2_LAT=%0d VECDIR=%s", N_SEG, LAT, vecdir);
 
     n_in  = 0;

@@ -1,0 +1,3 @@
+# Blocks are built on parallel branches and each adds one line to these lists
+sim/rtl.f       merge=union
+sim/testcase.f  merge=union

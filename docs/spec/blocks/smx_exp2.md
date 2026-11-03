@@ -29,7 +29,7 @@ Không làm: tính `u` hay `c`, tìm max, cộng dồn, chuẩn hoá. Không có
 | `C_W` | 9 | `smx_pkg::C_W` | `M` có dấu |
 | `E_W` | 16 | `smx_pkg::E_W` | `E` UQ1.15 |
 | `EXP_CUTOFF` | 15 | `smx_pkg::EXP_CUTOFF` | cố định 15 vì `E₀ < 2¹⁶` |
-| `EXP2_LAT` (mới) | 3 | thêm vào `smx_pkg` | latency cố định; `smx_ctrl` dùng để căn pipeline (Q2) |
+| `EXP2_LAT` (mới) | 3 | thêm vào `smx_pkg` | latency cố định; `smx_core` dùng để căn pipeline (Q2, `cross-block.md` mục 1) |
 
 ## 3. Giao diện
 
@@ -91,7 +91,7 @@ RTL dùng trực tiếp `s = M − u[24:16] = −I` (lượng dịch), nên khô
 - Trên toàn bộ `d ∈ [−17·2¹⁶, 0]` (1 114 113 điểm, N = 8): `max E = 32768 = 2¹⁵`, đạt duy nhất tại `d = 0`. Với `d ∈ (−2¹⁶, 0]`: `E ≥ 16384`. Tại `I = −15`: `E ≤ 1`; tại `I = −16`: `E = 0` (cutoff).
 - 300 000 cặp `(u, M)` hợp lệ ngẫu nhiên: dạng tách bit ở §4.1 khớp `exp2_neg(u − (M << 16))`, **0 sai khác**.
 
-Hệ quả cho block sau (ghi lại, không quyết ở đây): `E ≤ 2¹⁵` nên `sum ≤ L_MAX·2¹⁵ = 2²⁴` (25 bit); `SUM_W = 26` trong `smx_pkg` dư 1 bit — xem lại khi viết `smx_sumacc`.
+Hệ quả cho block sau (ghi lại, không quyết ở đây): `E ≤ 2¹⁵` nên `sum ≤ L_MAX·2¹⁵ = 2²⁴` (25 bit); `SUM_W` đã giảm từ 26 xuống 25 trong `smx_pkg` (`open-decisions.md` B1).
 
 ### 4.4. Lane không hợp lệ
 
@@ -202,7 +202,7 @@ Số đo một lane từ `syn/map_check.sh` (Quartus 18.1 Lite, chỉ Analysis &
 
 ## 8. Kế hoạch kiểm thử block
 
-Testbench `tb/tb_smx_exp2.sv` đọc file vector `(in_valid, in_en, u_in, m_in, e_expected)` sinh từ golden model, đưa vào DUT 1 vector/chu kỳ và so `e_out` với kỳ vọng khi `out_valid = 1`. Vector sinh bằng script mới `model/gen_vectors.py exp2 --n-seg N` (import `softmax_ref`, không đổi số học của model; Q8) vào `tb/vectors/smx_exp2/n<N>/t1.hex … t4.hex`. Mỗi dòng: `valid en u m e` ở dạng hex (bù hai theo độ rộng port); dòng bắt đầu bằng `#` là chú thích. Chạy cả ba N_SEG: `cd sim && make regress` (mặc định 4 8 16).
+Testbench `tb/tb_smx_exp2.sv` đọc file vector `(in_valid, in_en, u_in, m_in, e_expected)` sinh từ golden model, đưa vào DUT 1 vector/chu kỳ và so `e_out` với kỳ vọng khi `out_valid = 1`. Vector sinh bằng script mới `model/gen_vectors.py exp2 --n-seg N` (import `softmax_ref`, không đổi số học của model; Q8) vào `tb/vectors/smx_exp2/p<P>_n<N>/t1.hex … t4.hex`. Mỗi dòng: `valid en u m e` ở dạng hex (bù hai theo độ rộng port); dòng bắt đầu bằng `#` là chú thích. Chạy cả ba N_SEG: `cd sim && make regress` (mặc định 4 8 16).
 
 | Tập | Nội dung | Số vector |
 |---|---|---|
