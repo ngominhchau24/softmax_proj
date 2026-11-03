@@ -1,0 +1,23 @@
+{
+  "signal": [
+    { "name": "clk",       "wave": "p..........." },
+    ["input",
+      { "name": "in_valid", "wave": "01..01.0...." },
+      { "name": "e_in",     "wave": "x===x==x....", "data": ["Ea", "Eb", "0", "Ed", "Ee"] },
+      { "name": "rcp_in",   "wave": "x=..x=.x....", "data": ["Rcp0", "Rcp1"] }
+    ],
+    {},
+    ["pipe",
+      { "name": "s1_vld_q", "wave": "0.1..01.0..." },
+      { "name": "s2_vld_q", "wave": "0..1..01.0.." }
+    ],
+    {},
+    ["output",
+      { "name": "out_valid", "wave": "0...1..01.0." },
+      { "name": "y_out",     "wave": "x...===x==x.", "data": ["y(a)", "y(b)", "0", "y(d)", "y(e)"] }
+    ]
+  ],
+  "head": { "text": "smx_norm: NORM_LAT = 3, 1 element/cycle, E = 0 -> y_out = 0" },
+  "foot": { "text": "y(x) = min(255, (E_x * Rcp + 2^31) >> 32) = norm_out(E_x, Rcp) in model/softmax_ref.py" },
+  "config": { "hscale": 1 }
+}
