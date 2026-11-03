@@ -1,0 +1,23 @@
+{
+  "signal": [
+    { "name": "clk",     "wave": "p.............|..........|..." },
+    ["input",
+      { "name": "start",   "wave": "010...........|..........|10." },
+      { "name": "sum_in",  "wave": "x=x...........|..........|=x.", "data": ["S", "S2"] }
+    ],
+    {},
+    ["internal",
+      { "name": "busy_q",  "wave": "0.1...........|.......0..|1.." },
+      { "name": "cnt_q",   "wave": "x.=.=.=.=.....|.=.=.=.x..|=..", "data": ["0", "1", "2", "3", "24", "25", "26", "0"] },
+      { "name": "rem_q",   "wave": "x.=.=.=.=.....|.=.=.=.=..|=..", "data": ["2^13", "r1", "r2", "r3", "r25", "r26", "r27", "r0'"] }
+    ],
+    {},
+    ["output",
+      { "name": "done",    "wave": "0.............|.......10..|.." },
+      { "name": "rcp_out", "wave": "x=............|.......=..|...", "data": ["floor(2^40/S)"] }
+    ]
+  ],
+  "head": { "text": "smx_divider: start at cycle s, 27 iteration edges (s+1..s+27), done and final rcp_out at s + DIV_LAT = s+28" },
+  "foot": { "text": "'|' marks skipped cycles. start may be driven again in the done cycle (second start); sum_in is only sampled in the start cycle. rcp_out holds until the next done." },
+  "config": { "hscale": 1 }
+}
