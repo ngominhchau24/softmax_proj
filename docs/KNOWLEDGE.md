@@ -66,7 +66,7 @@ Bản đồ thanh ghi (offset byte, span 0x6000):
 
 ## 6. Thứ tự block và trạng thái
 
-`smx_exp2` → `smx_scale` → `smx_maxtree` → `smx_sumacc` → `smx_divider` → `smx_norm` → `smx_buf` → `smx_csr` → `smx_ctrl` → `smx_core`. Trạng thái hiện tại xem `docs/spec/blocks/README.md` (tất cả đang `TODO`).
+`smx_exp2` → `smx_scale` → `smx_maxtree` → `smx_sumacc` → `smx_divider` → `smx_norm` → `smx_buf` → `smx_csr` → `smx_ctrl` → `smx_core`. Trạng thái hiện tại xem `docs/spec/blocks/README.md`.
 
 ## 7. Lệnh hay dùng
 
@@ -74,9 +74,26 @@ Bản đồ thanh ghi (offset byte, span 0x6000):
 python3 model/softmax_ref.py --selftest
 python3 model/softmax_ref.py --gen-pwl 8
 python3 model/softmax_ref.py --gen-hex 8 rtl/pkg/pwl_n8.hex
+syn/map_check.sh smx_exp2 N_SEG=4,8,16     # quartus_map, không phải số Fitter/Fmax
 ```
 
 Môi trường Python: `source ~/venvs/ml/bin/activate` (xem `setup` ở thư mục gốc).
+
+**Mô phỏng** dùng một flow duy nhất ở `sim/`, cùng cách tổ chức với repo `risc_v` của Chau (`milestone3/10_sim`). Chạy từ `sim/`:
+
+```bash
+make                                 # clean + build + run (mặc định tb_smx_exp2, N_SEG=8)
+make testname=tb_smx_exp2 N_SEG=16   # testname là tên module top
+make regress                         # build một lần, chạy mọi N_SEG trong N_SEGS
+make run WAVE=1                      # chạy lại không compile, ghi wave/<run>.wlf
+make dump | view | clean
+```
+
+- `compile.f` = `rtl.f` + `tb.f` + `testcase.f`. Block mới: thêm RTL vào `rtl.f` (sau `smx_pkg.sv`, khối con trước khối cha) và `tb_<block>.sv` vào `testcase.f`. Không viết script chạy riêng trong `tb/`.
+- Test đạt khi log có `TB_RESULT: PASS`, nên mọi testbench phải in đúng dòng này. Log ở `sim/log/<testname>_n<N_SEG>.log`, `sim/sim.log` trỏ tới lần chạy gần nhất.
+- Vector tự sinh vào `tb/vectors/smx_<block>/n<N_SEG>/` bằng `model/gen_vectors.py <block>`; `REGEN=1` để sinh lại. Sau khi đổi model hoặc `gen_vectors.py` phải chạy với `REGEN=1`, vì vector cũ không tự cập nhật.
+- `Makefile` đang giả định theo `smx_exp2`: vector có `t4.hex`, `gen_vectors.py` nhận `--n-seg`, testbench có tham số `N_SEG` và plusarg `+VECDIR`. Block mới khác các điều này thì sửa `Makefile` cho tổng quát hơn, không tách flow.
+- `make` và `make clean` xoá `wave/`, `log/`, `work/`. Muốn giữ wave thì dùng `make run WAVE=1`. Mỗi file wave của `smx_exp2` khoảng 70 MB.
 
 ## 8. Câu hỏi còn mở (từ PROJECT.md mục 9)
 

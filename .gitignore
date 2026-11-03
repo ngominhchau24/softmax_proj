@@ -45,6 +45,8 @@ transcript
 vsim.wlf
 *.vstf
 modelsim.ini
+sim/log/
+sim/wave/
 
 # Harness và file gốc cục bộ (không đưa lên git)
 CLAUDE.md

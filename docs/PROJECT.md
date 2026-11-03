@@ -75,6 +75,7 @@ docs/      PROJECT.md, requirements.md, research/, spec/ (micro-arch, interface)
 model/     softmax_ref.py (golden, nguồn chân lý số học), sinh bảng PWL, sinh vector
 rtl/       pkg/smx_pkg.sv, core/, avalon/
 tb/        testbench tự viết cho sanity test (nhóm verify có môi trường riêng)
+sim/       Makefile và compile.f (= rtl.f + tb.f + testcase.f) để mô phỏng, chạy từ thư mục này
 ip/        smx_hw.tcl (Platform Designer component — nhóm implement)
 syn/       project Quartus chỉ cho IP (tài nguyên, Fmax)
 sw/        ví dụ mã HPS (driver /dev/mem) — tham khảo cho nhóm implement
@@ -169,6 +170,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 - 2026-10-31: Chốt D18 — target workload duy nhất là DeiT-Tiny (Chau duyệt). Cân nhắc 7 phương án (DeiT-Tiny, ViT tự train CIFAR-10, DistilBERT SST-2, BERT/I-BERT, GPT-2 decode, Swin-T, KWT); chọn DeiT-Tiny vì khớp v1.0 nguyên trạng (không mask, L = 197), có mốc I-ViT. Viết `docs/spec/target-workload.md`; thêm DeiT [13] vào tham khảo survey. Requirements và VERSION không đổi. Đóng câu hỏi nguồn vector demo.
 
 - 2026-10-31: `smx_exp2` APPROVED (`docs/spec/blocks/smx_exp2.md`, Q1–Q8): một lane, pipeline 3 tầng (`EXP2_LAT`), M cùng chu kỳ với u, mask lane trong block, N_SEG tham số hoá 4/8/16. Kiểm cấu trúc SV bằng Quartus 18.1 Lite (probe). Viết RTL, testbench, `model/gen_vectors.py`, `tb/run_smx_exp2.sh`, `syn/map_check.sh`; thêm `EXP2_LAT` và bảng PWL N = 4/16 vào `smx_pkg`. Chưa chạy mô phỏng.
+
+- 2026-11-03: Thêm flow mô phỏng `sim/` theo cách tổ chức của repo `risc_v` (milestone 2/3): `Makefile`, `compile.f` = `rtl.f` + `tb.f` + `testcase.f`, chọn test bằng `testname`; thay `tb/run_smx_exp2.sh`. Giữ nguyên bố cục `rtl/`, `tb/`. Khác `risc_v`: test fail thì `make` trả lỗi (kiểm `TB_RESULT: PASS`), và chỉ ghi wave khi `WAVE=1`. `smx_exp2` đạt UT-PASS ở N_SEG = 4, 8, 16 trên ModelSim ASE 10.5b. `syn/map_check.sh smx_exp2 N_SEG=4,8,16` đạt (N_SEG = 8: 93 ALUT, 94 thanh ghi, 1 DSP mỗi lane, chỉ Analysis & Synthesis; chưa có số Fitter/Fmax). Ghi cách dùng flow vào `docs/KNOWLEDGE.md` mục 7.
 
 ## 11. Tài liệu tham khảo chính
 

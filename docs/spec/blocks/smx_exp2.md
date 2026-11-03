@@ -192,9 +192,17 @@ Tất cả là [TK], chưa tổng hợp; thay bằng số Fitter khi có.
 | Thanh ghi | ~85–115 | ~700–900 | ~113 bit mục 5, trừ phần Quartus đưa vào DSP; chuỗi valid có thể được gộp giữa các lane |
 | M10K | 0 | 0 | |
 
+Số đo một lane từ `syn/map_check.sh` (Quartus 18.1 Lite, chỉ Analysis & Synthesis, 2026-11-03). Đây chưa phải số Fitter, và chưa có Fmax:
+
+| N_SEG | ALUT logic | Thanh ghi | Khối DSP |
+|---|---|---|---|
+| 4 | 77 | 72 | 1 |
+| 8 | 93 | 94 | 1 |
+| 16 | 95 | 95 | 1 |
+
 ## 8. Kế hoạch kiểm thử block
 
-Testbench `tb/tb_smx_exp2.sv` đọc file vector `(in_valid, in_en, u_in, m_in, e_expected)` sinh từ golden model, đưa vào DUT 1 vector/chu kỳ và so `e_out` với kỳ vọng khi `out_valid = 1`. Vector sinh bằng script mới `model/gen_vectors.py exp2 --n-seg N` (import `softmax_ref`, không đổi số học của model; Q8) vào `tb/vectors/smx_exp2/n<N>/t1.hex … t4.hex`. Mỗi dòng: `valid en u m e` ở dạng hex (bù hai theo độ rộng port); dòng bắt đầu bằng `#` là chú thích. Chạy cả ba N_SEG: `tb/run_smx_exp2.sh` (mặc định 4 8 16).
+Testbench `tb/tb_smx_exp2.sv` đọc file vector `(in_valid, in_en, u_in, m_in, e_expected)` sinh từ golden model, đưa vào DUT 1 vector/chu kỳ và so `e_out` với kỳ vọng khi `out_valid = 1`. Vector sinh bằng script mới `model/gen_vectors.py exp2 --n-seg N` (import `softmax_ref`, không đổi số học của model; Q8) vào `tb/vectors/smx_exp2/n<N>/t1.hex … t4.hex`. Mỗi dòng: `valid en u m e` ở dạng hex (bù hai theo độ rộng port); dòng bắt đầu bằng `#` là chú thích. Chạy cả ba N_SEG: `cd sim && make regress` (mặc định 4 8 16).
 
 | Tập | Nội dung | Số vector |
 |---|---|---|
@@ -227,3 +235,4 @@ Assertion đề xuất cho nhóm verify (file bind riêng, không ở file tổn
 - 2026-10-31: chốt Q2 (3 tầng), Q4 (A), Q6–Q8 theo đề xuất. Thêm mục 5.1: kiểm cấu trúc SV bằng Quartus 18.1 Lite và quy tắc viết RTL để tổng hợp được.
 - 2026-10-31: chốt Q3 (mask trong `smx_exp2`). Mọi câu hỏi mở đã trả lời.
 - 2026-10-31: **APPROVED** (Chau). Viết RTL `rtl/core/smx_exp2.sv`, testbench `tb/tb_smx_exp2.sv`, script `tb/run_smx_exp2.sh`, bộ sinh vector `model/gen_vectors.py`; thêm `EXP2_LAT` và bảng PWL N = 4/16 vào `smx_pkg`. Chưa compile/mô phỏng (Chau chạy).
+- 2026-11-03: **UT-PASS** (số từ mô phỏng thật). `make regress` trong `sim/` (ModelSim ASE 10.5b): 0 sai khác ở N_SEG = 4, 8, 16 (1 224 196 / 1 224 228 / 1 224 292 phần tử). `tb/run_smx_exp2.sh` được thay bằng flow `sim/`. `syn/map_check.sh smx_exp2 N_SEG=4,8,16` đạt, 0 lỗi, 0 cảnh báo (số ở mục 7).
