@@ -1,0 +1,25 @@
+{
+  "signal": [
+    { "name": "clk", "wave": "p..........." },
+    ["input",
+      { "name": "in_valid", "wave": "011010000000" },
+      { "name": "in_first", "wave": "010100000000" },
+      { "name": "in_en / c_in", "wave": "x====x......", "data": ["g0", "g1", "junk / X", "g2"] }
+    ],
+    {},
+    ["stage 1",
+      { "name": "s1_vld_q",   "wave": "001101000000" },
+      { "name": "s1_first_q", "wave": "x01010000000" },
+      { "name": "s1_a_q / s1_b_q", "wave": "xx====x.....", "data": ["g0", "g1", "junk", "g2"] }
+    ],
+    {},
+    ["output",
+      { "name": "out_valid", "wave": "000110100000" },
+      { "name": "m_out",  "wave": "xxx==.=.....", "data": ["M0", "M1", "M2"] },
+      { "name": "dm_out", "wave": "xxx==.=.....", "data": ["0", "dM1", "dM2"] }
+    ]
+  ],
+  "head": { "text": "smx_maxtree: MAXTREE_LAT = 2. Cycle 3 has in_first = 1, in_valid = 0 and is ignored; m_out holds through it" },
+  "foot": { "text": "g0 is the first group (dM = 0). Mg, M, dM per group = info['groups'] of softmax_row in model/softmax_ref.py. dm_out is meaningful only while out_valid = 1." },
+  "config": { "hscale": 1 }
+}
