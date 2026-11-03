@@ -3,3 +3,4 @@
 ../rtl/core/smx_delay.sv
 ../rtl/core/smx_exp2.sv
 ../rtl/core/smx_scale.sv
+../rtl/core/smx_sumacc.sv

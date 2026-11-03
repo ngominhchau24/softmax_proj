@@ -1,0 +1,24 @@
+{
+  "signal": [
+    { "name": "clk",       "wave": "p............" },
+    ["input",
+      { "name": "in_valid", "wave": "0100010000000" },
+      { "name": "in_first", "wave": "x1xxx0xxxxxxx" },
+      { "name": "e_in",     "wave": "x=xxx=xxxxxxx", "data": ["E0", "E1"] },
+      { "name": "dm_in",    "wave": "x=xxx=xxxxxxx", "data": ["0", "d1"] }
+    ],
+    {},
+    ["pipe",
+      { "name": "s1_vld_q", "wave": "0010001000000" },
+      { "name": "s2_vld_q", "wave": "0001000100000" }
+    ],
+    {},
+    ["output",
+      { "name": "out_valid", "wave": "0000100010000" },
+      { "name": "sum_out",   "wave": "x...=...=....", "data": ["S0 = sum(E0)", "(S0>>d1)+sum(E1)"] }
+    ]
+  ],
+  "head": { "text": "smx_sumacc: SUMACC_LAT = 3; group 0 (first) at cycle 1, group 1 at cycle 5; sum_out holds between groups" },
+  "foot": { "text": "sum <- first ? S : (sum >> dm) + S, S = sum of the P lanes of E (softmax_ref.group_sum)" },
+  "config": { "hscale": 1 }
+}
