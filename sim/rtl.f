@@ -2,3 +2,4 @@
 ../rtl/pkg/smx_pkg.sv
 ../rtl/core/smx_delay.sv
 ../rtl/core/smx_exp2.sv
+../rtl/core/smx_scale.sv
