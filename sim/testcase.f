@@ -7,3 +7,4 @@
 ../tb/tb_smx_norm.sv
 ../tb/tb_smx_buf.sv
 ../tb/tb_smx_ctrl.sv
+../tb/tb_smx_csr.sv
