@@ -4,3 +4,4 @@
 ../tb/tb_smx_sumacc.sv
 ../tb/tb_smx_divider.sv
 ../tb/tb_smx_maxtree.sv
+../tb/tb_smx_norm.sv
