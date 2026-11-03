@@ -5,3 +5,4 @@
 ../tb/tb_smx_divider.sv
 ../tb/tb_smx_maxtree.sv
 ../tb/tb_smx_norm.sv
+../tb/tb_smx_buf.sv
