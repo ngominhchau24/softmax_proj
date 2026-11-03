@@ -10,3 +10,4 @@
 ../rtl/core/smx_buf.sv
 ../rtl/core/smx_ctrl.sv
 ../rtl/core/smx_csr.sv
+../rtl/core/smx_core.sv
