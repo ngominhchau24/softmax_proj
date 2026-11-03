@@ -1,0 +1,27 @@
+{
+  "signal": [
+    { "name": "clk",            "wave": "p........." },
+    ["command",
+      { "name": "acc_addr",       "wave": "x==x=xxxxx", "data": ["0 (CTRL)", "1 (STATUS)", "0x802 (X_BUF)"] },
+      { "name": "acc_write",      "wave": "0100000000" },
+      { "name": "acc_writedata",  "wave": "x=xxxxxxxx", "data": ["1 (START)"] },
+      { "name": "acc_read",       "wave": "0010100000" }
+    ],
+    {},
+    ["registers",
+      { "name": "busy_q",         "wave": "0.1......." },
+      { "name": "start",          "wave": "0.10......" },
+      { "name": "cyc_q",          "wave": "xx====....", "data": ["0", "1", "2", "3"] }
+    ],
+    {},
+    ["read pipe",
+      { "name": "s1_csr_q",       "wave": "0..1.0...." },
+      { "name": "s1_x_q",         "wave": "0....1.0.." },
+      { "name": "x_rd_data",      "wave": "x....=.x..", "data": ["bank word"] },
+      { "name": "acc_readdata",   "wave": "0...=.=...", "data": ["STATUS = BUSY", "X_BUF word"] }
+    ]
+  ],
+  "head": { "text": "smx_csr: valid START at cycle n, STATUS read at n+1 sees BUSY, readdata exactly ACC_RD_LAT = 2 cycles after acc_read" },
+  "foot": { "text": "Read command in cycle n: s1_* and the CSR value registered at the end of n, smx_buf data valid in n+1, acc_readdata registered at the end of n+1." },
+  "config": { "hscale": 1 }
+}
