@@ -8,3 +8,4 @@
 ../rtl/core/smx_maxtree.sv
 ../rtl/core/smx_norm.sv
 ../rtl/core/smx_buf.sv
+../rtl/core/smx_ctrl.sv
