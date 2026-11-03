@@ -4,3 +4,4 @@
 ../rtl/core/smx_exp2.sv
 ../rtl/core/smx_scale.sv
 ../rtl/core/smx_sumacc.sv
+../rtl/core/smx_divider.sv

@@ -2,3 +2,4 @@
 ../tb/tb_smx_exp2.sv
 ../tb/tb_smx_scale.sv
 ../tb/tb_smx_sumacc.sv
+../tb/tb_smx_divider.sv
