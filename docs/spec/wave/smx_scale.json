@@ -1,0 +1,24 @@
+{
+  "signal": [
+    { "name": "clk",       "wave": "p..........." },
+    ["input",
+      { "name": "in_valid", "wave": "01.0.1.0...." },
+      { "name": "q_in",     "wave": "x==x.=.x....", "data": ["q0", "q1", "q2"] },
+      { "name": "k_in",     "wave": "x==x.=.x....", "data": ["K", "K", "K"] }
+    ],
+    {},
+    ["pipe",
+      { "name": "s1_vld_q", "wave": "0.1.0.1.0..." },
+      { "name": "s2_vld_q", "wave": "0..1.0.1.0.." }
+    ],
+    {},
+    ["output",
+      { "name": "out_valid", "wave": "0...1.0.1.0." },
+      { "name": "u_out",     "wave": "x...==x.=.x.", "data": ["u0", "u1", "u2"] },
+      { "name": "c_out",     "wave": "x...==x.=.x.", "data": ["c0", "c1", "c2"] }
+    ]
+  ],
+  "head": { "text": "smx_scale: SCALE_LAT = 3, 1 element/cycle; q0, q1 back to back, one gap, then q2" },
+  "foot": { "text": "u = q*K and c = ceil_q16(u) from model/softmax_ref.py" },
+  "config": { "hscale": 1 }
+}
