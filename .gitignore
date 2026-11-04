@@ -38,6 +38,7 @@ syn/*_assignment_defaults.qdf
 # Generated test vectors and logs (model/gen_vectors.py), throwaway map checks
 tb/vectors/*/
 syn/map_check/
+syn/fit/
 
 # ModelSim / Questa
 work/

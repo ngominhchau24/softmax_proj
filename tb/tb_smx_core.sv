@@ -1,6 +1,8 @@
 // tb_smx_core.sv - self-checking testbench for smx_core (simulation only).
 //
 // Drives only the acc_* port, like software would (requirements 5.3), and respects read latency 2.
+// The only look inside the DUT is a passive count of Y_BUF writes, the one thing a repeat of the same
+// run could not show through acc_*.
 // Expected values come from model/vec_core.py -> softmax_ref.softmax_row (file core.hex; format in
 // the header of vec_core.py). The same bench also exercises smx_delay (no separate test).
 // Convention: every command is driven at a falling clock edge; a read issued at falling edge T0
@@ -40,6 +42,7 @@ module tb_smx_core;
   int    n_check = 0;          // Y bytes compared
   int    n_xseen = 0;          // unwritten X_BUF bytes read back as X
   int    n_runs_done = 0;
+  int    n_pairs = 0;
   string vecdir;
   string cur;
   bit    mon_en = 1'b0;
@@ -56,6 +59,20 @@ module tb_smx_core;
       else if (status_busy && status_done) report("BUSY and DONE both 1");
     end
   end
+
+  // ---- Y_BUF writes: all banks together, only in BUSY; start_and_wait compares the count ----
+  int n_ywr = 0;
+  always @(posedge clk) begin
+    if (mon_en && rst_n && dut.u_ybuf.wr_en !== '0) begin
+      n_ywr++;
+      if (dut.u_ybuf.wr_en !== '1) report("Y_BUF write on only some banks");
+      if (status_busy !== 1'b1) report("Y_BUF write outside BUSY");
+    end
+  end
+
+  // ---- CYCLE_CNT mirror: start_and_wait clears it, read checks during BUSY compare with it ----
+  int cyc_m = 0;
+  always @(posedge clk) if (status_busy === 1'b1) cyc_m++;
 
   // ---- vector storage ----
   int           n_runs;
@@ -190,12 +207,66 @@ module tb_smx_core;
     end
   endtask
 
-  // ---- start and wait: statuses, busy cycle count ----
+  function automatic int expect_cycles(input int L, input int R);
+    return R * (2 * groups(L) + smx_pkg::ROW_OVERHEAD) + 1;
+  endfunction
+
+  // ---- bus traffic during BUSY (flag bit 4): one command per cycle ----
+  // pend_*[0] is the read due at the next falling edge, pend_*[1] the one issued at this edge.
+  bit          pend_chk [2];
+  logic [31:0] pend_exp [2];
+  int          n_traffic_rd = 0;
+
+  task automatic bus_op(input int k);
+    int r, w;
+    r = $urandom % run_R[k];
+    w = $urandom % (groups(run_L[k]) * P / 4);
+    acc_read = 1'b0; acc_write = 1'b0;
+    acc_addr = 13'($urandom); acc_writedata = $urandom; acc_byteenable = 4'($urandom);
+    pend_chk[1] = 1'b0;
+    case ($urandom % 24)
+      0, 1: begin acc_addr = 13'(A_STATUS); acc_read = 1'b1; pend_chk[1] = 1'b1;
+                  pend_exp[1] = {29'd0, status_err, status_done, status_busy}; end
+      2, 3: begin acc_addr = 13'(A_CYC); acc_read = 1'b1; pend_chk[1] = 1'b1; pend_exp[1] = 32'(cyc_m); end
+      4:    begin acc_addr = 13'(A_LEN);  acc_read = 1'b1; pend_chk[1] = 1'b1; pend_exp[1] = 32'(run_L[k]); end
+      5:    begin acc_addr = 13'(A_ROWS); acc_read = 1'b1; pend_chk[1] = 1'b1; pend_exp[1] = 32'(run_R[k]); end
+      6:    begin acc_addr = 13'(A_K);    acc_read = 1'b1; pend_chk[1] = 1'b1; pend_exp[1] = 32'(run_K[k]); end
+      7:    begin acc_addr = 13'h1800 + 13'($urandom % 2048); acc_read = 1'b1; pend_chk[1] = 1'b1; pend_exp[1] = 32'd0; end
+      8:    begin acc_addr = 13'(A_XBUF + r*ROWWORDS + w); acc_read = 1'b1; end
+      9:    begin acc_addr = 13'(A_YBUF + r*ROWWORDS + w); acc_read = 1'b1; end
+      // every write below must be ignored; check_run reads these places back
+      10:   begin acc_addr = 13'(A_LEN);  acc_write = 1'b1; acc_byteenable = 4'hF; end
+      11:   begin acc_addr = 13'(A_ROWS); acc_write = 1'b1; acc_byteenable = 4'hF; end
+      12:   begin acc_addr = 13'(A_K);    acc_write = 1'b1; acc_byteenable = 4'hF; end
+      13:   begin acc_addr = 13'(A_XBUF + r*ROWWORDS + w); acc_write = 1'b1; acc_byteenable = 4'hF; end
+      14:   begin acc_addr = 13'(A_YBUF + r*ROWWORDS + w); acc_write = 1'b1; acc_byteenable = 4'hF; end
+      15:   begin acc_addr = 13'(A_STATUS); acc_write = 1'b1; acc_byteenable = 4'hF; end
+      16:   begin acc_addr = 13'(A_CYC);    acc_write = 1'b1; acc_byteenable = 4'hF; end
+      17:   begin acc_addr = 13'(A_CTRL);   acc_write = 1'b1; acc_byteenable = 4'hF; acc_writedata = 32'hFFFF_FFFF; end
+      default: ;    // idle bus, garbage on the data and address lines
+    endcase
+  endtask
+
+  // call right after each falling edge
+  task automatic bus_check();
+    if (pend_chk[0]) begin
+      n_traffic_rd++;
+      if (acc_readdata !== pend_exp[0])
+        report($sformatf("read during BUSY: %h, want %h", acc_readdata, pend_exp[0]));
+    end
+    pend_chk[0] = pend_chk[1]; pend_exp[0] = pend_exp[1];
+    pend_chk[1] = 1'b0;
+  endtask
+
+  // ---- start and wait: statuses, busy cycle count, Y_BUF write count ----
   int busy_cycles;
 
-  // START then wait for DONE. Leaves us at the falling edge where DONE is first seen.
-  task automatic start_and_wait(input int max_cycles);
-    int cnt;
+  // START then wait for DONE. Without traffic, leaves us at the falling edge where DONE is first seen.
+  task automatic start_and_wait(input int k, input bit traffic);
+    int cnt, want;
+    want = expect_cycles(run_L[k], run_R[k]);
+    n_ywr = 0;
+    cyc_m = 0;
     cmd_write(A_CTRL, 32'd1, 4'hF);
     // now in cycle n+1: BUSY must already be up
     if (status_busy !== 1'b1 || status_done !== 1'b0 || status_err !== 1'b0)
@@ -208,20 +279,25 @@ module tb_smx_core;
         break;
       end
       cnt++;
-      if (cnt > max_cycles) begin
+      if (cnt > 2 * want + 100) begin
         report("timeout waiting for DONE");
         break;
       end
+      if (traffic) bus_op(k);
       @(negedge clk);
+      if (traffic) bus_check();
+    end
+    if (traffic) begin
+      acc_read = 1'b0; acc_write = 1'b0;
+      repeat (2) begin @(negedge clk); bus_check(); end
     end
     if (status_busy !== 1'b0) report("BUSY still 1 when DONE seen");
     if (status_err !== 1'b0) report("ERR set after good run");
     busy_cycles = cnt;
+    if (busy_cycles != want) report($sformatf("busy cycles %0d, want %0d", busy_cycles, want));
+    if (n_ywr != run_R[k] * groups(run_L[k]))
+      report($sformatf("%0d Y_BUF writes, want %0d", n_ywr, run_R[k] * groups(run_L[k])));
   endtask
-
-  function automatic int expect_cycles(input int L, input int R);
-    return R * (2 * groups(L) + smx_pkg::ROW_OVERHEAD) + 1;
-  endfunction
 
   // ---- check results and cycle count of run k ----
   task automatic check_run(input int k, input int n_busy);
@@ -238,6 +314,12 @@ module tb_smx_core;
       report($sformatf("CYCLE_CNT %0d, want %0d (L=%0d R=%0d)", d, want, L, R));
     rd1(A_STATUS, d);
     if (d !== 32'h2) report($sformatf("STATUS %h after run, want 2", d));
+    rd1(A_LEN, d);
+    if (d !== 32'(L)) report($sformatf("LEN %0d after run, want %0d", d, L));
+    rd1(A_ROWS, d);
+    if (d !== 32'(R)) report($sformatf("ROWS %0d after run, want %0d", d, R));
+    rd1(A_K, d);
+    if (d !== 32'(run_K[k])) report($sformatf("SCALE_K %0d after run, want %0d", d, run_K[k]));
     for (int r = 0; r < R; r++) begin
       rd_burst(A_YBUF + r*ROWWORDS, nw);
       for (int w = 0; w < nw; w++) begin
@@ -268,12 +350,19 @@ module tb_smx_core;
   task automatic do_run(input int k);
     cur = $sformatf("run%0d L=%0d R=%0d K=%0d", k, run_L[k], run_R[k], run_K[k]);
     program_run(k);
-    start_and_wait(2 * expect_cycles(run_L[k], run_R[k]) + 100);
-    if (busy_cycles != expect_cycles(run_L[k], run_R[k]))
-      report($sformatf("busy cycles %0d, want %0d", busy_cycles, expect_cycles(run_L[k], run_R[k])));
-    if (run_fl[k][1])      // same configuration again, START in the cycle right after DONE appears
-      start_and_wait(2 * expect_cycles(run_L[k], run_R[k]) + 100);
-    check_run(k, busy_cycles);
+    start_and_wait(k, run_fl[k][4]);
+    if (run_fl[k][3]) begin
+      // pair: Y of this run is left unread, the partner must overwrite all of it
+      cur = $sformatf("pair run%0d after DONE of run%0d", k + 1, k);
+      cmd_write(A_K, 32'(run_K[k+1]), 4'hF);
+      start_and_wait(k + 1, 1'b0);
+      check_run(k + 1, busy_cycles);
+      n_pairs++;
+    end else begin
+      if (run_fl[k][1])      // same configuration again, START in the cycle right after DONE appears
+        start_and_wait(k, 1'b0);
+      check_run(k, busy_cycles);
+    end
     n_runs_done++;
   endtask
 
@@ -355,11 +444,13 @@ module tb_smx_core;
     if (d !== 32'h0) report($sformatf("CYCLE_CNT %0d after ERR, want 0", d));
   endtask
 
-  // reset in the middle of a run, then the same run must be correct
+  // Reset in the middle of the partner run k+1 (same L and R, Y differs in every row), then run k must
+  // be correct. Y_BUF holds the partner's values at that point, so a lost write cannot pass.
   task automatic test_reset_mid(input int k, input int delay);
     logic [31:0] d;
-    cur = $sformatf("reset_mid run%0d after %0d cycles", k, delay);
-    program_run(k);
+    do_run(k + 1);
+    cur = $sformatf("reset_mid run%0d after %0d cycles", k + 1, delay);
+    program_run(k + 1);
     cmd_write(A_CTRL, 32'd1, 4'hF);
     repeat (delay) @(negedge clk);
     if (delay < expect_cycles(run_L[k], run_R[k]) - 1 && status_busy !== 1'b1)
@@ -407,7 +498,7 @@ module tb_smx_core;
     test_xbuf_be();
 
     // all vector runs
-    for (int k = 0; k < n_runs; k++) do_run(k);
+    for (int k = 0; k < n_runs; k += run_fl[k][3] ? 2 : 1) do_run(k);
     if (n_xseen == 0) begin
       cur = "fresh";
       report("no unwritten X_BUF element was read back as X: REQ-FUN-03 case not exercised");
@@ -448,9 +539,11 @@ module tb_smx_core;
 
     cur = "end";
     if (n_runs_done == 0) report("no run executed");
+    if (n_pairs == 0) report("no pair run executed");
+    if (n_traffic_rd == 0) report("no read checked during BUSY");
     if (n_err == 0)
-      $display("TB_RESULT: PASS tb_smx_core P=%0d N_SEG=%0d: %0d runs, %0d Y bytes checked, %0d X bytes seen in unwritten X_BUF",
-               P, N_SEG, n_runs_done, n_check, n_xseen);
+      $display("TB_RESULT: PASS tb_smx_core P=%0d N_SEG=%0d: %0d runs, %0d pairs, %0d Y bytes checked, %0d reads checked during BUSY, %0d X bytes seen in unwritten X_BUF",
+               P, N_SEG, n_runs_done, n_pairs, n_check, n_traffic_rd, n_xseen);
     else
       $display("TB_RESULT: FAIL tb_smx_core P=%0d N_SEG=%0d: %0d errors", P, N_SEG, n_err);
     $finish;
