@@ -155,7 +155,7 @@ Số thật sau Fitter, `syn/fit.sh P 8 SEED` (Quartus Prime Lite 18.1, 5CSXFC6D
 | 8 | 1 035 | 1 681 | 1 211 | 21 | 131 683 | 24 | 122,09 / 129,87 / 134,41 |
 | 16 | 1 821 | 2 994 | 2 011 | 33 | 132 227 | 48 | 108,57 / 112,94 / 107,83 |
 
-Thanh ghi ít hơn bảng `map_check` vì luồng đầy đủ chuyển một phần shift register sang M10K (131 683 so với 131 072 bit): ở P = 8, 2 477 thanh ghi của `map_check` còn 1 874 sau Analysis & Synthesis của luồng đầy đủ và 1 211 sau Fitter. M10K gồm X_BUF 8/8/16 khối, phần sideband và trễ `u` 3/6/10 khối (P = 4/8/16), Y_BUF 7 khối. Số 7 của Y_BUF suy từ tổng [TK], vì các dòng Y_BUF trong Fitter RAM Summary cộng lại không khớp tổng; nhiều khả năng Quartus gộp các RAM Y_BUF vì chúng cùng địa chỉ và cùng cho phép ghi.
+Thanh ghi ít hơn bảng `map_check` vì luồng đầy đủ chuyển một phần shift register sang M10K (131 683 so với 131 072 bit): ở P = 8, 2 477 thanh ghi của `map_check` còn 1 874 sau Analysis & Synthesis của luồng đầy đủ và 1 211 sau Fitter. M10K gồm X_BUF 8/8/16 khối, phần sideband và trễ `u` 3/6/10 khối (P = 4/8/16), Y_BUF 7 khối. Số 7 của Y_BUF suy từ tổng, vì các dòng Y_BUF trong Fitter RAM Summary cộng lại không khớp tổng; khi tắt suy luận shift register, tổng còn đúng 15 khối ở P = 8 và 23 khối ở P = 16, khớp với số suy ra. Nhiều khả năng Quartus gộp các RAM Y_BUF vì chúng cùng địa chỉ và cùng cho phép ghi [TK].
 
 Chênh lệch giữa các seed tới 10 % ở P = 8, nên so sánh hai phương án phải qua nhiều seed. REQ-PRF-01 (≥ 100 MHz) đạt ở mọi lần chạy, sát nhất là 107,83 MHz (P = 16, seed 3). REQ-RES-01 đạt (1 681 ALUT + 24 DSP ở P = 8).
 
@@ -184,7 +184,7 @@ Rà soát độc lập 2026-11-03 (bench riêng, không nằm trong repo; báo c
 
 ## 9. Câu hỏi mở / quyết định cần duyệt
 
-- [ ] Q1. Sideband dùng một shift register chung sâu 12 ô, mỗi tap đọc đúng ô cần, thay vì nhiều đường trễ nhỏ. Khuyến nghị giữ: một chỗ sửa khi đổi latency. Quartus đưa một phần chuỗi này vào M10K và đó là đường găng nhất ở P = 8 (mục 6), xem `open-decisions.md` A5.
+- [ ] Q1. Sideband dùng một shift register chung sâu 12 ô, mỗi tap đọc đúng ô cần, thay vì nhiều đường trễ nhỏ. Khuyến nghị giữ: một chỗ sửa khi đổi latency. Quartus đưa một phần chuỗi này vào M10K và đó là đường găng nhất ở P = 8 (mục 6), nhưng tắt suy luận không cho lợi Fmax rõ ràng qua 3 seed (`open-decisions.md` A5).
 - [ ] Q2. `status_busy` chọn địa chỉ X_BUF là một mux nhỏ trên đường tới RAM. Fitter không xếp đường này vào nhóm găng nhất ở mục 6, nên khuyến nghị giữ nguyên.
 
 ## 10. Lịch sử
