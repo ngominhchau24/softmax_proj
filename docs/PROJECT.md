@@ -130,10 +130,10 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 | A3 | Không chồng lặp bộ chia | [TL] Softermax [3]: Normalization Unit đặt ngoài đường găng, dùng chung; [TK] thiệt ~28/176 ≈ 16% chu kỳ mỗi hàng (ước lượng) |
 | A4 | X/Y tách riêng | [TL] SoftGen [6]: đánh đổi diện tích–tính linh hoạt khi lưu dữ liệu trung gian; [TK] ưu tiên khả năng debug |
 | A5 | Tham số P, quét 4/8/16 | [TL] SoftGen [6]: generator tham số hoá để khám phá không gian thiết kế; [TK] |
-| — | Ước lượng ~16 DSP, ~176 chu kỳ/hàng, rủi ro timing vòng tích luỹ | [TK] chưa đo; thay bằng số liệu Quartus/mô phỏng khi có |
+| — | P = 8: 24 DSP, 1 681 ALUT, 21 M10K, 122–134 MHz qua 3 seed; 182 chu kỳ/hàng ở L = 512; vòng tích luỹ không phải đường găng nhất | Fitter Quartus 18.1 (`syn/fit.sh`) và mô phỏng `CYCLE_CNT`, 2026-11-04; thay ước lượng cũ ~16 DSP, ~176 chu kỳ/hàng |
 | D18 | DeiT-Tiny: 197 token, 3 head, 12 layer, ~5M tham số | [TL] DeiT [13] — cần đối chiếu; [ĐC] trọng số `timm` |
 | D18 | Không cần mask, có mốc integer-only trên cùng mô hình | [TL] I-ViT [4] báo cáo DeiT-T; [TK] ViT không dùng attention mask → khớp B6 |
-| D18 | ~98 chu kỳ/hàng, ~58k chu kỳ và ~231 KiB JTAG mỗi layer mỗi ảnh | [TK] suy từ ước lượng `architecture.md` mục 3; đo bằng `CYCLE_CNT` và băng thông JTAG thật |
+| D18 | 104 chu kỳ/hàng, 61 503 chu kỳ mỗi layer mỗi ảnh; ~231 KiB JTAG | chu kỳ: công thức `CYCLE_CNT` đã kiểm bằng mô phỏng; JTAG: [TK], đo bằng băng thông thật |
 
 ## 8. Kế hoạch
 
@@ -174,6 +174,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 - 2026-11-03: Thêm flow mô phỏng `sim/` theo cách tổ chức của repo `risc_v` (milestone 2/3): `Makefile`, `compile.f` = `rtl.f` + `tb.f` + `testcase.f`, chọn test bằng `testname`; thay `tb/run_smx_exp2.sh`. Giữ nguyên bố cục `rtl/`, `tb/`. Khác `risc_v`: test fail thì `make` trả lỗi (kiểm `TB_RESULT: PASS`), và chỉ ghi wave khi `WAVE=1`. `smx_exp2` đạt UT-PASS ở N_SEG = 4, 8, 16 trên ModelSim ASE 10.5b. `syn/map_check.sh smx_exp2 N_SEG=4,8,16` đạt (N_SEG = 8: 93 ALUT, 94 thanh ghi, 1 DSP mỗi lane, chỉ Analysis & Synthesis; chưa có số Fitter/Fmax). Ghi cách dùng flow vào `docs/KNOWLEDGE.md` mục 7.
 
 - 2026-11-03: Chau yêu cầu xây các block còn lại bằng nhiều agent, cả tài liệu lẫn RTL, tự thống nhất phần liên block và lưu việc chưa quyết được. Tạo `docs/spec/cross-block.md` (hợp đồng port, latency, FSM, `CYCLE_CNT`), hai reviewer độc lập phản biện bằng mô hình chu kỳ và probe Quartus; `docs/spec/open-decisions.md` là danh sách cho Chau xem. Tài liệu các block mới chưa được duyệt. `SUM_W` 26 → 25; `smx_pkg` thêm latency các block, `ROW_OVERHEAD`, `DM_W`, bỏ `LANE_IDX_W`, `SEG_W`. `softmax_ref.py` thêm số trung gian và tách hàm, số học không đổi (6000 hàng trùng bản cũ). `sim/` hỗ trợ quét P.
+
+- 2026-11-04: `smx_core` tích hợp xong và qua Fitter. P = 4/8/16 đạt ≥ 100 MHz ở mọi seed đã chạy (sát nhất 107,83 MHz ở P = 16); P = 8 dùng 1 681 ALUT, 24 DSP, 21 M10K, Fmax 122,09–134,41 MHz, lấy góc xấu hơn trong hai góc slow. Đường găng nhất ở P = 8, 16 là tầng 1 `smx_maxtree`, ở P = 8 có `tag_q` bị Quartus chuyển vào M10K, không phải vòng tích luỹ như dự đoán. Rà soát độc lập không tìm ra lỗi số học nhưng chỉ ra `tb_smx_core` bỏ sót mutation về bus khi BUSY và Y cũ che lỗi; đã siết bench, 11/11 mutation bị bắt, `make regress` PASS ở P, N_SEG = 4/8/16. RTL không đổi. Thêm `syn/fit.sh`. Thêm A5–A7 vào `docs/spec/open-decisions.md`. Sửa số chu kỳ DeiT-Tiny theo số đo (104 chu kỳ/hàng, 61 503 chu kỳ/layer).
 
 ## 11. Tài liệu tham khảo chính
 

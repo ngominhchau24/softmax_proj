@@ -78,7 +78,7 @@ Báo cáo ghi các RAM là `altsyncram` suy ra. Số khối M10K không có tron
 ## 9. Câu hỏi mở / quyết định cần duyệt
 
 - [ ] Đọc đúng địa chỉ đang ghi trong cùng chu kỳ không được đặc tả (don't-care). Đề xuất giữ vậy; `smx_core` không nên phụ thuộc vào nó.
-- [ ] Số khối M10K cần xác nhận bằng Fitter ở lần tổng hợp lõi.
+- [x] Số khối M10K: X_BUF 8/8/16 khối ở P = 4/8/16 đúng như ước tính, đo bằng Fitter (`syn/fit.sh`). Y_BUF dùng ít hơn: suy từ tổng còn 7 khối, xem `smx_core.md` mục 7.
 
 ## 10. Lịch sử
 

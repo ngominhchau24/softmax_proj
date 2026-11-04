@@ -53,7 +53,7 @@ flowchart LR
 | `smx_divider` | `Rcp = ⌊2⁴⁰/sum⌋`, radix-2 tuần tự | so sánh 25 bit, 28 chu kỳ |
 | `smx_norm` ×P | `y = min(255, (E·Rcp + 2³¹) >> 32)` | 1 nhân 16×27/lane |
 
-`smx_scale` và `smx_exp2` dùng chung cho hai lượt (chỉ khác nguồn M và đích của E). Ước lượng ~24 bộ nhân ≈ 16 DSP; số thật lấy từ báo cáo Fitter.
+`smx_scale` và `smx_exp2` dùng chung cho hai lượt (chỉ khác nguồn M và đích của E). Số thật sau Fitter: 24 DSP ở P = 8, mỗi bộ nhân một khối (`docs/spec/blocks/smx_core.md` mục 7).
 
 ## 3. Điều khiển
 
@@ -80,6 +80,8 @@ Latency thiết kế mỗi hàng (L = 512, P = 8): `T_row = 2G + 54 = 182` chu k
 1. **Vòng cập nhật M (lượt 1):** E của một nhóm cần `Mnew` của chính nhóm đó. Cây max đặt ngay sau bộ nhân K; thanh ghi M cập nhật trong 1 chu kỳ (so sánh + chọn 9 bit); `Mnew` đi kèm nhóm xuống tầng exp2. Không chặn throughput 1 nhóm/chu kỳ.
 2. **Vòng tích luỹ tổng:** barrel shifter 25 bit + cộng 25 bit trong 1 chu kỳ. Dự phòng: kẹp ΔM ≥ 25 → 0; nếu vẫn thiếu, tính trước điều khiển dịch ở tầng trước để vòng phản hồi chỉ còn mux + cộng. Không đổi kết quả bit-exact.
 3. **Bộ nhân:** đăng ký đầu vào và đầu ra để Quartus dùng thanh ghi trong DSP.
+
+Đo sau Fitter: mục tiêu 100 MHz đạt ở P = 4, 8, 16. Đường găng nhất ở P = 8, 16 là tầng 1 của `smx_maxtree`, không phải hai vòng trên; xem `docs/spec/blocks/smx_core.md` mục 6.
 
 ## 5. Quyết định kiến trúc (đã chốt v1.0)
 

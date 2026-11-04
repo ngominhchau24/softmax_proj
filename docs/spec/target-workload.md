@@ -39,8 +39,8 @@ Một **hàng** của `smx` = một query token i của một head h trong một
 | Lần chạy / layer / ảnh | 3 × 13 = 39 | mỗi lần chạy chỉ chứa hàng của **một** head → một K |
 | Hàng / layer / ảnh | 3 × 197 = 591 | |
 | Nhóm P = 8 / hàng | ⌈197/8⌉ = 25, nhóm cuối 5 lane | |
-| Chu kỳ / hàng | ≈ 2·25 + ~48 ≈ 98; trần REQ-PRF-03: 2·25 + 64 = 114 | [TK] theo ước lượng xả + chia trong `architecture.md` mục 3 |
-| Chu kỳ / layer / ảnh | ≈ 591 × 98 ≈ 58k (≈ 0,58 ms @ 100 MHz) | [TK]; đo thật bằng `CYCLE_CNT` |
+| Chu kỳ / hàng | 2·25 + 54 = 104; trần REQ-PRF-03: 2·25 + 64 = 114 | đo bằng `CYCLE_CNT` trong `tb_smx_core`, gồm mọi L ở P = 8 |
+| Chu kỳ / layer / ảnh | 591 × 104 + 39 = 61 503 (≈ 0,62 ms @ 100 MHz) | tính từ công thức `CYCLE_CNT = R·T_row + 1` đã kiểm bằng mô phỏng; chưa đo trên board |
 | Dữ liệu JTAG / layer / ảnh | ghi ⌈197/4⌉ = 50 word/hàng, đọc 50 word/hàng → 591 × 400 B ≈ 231 KiB | [TK]; X_BUF stride 512 B/hàng nhưng chỉ ghi 50 word đầu |
 
 Với băng thông JTAG cỡ chục–trăm KB/s (`integration-notes.md`, chưa đo), một layer của một ảnh mất cỡ giây đến chục giây trên board. Chấp nhận được cho demo vài ảnh; **không** chạy cả tập dữ liệu trên board (xem mục 5).

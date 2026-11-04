@@ -34,6 +34,8 @@
 
 Latency mục tiêu: ≤ `2·⌈L/P⌉ + 64` chu kỳ/hàng (L = 512 → ≤ 192). Fmax mục tiêu ≥ 100 MHz. Tài nguyên: > 1000 ALUT + DSP.
 
+Số đo (`syn/fit.sh`, góc slow xấu hơn, 3 seed; chi tiết `docs/spec/blocks/smx_core.md` mục 6, 7): P = 8 đạt 122–134 MHz với 1 681 ALUT, 24 DSP, 21 M10K; P = 16 đạt 108–113 MHz; P = 4 đạt 149 MHz (1 seed). Chỉ tính đường thanh ghi tới thanh ghi. `T_row = 2G + 54` chu kỳ.
+
 ## 4. Giao diện
 
 - Avalon-MM slave, 32 bit, word address, không burst, không waitrequest, **readLatency = 2**, có byteenable 4 bit.
@@ -75,6 +77,7 @@ python3 model/softmax_ref.py --selftest
 python3 model/softmax_ref.py --gen-pwl 8
 python3 model/softmax_ref.py --gen-hex 8 rtl/pkg/pwl_n8.hex
 syn/map_check.sh smx_exp2 N_SEG=4,8,16     # quartus_map, không phải số Fitter/Fmax
+syn/fit.sh 8 8 1                           # P N_SEG SEED: Fitter đầy đủ cho smx_core, in tài nguyên và Fmax
 ```
 
 Môi trường Python: `source ~/venvs/ml/bin/activate` (xem `setup` ở thư mục gốc).
