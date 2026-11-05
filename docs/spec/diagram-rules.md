@@ -75,7 +75,7 @@ Các rule còn lại là chuyện trình bày, nên phải mở hình ra nhìn t
 
 ## 4. Trạng thái áp dụng
 
-Mọi sơ đồ cấu trúc và FSM trong `docs/spec/` đã theo rule này, gồm 13 hình trong `docs/spec/fig/`. `docs/archive/` không chuyển vì là tài liệu đã huỷ.
+Mọi sơ đồ cấu trúc và FSM trong `docs/spec/` đã theo rule này, gồm 14 hình trong `docs/spec/fig/`. `docs/archive/` không chuyển vì là tài liệu đã huỷ.
 
 Sinh lại tất cả:
 

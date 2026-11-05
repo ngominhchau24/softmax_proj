@@ -10,7 +10,8 @@
 <rect x="170" y="80" width="100" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
 <text x="220" y="104" font-size="13" text-anchor="middle">s1_q_q</text>
 <rect x="170" y="180" width="100" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
-<text x="220" y="204" font-size="13" text-anchor="middle">s1_k_q</text>
+<text x="220" y="197" font-size="13" text-anchor="middle">s1_k_q</text>
+<text x="220" y="213" font-size="11" text-anchor="middle">{1'b0, k_in}</text>
 <rect x="350" y="80" width="90" height="140" fill="#fff" stroke="#000" stroke-width="1.5"/>
 <text x="395" y="147" font-size="13" text-anchor="middle">multiplier</text>
 <text x="395" y="163" font-size="11" text-anchor="middle">8 x 17 signed</text>
@@ -32,7 +33,7 @@
 <polyline points="20,100 170,100" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
 <text x="25" y="95" font-size="11" text-anchor="start">q_in[7:0]</text>
 <polyline points="20,200 170,200" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
-<text x="25" y="195" font-size="11" text-anchor="start">{1'b0, k_in[15:0]}</text>
+<text x="25" y="195" font-size="11" text-anchor="start">k_in[15:0]</text>
 <polyline points="270,100 350,100" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
 <text x="275" y="95" font-size="11" text-anchor="start">s1_q_q[7:0]</text>
 <polyline points="270,200 350,200" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>

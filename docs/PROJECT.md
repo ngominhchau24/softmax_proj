@@ -185,7 +185,7 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-05: Chau yêu cầu sơ đồ theo kiểu sơ đồ vi mạch, dây thẳng bẻ góc vuông. Thêm `docs/spec/diagram-rules.md` và `docs/spec/fig/schematic.py` (SVG đặt tay, tự kiểm rule). Bỏ Mermaid `flowchart` và `stateDiagram` cho hình mới, vì đã thử Mermaid 12.2 với `look: classic`: có góc vuông nhưng dây chạy trùng nhau và nhãn đè lên dây. Hình mẫu: `fig/smx_core.svg`. Sơ đồ cũ chưa chuyển.
 
-- 2026-11-05: Chau duyệt kiểu sơ đồ. Chuyển toàn bộ sơ đồ cấu trúc và FSM trong `docs/spec/` sang `docs/spec/fig/` (13 hình). Thêm rule ghi độ rộng dạng `addr[15:0]` trên dây, tính ở P = 8, N_SEG = 8.
+- 2026-11-05: Chau duyệt kiểu sơ đồ. Chuyển toàn bộ sơ đồ cấu trúc và FSM trong `docs/spec/` sang `docs/spec/fig/` (14 hình). Thêm rule ghi độ rộng dạng `addr[15:0]` trên dây, tính ở P = 8, N_SEG = 8.
 
 ## 11. Tài liệu tham khảo chính
 

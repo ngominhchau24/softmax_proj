@@ -3,7 +3,7 @@ from schematic import Sheet
 
 s = Sheet("smx_system", 1130, 220)
 s.boundary(240, 30, 760, 170, "FPGA system (implement team)")
-s.box(40, 70, 120, 60, "PC", "Python, System Console")
+s.box(20, 70, 140, 60, "PC", "Python, System Console")
 s.box(280, 70, 140, 60, "JTAG to Avalon", "Master Bridge")
 s.box(540, 70, 130, 60, "smx_avalon", "thin wrapper")
 s.box(800, 70, 130, 60, "smx_core")
