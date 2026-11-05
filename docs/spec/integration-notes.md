@@ -16,6 +16,7 @@
 - **Địa chỉ:** qua JTAG master dùng base do Platform Designer gán (ví dụ 0x0) + offset trong requirements 5.2. Qua HPS là `0xFF200000 + base` (đối chiếu tài liệu Terasic).
 - **Băng thông JTAG** thấp (cỡ chục–trăm KB/s) nhưng đủ: mỗi lần chạy ≤ 8 KB. Thời gian tính đo bằng `CYCLE_CNT`, không phụ thuộc JTAG.
 - **Byteenable** được hỗ trợ, nhưng Tcl nên ghi nguyên word cho nhanh.
+- **Reset:** `smx_core` không có bộ đồng bộ reset. `rst_n` được assert bất đồng bộ, nhưng phải deassert đồng bộ với `clk` (REQ-IF-04), và đây là trách nhiệm của bên lái `rst_n`.
 - **Conduit `status`** nối 3 LED (busy/done/err) để người xem thấy accelerator chạy.
 - **Thuật ngữ:** golden model = `model/softmax_ref.py`; GHRD = thiết kế mẫu Terasic.
 

@@ -177,6 +177,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-04: `smx_core` tích hợp xong và qua Fitter. P = 4/8/16 đạt ≥ 100 MHz ở mọi seed đã chạy (sát nhất 107,83 MHz ở P = 16); P = 8 dùng 1 681 ALUT, 24 DSP, 21 M10K, Fmax 122,09–134,41 MHz, lấy góc xấu hơn trong hai góc slow. Đường găng nhất ở P = 8, 16 là tầng 1 `smx_maxtree`, ở P = 8 có `tag_q` bị Quartus chuyển vào M10K, không phải vòng tích luỹ như dự đoán. Rà soát độc lập không tìm ra lỗi số học nhưng chỉ ra `tb_smx_core` bỏ sót mutation về bus khi BUSY và Y cũ che lỗi; đã siết bench, 11/11 mutation bị bắt, `make regress` PASS ở P, N_SEG = 4/8/16. RTL không đổi. Thêm `syn/fit.sh`. Thêm A5–A7 vào `docs/spec/open-decisions.md`. Sửa số chu kỳ DeiT-Tiny theo số đo (104 chu kỳ/hàng, 61 503 chu kỳ/layer).
 
+- 2026-11-05: Chau chốt A2: deassert `rst_n` do test drive, lõi không chứa bộ đồng bộ reset. REQ-IF-04 không đổi; RTL không đổi, testbench đã thả reset ở cạnh xuống của `clk`.
+
 ## 11. Tài liệu tham khảo chính
 
 Danh sách đầy đủ ở `docs/research/softmax-survey.md` mục 7. Cốt lõi: Milakov & Gimelshein 2018 (online normalizer); Kim et al., I-BERT, ICML 2021; Stevens et al., Softermax, DAC 2021; Li & Gu, I-ViT/Shiftmax, ICCV 2023; Wei et al., SoftGen, ASAP 2020; Wang et al., log-sum-exp, APCCAS 2018; Wang et al., SOLE, 2025. Tài liệu nền accelerator (Kung 1982, TPU 2017, Eyeriss 2016, Sze 2017, Jacob 2018) ở `docs/archive/gemm-sa-proposal.md` mục tham khảo.

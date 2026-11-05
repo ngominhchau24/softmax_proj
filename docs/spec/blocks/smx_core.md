@@ -28,7 +28,7 @@ Nội bộ (không ghi đè): `BANKS = P/4`, `ADDR_W = $clog2(8192/P)`, `TW = 3 
 | Port | Hướng | Độ rộng | Mô tả |
 |---|---|---|---|
 | `clk` | in | 1 | |
-| `rst_n` | in | 1 | active-low, bất đồng bộ |
+| `rst_n` | in | 1 | active-low, assert bất đồng bộ; lõi không có bộ đồng bộ, bên lái phải deassert đồng bộ (trong mô phỏng là testbench, `open-decisions.md` A2) |
 | `acc_addr` | in | 13 | word address (mục 4.1 của `cross-block.md`) |
 | `acc_write` | in | 1 | |
 | `acc_writedata` | in | 32 | |

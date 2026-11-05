@@ -5,7 +5,7 @@
 ## A. Cần Chau quyết
 
 - [ ] **A1. Duyệt tài liệu block.** Theo yêu cầu của Chau, RTL được viết trước cổng duyệt. Các block mới không mang trạng thái `APPROVED`; tài liệu ghi "chưa Chau duyệt". Chau đọc rồi xác nhận từng block hoặc yêu cầu sửa.
-- [ ] **A2. Bộ đồng bộ reset (REQ-IF-04).** Yêu cầu nói `rst_n` assert bất đồng bộ, deassert đồng bộ, nhưng không nói ai làm phần deassert. Đề xuất: lõi không chứa bộ đồng bộ, dựa vào reset controller của Platform Designer, và ghi vào `integration-notes.md`. Việc này ảnh hưởng nhóm implement nên cần Chau xác nhận.
+- [x] **A2. Bộ đồng bộ reset (REQ-IF-04).** Chau chốt 2026-11-05: phần deassert do test drive. Lõi không chứa bộ đồng bộ; bên lái `rst_n` phải thả reset đồng bộ. Mọi testbench trong `tb/` đã thả ở cạnh xuống của `clk`, cách cạnh lên kế tiếp nửa chu kỳ. Khi lõi nằm trong hệ thống thật, phần này thuộc về bên nối `rst_n` (`integration-notes.md` mục 2).
 - [ ] **A3. Sửa câu trong REQ-ARI-05 (requirements đóng băng).** Câu "`sum` không dấu, ≥ 25 bit (≤ 512·2¹⁶)" có cận 2²⁵, cần 26 bit. Cận đúng và đã đo là `L_MAX·2¹⁵ = 2²⁴`, cần 25 bit. Không ảnh hưởng số học hay giao diện. Đề xuất sửa thành "≤ 512·2¹⁵".
 - [ ] **A4. Span Platform Designer (bàn giao nhóm implement, chưa kiểm).** Cổng 13 bit word address có thể khiến Platform Designer gán span 0x8000 thay vì 0x6000 trong requirements 5.2. Lõi không bị ảnh hưởng vì vùng `0x1800..0x1FFF` đọc 0. Đề xuất ghi một dòng vào `integration-notes.md` để nhóm implement kiểm.
 
