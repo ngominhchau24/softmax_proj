@@ -2,7 +2,11 @@
 
 > Đọc đầu phiên, trước khi bắt đầu việc. Cập nhật file này trong cùng commit khi trạng thái đổi: xong một việc, có quyết định mới, hoặc có việc mới phải chờ. Chỉ ghi trạng thái hiện tại; lịch sử nằm ở `git log` và `docs/PROJECT.md` mục 10.
 
-**Cập nhật lần cuối:** 2026-11-05. **Nhánh:** `rtl/smx-core`, đã push, chưa có PR vào `main`.
+**Cập nhật lần cuối:** 2026-11-05. **Nhánh:** `rtl/smx-core`, đã push, chưa có PR vào `main`. RTL, số học và bản đồ thanh ghi không đổi kể từ commit tích hợp `ea2f8cd`.
+
+## Phiên gần nhất dừng ở đâu
+
+Không có việc nào đang làm dở: mọi thay đổi đã commit và push, không có tác vụ nền. Phiên 2026-11-05 kết thúc sau khi chuyển xong sơ đồ sang kiểu vuông góc. Bước tiếp theo thuộc về Chau: đọc `docs/spec/softmax-theory.md`, rồi trả lời các mục A ở dưới. Khi bắt đầu phiên mới, hỏi Chau đã đọc tới đâu và có trả lời nào chưa, đừng tự chuyển sang việc khác.
 
 ## Trạng thái
 
@@ -14,7 +18,8 @@ RTL `smx_core` đã tích hợp và qua Fitter. Tài liệu vẫn là DRAFT, nê
 | `tb_smx_core` | PASS ở P, N_SEG = 4/8/16; 11/11 mutation bị bắt ở P = N_SEG = 8 | `tb/tb_smx_core.sv`, `model/vec_core.py` |
 | Fitter | Đạt ≥ 100 MHz; P = 8 và 16 chạy 3 seed, P = 4 chạy 1 seed, N_SEG = 8 | `syn/fit.sh`, `docs/spec/blocks/smx_core.md` mục 6, 7 |
 | Spec gộp | Xong, DRAFT | `docs/spec/design-spec.md` |
-| Trang tổng quan | Đã publish, riêng tư | https://claude.ai/artifact/3DFqbxKoc9vqgVEwhHirCx |
+| Trang tổng quan | Đã publish, riêng tư, đã có hình mới | https://claude.ai/artifact/3DFqbxKoc9vqgVEwhHirCx |
+| Sơ đồ | Xong: mọi sơ đồ cấu trúc và FSM đã chuyển, Chau đã duyệt kiểu vẽ | `docs/spec/diagram-rules.md`, `docs/spec/fig/` (14 hình), hình mẫu https://claude.ai/artifact/KdXrpjvPAcWa2vqQCf61E3 |
 | Tài liệu lý thuyết softmax | Xong, Chau đang đọc trước khi duyệt các mục A | `docs/spec/softmax-theory.md`, bản web https://claude.ai/artifact/ScwHoNtA1WWJKCqLboefGu |
 
 Chưa có gì trong `rtl/avalon/`, `ip/`, `sw/`: wrapper và hệ thống thuộc nhóm implement, không tự viết (`CLAUDE.md`).
@@ -35,6 +40,7 @@ Chưa có gì trong `rtl/avalon/`, `ip/`, `sw/`: wrapper và hệ thống thuộ
 Câu hỏi khác đang chờ Chau:
 
 - **Reset trên board:** A2 đã chốt là deassert do test drive, lõi không có bộ đồng bộ. `integration-notes.md` đang tạm ghi trên hệ thống thật là trách nhiệm của bên lái `rst_n`; chưa xác nhận.
+- **Độ chi tiết sơ đồ:** có khối nào cần vẽ chi tiết hơn không. Ứng viên là `smx_csr`, đang gom khối thanh ghi và cổng X_BUF. Mặc định giữ nguyên.
 - **Worktree cũ:** có xoá 9 worktree đã merge trong `.claude/worktrees` (98 MB) không. Chưa xoá.
 - **PR vào `main`:** chỉ mở khi Chau yêu cầu.
 - **Tài liệu trên claude.ai:** nhắc Chau tải lại docs lên Project; repo không tự đồng bộ.
@@ -61,9 +67,11 @@ Theo thứ tự, khi Chau không chỉ định khác. Lịch ở `PROJECT.md` m�
 
 - **Git:** commit và push sau mỗi bước đã kiểm chứng, trên nhánh làm việc; không push thẳng `main`.
 - **Tác vụ tự chạy tiếp:** "Resume softmax core work after quota" đang **tắt**, và gắn với phiên cũ `session_018kvwhthqKq5fC6j8brjM6B`. Phiên mới cần cơ chế này thì tạo tác vụ mới. Nó chỉ chạy khi máy bật và phiên còn sống.
-- **`/tmp` mất khi tắt máy:** bench riêng của reviewer và script dựng trang tổng quan đều nằm ở đó, không có trong repo. Đừng tìm lại. Muốn sửa trang: dùng `Artifact` `action: read` với URL ở trên rồi publish lại vào cùng URL.
-- **Xem hình trên máy này:** không có browser cho `mmdc` và Playwright, nhưng có Firefox: `firefox --headless --no-remote --profile <thư mục tạm> --window-size W,H --screenshot <scratch>/x.png file:///...`. Ghi ảnh ra scratch, vì repo chặn đọc file PNG.
-- **Trang tổng quan là bản chụp:** khi spec đổi đáng kể thì publish lại.
+- **`/tmp` mất khi tắt máy:** bench riêng của reviewer và script dựng ba trang artifact đều nằm ở đó, không có trong repo. Đừng tìm lại. Muốn sửa trang: dùng `Artifact` `action: read` với URL ở trên, sửa, rồi publish lại vào cùng URL để giữ link. Hai trang lớn nhúng SVG inline từ `docs/spec/fig/`; trang lý thuyết còn có công thức KaTeX render sẵn và font nhúng, lấy `katex`, `marked` từ `node_modules` của `@mermaid-js/mermaid-cli` trong `~/.local/lib/node_modules`.
+- **File chỉ có trên máy này:** `CLAUDE.md` và `.claude/commands/` nằm trong `.gitignore`. Chúng đã được cập nhật rule mới nhưng không có trên git. Chau xác nhận các phiên sau vẫn chạy local nên giữ nguyên.
+- **Vẽ sơ đồ:** theo `docs/spec/diagram-rules.md`. Không dùng Mermaid `flowchart` hay `stateDiagram`. Sau khi sinh hình, phải mở ảnh ra xem, vì script chỉ kiểm được phần quy tắc hình học.
+- **Xem hình trên máy này:** không có browser cho `mmdc` và Playwright, nhưng có Firefox. Bọc SVG vào một file HTML trong scratch rồi chạy `firefox --headless --no-remote --profile <thư mục tạm> --window-size W,H --screenshot <scratch>/x.png file:///<scratch>/x.html`. Ghi ảnh ra scratch, vì repo chặn đọc file PNG.
+- **Các trang artifact là bản chụp:** khi spec hoặc hình đổi đáng kể thì publish lại.
 
 ## Kiểm tra nhanh đầu phiên
 
