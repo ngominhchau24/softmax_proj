@@ -181,6 +181,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-05: Thêm `docs/spec/design-spec.md`, bản gộp cho `smx_core`: hoạt động từng bước với mốc chu kỳ đo bằng mô phỏng và ví dụ số từ golden model, interface, port, sơ đồ, số đo. Không có quyết định mới. Thêm sơ đồ cấu trúc cho `smx_ctrl`, sửa sơ đồ trong `architecture.md` mục 2 để khớp RTL.
 
+- 2026-11-05: Thêm `docs/spec/softmax-theory.md` theo yêu cầu của Chau, để hiểu toán trước khi duyệt các mục A: dẫn từ định nghĩa softmax tới từng phương trình của lõi, chứng minh cận `2¹⁴ ≤ sum ≤ 2²⁴`, đo sai số bằng golden model. Không đổi số học.
+
 ## 11. Tài liệu tham khảo chính
 
 Danh sách đầy đủ ở `docs/research/softmax-survey.md` mục 7. Cốt lõi: Milakov & Gimelshein 2018 (online normalizer); Kim et al., I-BERT, ICML 2021; Stevens et al., Softermax, DAC 2021; Li & Gu, I-ViT/Shiftmax, ICCV 2023; Wei et al., SoftGen, ASAP 2020; Wang et al., log-sum-exp, APCCAS 2018; Wang et al., SOLE, 2025. Tài liệu nền accelerator (Kung 1982, TPU 2017, Eyeriss 2016, Sze 2017, Jacob 2018) ở `docs/archive/gemm-sa-proposal.md` mục tham khảo.

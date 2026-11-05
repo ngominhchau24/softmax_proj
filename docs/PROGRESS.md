@@ -15,12 +15,13 @@ RTL `smx_core` đã tích hợp và qua Fitter. Tài liệu vẫn là DRAFT, nê
 | Fitter | Đạt ≥ 100 MHz; P = 8 và 16 chạy 3 seed, P = 4 chạy 1 seed, N_SEG = 8 | `syn/fit.sh`, `docs/spec/blocks/smx_core.md` mục 6, 7 |
 | Spec gộp | Xong, DRAFT | `docs/spec/design-spec.md` |
 | Trang tổng quan | Đã publish, riêng tư | https://claude.ai/artifact/3DFqbxKoc9vqgVEwhHirCx |
+| Tài liệu lý thuyết softmax | Xong, Chau đang đọc trước khi duyệt các mục A | `docs/spec/softmax-theory.md`, bản web https://claude.ai/artifact/ScwHoNtA1WWJKCqLboefGu |
 
 Chưa có gì trong `rtl/avalon/`, `ip/`, `sw/`: wrapper và hệ thống thuộc nhóm implement, không tự viết (`CLAUDE.md`).
 
 ## Đang chờ Chau
 
-Đừng tự quyết các mục này. Chi tiết và đề xuất: `docs/spec/open-decisions.md` phần A.
+Đừng tự quyết các mục này. Chi tiết và đề xuất: `docs/spec/open-decisions.md` phần A. Chau đọc `docs/spec/softmax-theory.md` trước rồi mới duyệt; mục 14 của file đó nối từng mục A với phần toán liên quan.
 
 | Mục | Cần gì | Việc phải làm sau khi có trả lời |
 |---|---|---|
