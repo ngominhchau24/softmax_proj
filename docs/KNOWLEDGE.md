@@ -1,5 +1,7 @@
 # KNOWLEDGE — smx (bản tóm tắt để đọc đầu phiên)
 
+> **Đang ở đâu, chờ gì, làm gì tiếp: đọc `docs/PROGRESS.md` trước.**
+>
 > Bản nén của `PROJECT.md` và `requirements.md`. Đọc file này trước; chỉ mở tài liệu gốc khi cần chi tiết hoặc khi sửa số học/giao diện. Nguồn chân lý số học: `model/softmax_ref.py`.
 
 ## 1. Đề tài và phạm vi
