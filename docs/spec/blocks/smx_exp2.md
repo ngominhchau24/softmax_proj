@@ -101,37 +101,7 @@ Hệ quả cho block sau (ghi lại, không quyết ở đây): `E ≤ 2¹⁵` n
 
 Pipeline 3 tầng, căn theo khối DSP (thanh ghi đầu vào và đầu ra của bộ nhân).
 
-```mermaid
-flowchart LR
-  subgraph S1["Tầng 1 (comb → reg)"]
-    U["u_in[24:0]"] --> SPLIT["tách bit"]
-    SPLIT -- "idx = u[15:13]" --> ROM["ROM PWL<br/>C[idx] 16b, M_[idx] 13b<br/>(hằng smx_pkg, LUT)"]
-    SPLIT -- "r = u[12:0]" --> R1["s1_r_q"]
-    SPLIT -- "u_hi = u[24:16]" --> SUB["s = m_in − u_hi<br/>9b"]
-    MIN["m_in[8:0]"] --> SUB
-    SUB --> KILL["kill = ~en | s[8:4]≠0<br/>sh = s[3:0]"]
-    EN["in_en"] --> KILL
-    ROM --> C1["s1_c_q"]
-    ROM --> M1["s1_m_q"]
-    KILL --> K1["s1_sh_q, s1_kill_q"]
-  end
-  subgraph S2["Tầng 2 (DSP)"]
-    M1 --> MUL["× 13×13 không dấu"]
-    R1 --> MUL
-    MUL --> P2["s2_prod_q 26b"]
-    C1 --> C2["s2_c_q"]
-    K1 --> K2["s2_sh_q, s2_kill_q"]
-  end
-  subgraph S3["Tầng 3"]
-    P2 -- "prod[25:13]" --> ADD["e0 = c + prod>>13<br/>16b"]
-    C2 --> ADD
-    ADD --> SH["e0 >> sh<br/>barrel 4 mức"]
-    K2 --> SH
-    SH --> Z["kill ? 0"]
-    Z --> E["e_q → e_out"]
-  end
-  V["in_valid"] --> V1["s1_vld_q"] --> V2["s2_vld_q"] --> V3["vld_q → out_valid"]
-```
+![smx_exp2](../fig/smx_exp2.svg)
 
 Thanh ghi (độ rộng ở N_SEG = 8):
 

@@ -36,7 +36,6 @@ Câu hỏi khác đang chờ Chau:
 
 - **Reset trên board:** A2 đã chốt là deassert do test drive, lõi không có bộ đồng bộ. `integration-notes.md` đang tạm ghi trên hệ thống thật là trách nhiệm của bên lái `rst_n`; chưa xác nhận.
 - **Worktree cũ:** có xoá 9 worktree đã merge trong `.claude/worktrees` (98 MB) không. Chưa xoá.
-- **Sơ đồ cũ:** `docs/spec/diagram-rules.md` đã có hiệu lực cho hình mới, nhưng các sơ đồ Mermaid hiện có chưa chuyển. Chau chưa quyết có chuyển hết không; trang artifact cũng chưa cập nhật theo.
 - **PR vào `main`:** chỉ mở khi Chau yêu cầu.
 - **Tài liệu trên claude.ai:** nhắc Chau tải lại docs lên Project; repo không tự đồng bộ.
 - **Đề tài và lịch:** tên đề tài trong sheet nhóm 6, ngày nộp chính xác (`PROJECT.md` mục 9).

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 500" width="1440" height="500" font-family="Arial, Helvetica, sans-serif" fill="#000">
+<title>smx_csr</title>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0.8 L7.5,4 L0,7.2 z" fill="#000"/></marker></defs>
+<rect width="1440" height="500" fill="#fff"/>
+<rect x="150" y="30" width="1050" height="440" fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="7 4"/>
+<text x="158" y="462" font-size="11" text-anchor="start">smx_csr</text>
+<rect x="190" y="60" width="110" height="150" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="245" y="132" font-size="13" text-anchor="middle">address</text>
+<text x="245" y="148" font-size="11" text-anchor="middle">decode</text>
+<rect x="470" y="60" width="170" height="120" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="555" y="117" font-size="13" text-anchor="middle">control registers</text>
+<text x="555" y="133" font-size="11" text-anchor="middle">len, rows, k, busy, done, err</text>
+<rect x="720" y="130" width="100" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="770" y="159" font-size="13" text-anchor="middle">csr_val mux</text>
+<rect x="900" y="130" width="90" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="945" y="159" font-size="13" text-anchor="middle">s1_val_q</text>
+<rect x="900" y="200" width="90" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="945" y="222" font-size="13" text-anchor="middle">s1_csr, x, y_q</text>
+<text x="945" y="238" font-size="11" text-anchor="middle">s1_bank_q[1:0]</text>
+<rect x="1050" y="130" width="70" height="170" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1085" y="212" font-size="13" text-anchor="middle">read</text>
+<text x="1085" y="228" font-size="11" text-anchor="middle">mux</text>
+<rect x="1150" y="190" width="40" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1170" y="219" font-size="13" text-anchor="middle">rd_q</text>
+<rect x="470" y="330" width="170" height="100" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="555" y="377" font-size="13" text-anchor="middle">X_BUF port</text>
+<text x="555" y="393" font-size="11" text-anchor="middle">enable, address, data</text>
+<polyline points="20,80 190,80" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="75" font-size="11" text-anchor="start">acc_addr[12:0]</text>
+<polyline points="20,110 190,110" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="105" font-size="11" text-anchor="start">acc_write</text>
+<polyline points="20,140 190,140" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="135" font-size="11" text-anchor="start">acc_read</text>
+<polyline points="20,170 190,170" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="165" font-size="11" text-anchor="start">acc_byteenable[3:0]</text>
+<polyline points="20,240 420,240 420,130 470,130" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="235" font-size="11" text-anchor="start">acc_writedata[31:0]</text>
+<polyline points="20,310 560,310 560,180" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="305" font-size="11" text-anchor="start">run_done</text>
+<polyline points="300,90 470,90" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="305" y="85" font-size="11" text-anchor="start">wr_len, wr_rows, wr_k, wr_ctrl</text>
+<circle cx="420" cy="240" r="2.8" fill="#000"/>
+<polyline points="420,240 420,420 470,420" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="240,210 240,360 470,360" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="320" y="355" font-size="11" text-anchor="start">x_wr_hit, addr</text>
+<polyline points="300,200 900,200" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="660" y="195" font-size="11" text-anchor="start">acc_read &amp; hit_*, bank</text>
+<polyline points="640,150 720,150" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="645" y="145" font-size="11" text-anchor="start">registers</text>
+<polyline points="820,150 900,150" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="825" y="145" font-size="11" text-anchor="start">csr_val[31:0]</text>
+<polyline points="990,150 1050,150" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="995" y="145" font-size="11" text-anchor="start">[31:0]</text>
+<polyline points="990,220 1050,220" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="20,260 1050,260" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="255" font-size="11" text-anchor="start">x_rd_data[63:0]</text>
+<polyline points="20,290 1050,290" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="285" font-size="11" text-anchor="start">y_rd_data[63:0]</text>
+<polyline points="1120,210 1150,210" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="1190,210 1420,210" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="205" font-size="11" text-anchor="start">acc_readdata[31:0]</text>
+<polyline points="640,80 1420,80" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="75" font-size="11" text-anchor="start">len[9:0], rows[4:0], k[15:0], start</text>
+<polyline points="640,110 1420,110" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="105" font-size="11" text-anchor="start">status_busy, status_done, status_err</text>
+<polyline points="640,340 1420,340" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="335" font-size="11" text-anchor="start">x_wr_en[1:0]</text>
+<polyline points="640,360 1420,360" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="355" font-size="11" text-anchor="start">x_wr_be[3:0]</text>
+<polyline points="640,380 1420,380" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="375" font-size="11" text-anchor="start">x_wr_addr[9:0]</text>
+<polyline points="640,400 1420,400" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="395" font-size="11" text-anchor="start">x_wr_data[63:0]</text>
+<polyline points="640,420 1420,420" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1210" y="415" font-size="11" text-anchor="start">buf_rd_addr[9:0]</text>
+<text x="690" y="462" font-size="11" text-anchor="start">Read: command at n, data at n + 2. Drawn at P = 8. clk and rst_n are not drawn.</text>
+</svg>

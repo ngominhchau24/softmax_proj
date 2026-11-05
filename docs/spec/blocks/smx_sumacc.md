@@ -56,31 +56,7 @@ Nhóm liên tiếp: tầng 3 là `sum_q ← f(sum_q, ...)` mỗi chu kỳ nên n
 
 ## 5. Cấu trúc bên trong
 
-```mermaid
-flowchart LR
-  subgraph S1["Tầng 1"]
-    E["e_in P x 16"] --> A1["NG bộ cộng GS lane"]
-    A1 --> R1["s1_part_q NG x (16+log2 GS)"]
-    I1["dm_in, in_first"] --> D1["s1_dm_q, s1_first_q"]
-  end
-  subgraph S2["Tầng 2"]
-    R1 --> A2["tổng NG phần"]
-    A2 --> R2["s2_tot_q 16+log2 P"]
-    D1 --> D2["s2_dm_q, s2_first_q"]
-  end
-  subgraph S3["Tầng 3: tích luỹ"]
-    R2 --> ADD["+"]
-    SQ["sum_q"] --> SH["dịch phải dm"]
-    D2 --> SH
-    SH --> ADD
-    ADD --> MX{"first ?"}
-    R2 --> MX
-    D2 --> MX
-    MX -- "s2_vld_q" --> SQ
-  end
-  SQ --> OUT["sum_out"]
-  V["in_valid"] --> V1["s1_vld_q"] --> V2["s2_vld_q"] --> V3["vld_q = out_valid"]
-```
+![smx_sumacc](../fig/smx_sumacc.svg)
 
 Chia cây hai tầng với mọi P: tầng 1 gom `GS` lane liền kề (P = 4: 2 lane, hai tổng; P = 8: 4 lane, hai tổng; P = 16: 4 lane, bốn tổng); tầng 2 cộng các tổng riêng. Thanh ghi: `s1_part_q` (NG phần tử 17–18 bit), `s2_tot_q` (18–20 bit), `s1/s2_dm_q` 8 bit, `s1/s2_first_q`, `sum_q` 25 bit, ba bit valid. Không DSP, không RAM. Tầng 3 là bộ dịch barrel 25 bit (5 mức, bit 5..7 của `dm` chỉ thêm điều kiện về 0) nối tiếp bộ cộng 25 bit.
 

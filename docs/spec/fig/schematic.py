@@ -24,6 +24,7 @@ class Sheet:
         self.name, self.w, self.h = name, width, height
         self.items, self.boxes, self.segs, self.errors, self.labels = [], [], [], [], []
         self.pins = set()
+        self.borders = []
 
     def _grid(self, *vals):
         for v in vals:
@@ -51,6 +52,7 @@ class Sheet:
         self._grid(x, y, w, h)
         self.items.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="#000" '
                           f'stroke-width="{STROKE_WIRE}" stroke-dasharray="7 4"/>')
+        self.borders.append((x, y, w, h))
         self._text(x + 8, y + h - 8, name, SIZE_SUB)
 
     def _label(self, x, y, s, anchor="start"):
@@ -60,10 +62,11 @@ class Sheet:
         self.labels.append((x0, y - SIZE_NET + 2, x0 + w, y + 2, s))
         self._text(x, y, s, SIZE_NET, anchor)
 
-    def wire(self, pts, label=None, at=None, bus=False, arrow=True, side="auto", lx=None):
+    def wire(self, pts, label=None, at=None, bus=False, arrow=True, side="auto", lx=None, port=False):
         """A net through explicit points. The arrow goes on the last point only.
         label sits above a horizontal segment or right of a vertical one, on segment index `at`.
-        lx moves the label along a horizontal segment to that x."""
+        lx moves the label along a horizontal segment to that x.
+        port=True marks the last point as an output pin of the figure, so it may end in empty space."""
         self._grid(*[c for p in pts for c in p])
         for a, b in zip(pts, pts[1:]):
             if a[0] != b[0] and a[1] != b[1]:
@@ -75,7 +78,7 @@ class Sheet:
         marker = ' marker-end="url(#arrow)"' if arrow else ""
         width = STROKE_BUS if bus else STROKE_WIRE
         self.items.append(f'<polyline points="{d}" fill="none" stroke="#000" stroke-width="{width}"{marker}/>')
-        if arrow:
+        if arrow and not port:
             self.pins.add(pts[-1])
         if label:
             i = at if at is not None else 0
@@ -125,6 +128,10 @@ class Sheet:
             for x, y, w, h, name in self.boxes:
                 if x < x1 and x + w > x0 and y < y1 and y + h > y0:
                     self.errors.append(f"label '{text}' lies on box {name}")
+            for x, y, w, h in self.borders:
+                if (y < y1 and y + h > y0 and (x0 < x < x1 or x0 < x + w < x1)) or (
+                        x < x1 and x + w > x0 and (y0 < y < y1 or y0 < y + h < y1)):
+                    self.errors.append(f"label '{text}' lies on the boundary")
         for p in self.pins:
             on_box = any((x <= p[0] <= x + w and p[1] in (y, y + h)) or (y <= p[1] <= y + h and p[0] in (x, x + w))
                          for x, y, w, h, _ in self.boxes)

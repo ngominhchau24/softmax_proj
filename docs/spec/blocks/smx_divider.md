@@ -63,31 +63,9 @@ Bộ chia khôi phục tính chính xác số này với `rem` khởi tạo `2^(
 
 ## 5. Cấu trúc bên trong
 
-```mermaid
-flowchart LR
-  SI[sum_in] -- start --> SQ[sum_q 25]
-  INIT[2^13] -- start --> RQ[rem_q 24]
-  RQ --> T["twice = rem·2"]
-  T --> SUB["diff = twice − sum_q (26 bit)"]
-  SQ --> SUB
-  SUB -- "ge = ~borrow" --> MUX{ge?}
-  T --> MUX
-  SUB --> MUX
-  MUX --> RQ
-  SUB -- ge --> QQ["quo_q 26<br/>shift left"]
-  QQ --> RC["rcp_q 27<br/>load at last"]
-  SUB -- "ge (bit cuối)" --> RC
-  CTL["busy / cnt 5b / done"] -- last --> RC
-```
+![smx_divider](../fig/smx_divider.svg)
 
-```mermaid
-stateDiagram-v2
-  [*] --> IDLE
-  IDLE --> BUSY: start / nạp, cnt = 0
-  BUSY --> BUSY: cnt &lt; 26 / lặp
-  BUSY --> IDLE: cnt == 26 / rcp_q nạp, done_q = 1
-  BUSY --> BUSY: start / nạp lại (dùng sai)
-```
+![smx_divider_fsm](../fig/smx_divider_fsm.svg)
 
 Thanh ghi: `sum_q` 25, `rem_q` 24, `quo_q` 26 (bit thương thứ 27 đi thẳng vào `rcp_q`), `rcp_q` 27, `cnt_q` 5, `busy_q`, `done_q`: tổng 109. Không có bộ nhân, không RAM. Thanh ghi dữ liệu `rem_q`, `quo_q` chạy tự do (không cần enable) khi rảnh; giá trị rác đó không bao giờ vào `rcp_q`.
 

@@ -63,25 +63,7 @@ Golden (dòng `norm_out`): `min(OUT_MAX, (e * R + (1 << (OUT_SHIFT - 1))) >> OUT
 
 Ba tầng, căn theo khối DSP: thanh ghi đầu vào bộ nhân, bộ nhân, thanh ghi đầu ra bộ nhân, rồi làm tròn và bão hoà.
 
-```mermaid
-flowchart LR
-  subgraph S1["Tầng 1"]
-    E["e_in 16b"] --> E1["s1_e_q"]
-    R["rcp_in 27b"] --> R1["s1_r_q"]
-  end
-  subgraph S2["Tầng 2 (DSP)"]
-    E1 --> MUL["x  16x27 không dấu"]
-    R1 --> MUL
-    MUL --> P2["s2_prod_q 43b"]
-  end
-  subgraph S3["Tầng 3"]
-    P2 -- "prod[42:32]" --> ADD["t = H + prod[31]<br/>12b"]
-    P2 -- "prod[31]" --> ADD
-    ADD --> SAT["t[11:8] ≠ 0 ? 255 : t[7:0]"]
-    SAT --> Y["y_q → y_out"]
-  end
-  V["in_valid"] --> V1["s1_vld_q"] --> V2["s2_vld_q"] --> V3["vld_q → out_valid"]
-```
+![smx_norm](../fig/smx_norm.svg)
 
 | Tầng | Thanh ghi | Bit |
 |---|---|---|

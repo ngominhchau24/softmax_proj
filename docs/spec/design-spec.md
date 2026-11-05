@@ -45,13 +45,7 @@ Kết quả đo ở P = 8: 182 chu kỳ/hàng khi L = 512 và 104 chu kỳ/hàng
 
 Lõi chỉ biết cổng `acc_*`. Wrapper và hệ thống thuộc nhóm implement (`integration-notes.md`).
 
-```mermaid
-flowchart LR
-  PC["PC: Python + System Console"] -- USB-Blaster --> JTAG["JTAG to Avalon<br/>Master Bridge"]
-  JTAG -- Avalon-MM --> AV["smx_avalon<br/>wrapper mỏng, nhóm implement"]
-  AV -- "acc_*, read latency 2" --> CORE["smx_core<br/>phạm vi tài liệu này"]
-  CORE -- "status_busy, done, err" --> LED["LED, tuỳ chọn"]
-```
+![smx_system](fig/smx_system.svg)
 
 ### 2.2. Bên trong `smx_core`
 
@@ -153,19 +147,7 @@ Softmax float64 nhân 256 cho 21,15; 8,28; 13,66; 11,32; 3,24; 17,54; 12,05; 6,8
 
 `smx_ctrl` đi theo FSM dưới đây và chuyển pha theo sự kiện từ datapath, không tự đếm latency. Một nhóm được phát mỗi chu kỳ ở `P1_RUN` và `P2_RUN`.
 
-```mermaid
-stateDiagram-v2
-  [*] --> IDLE
-  IDLE --> P1_RUN: start / r = 0
-  P1_RUN --> P1_DRAIN: nhóm cuối đã phát
-  P1_DRAIN --> DIV: sum_last
-  DIV --> DIV_WAIT: một chu kỳ, div_start = 1
-  DIV_WAIT --> P2_RUN: div_done
-  P2_RUN --> P2_DRAIN: nhóm cuối đã phát
-  P2_DRAIN --> NEXT_ROW: y_last
-  NEXT_ROW --> P1_RUN: r + 1 < R / r = r + 1
-  NEXT_ROW --> IDLE: r + 1 == R / run_done = 1
-```
+![smx_fsm](fig/smx_fsm.svg)
 
 ### 4.3. Một hàng theo chu kỳ
 

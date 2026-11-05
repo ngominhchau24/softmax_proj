@@ -78,41 +78,7 @@ Hai đường trễ dữ liệu dùng `smx_delay` (cùng tiện ích, không res
 
 ## 5. Cấu trúc bên trong
 
-```mermaid
-flowchart LR
-  ACC[acc_*] --> CSR[smx_csr]
-  CSR -- x_wr_* --> XB[X_BUF]
-  CSR -- len rows k start --> CT[smx_ctrl]
-  CT -- grp_addr --> MUX{busy?}
-  CSR -- buf_rd_addr --> MUX
-  MUX --> XB
-  XB -- q x P --> SC[smx_scale x P]
-  SC -- c --> MT[smx_maxtree]
-  SC -- u --> UD[smx_delay MAXTREE_LAT]
-  UD --> EX[smx_exp2 x P]
-  MT -- m_out --> EX
-  MT -- dm_out --> DD[smx_delay EXP2_LAT]
-  EX -- E --> SA[smx_sumacc]
-  DD --> SA
-  SA -- sum_out --> DV[smx_divider]
-  DV -- rcp_out --> NM[smx_norm x P]
-  EX -- E --> NM
-  NM -- y --> YB[Y_BUF]
-  CT -- y_wr_addr --> YB
-  CSR -- buf_rd_addr --> YB
-  YB -- y_rd_data --> CSR
-  XB -- x_rd_data --> CSR
-  CT -- grp tag --> SB[sideband<br/>shift register]
-  SB -- sum_last y_valid y_last --> CT
-  SB -. valid / pass2 / first / en .-> SC
-  SB -.-> MT
-  SB -.-> EX
-  SB -.-> SA
-  SB -.-> NM
-  CT -- div_start --> DV
-  DV -- div_done --> CT
-  CT -- run_done --> CSR
-```
+![smx_core](../fig/smx_core.svg)
 
 Thanh ghi: shift register `D_MAX = 12` ô × (1 valid có reset + `3 + P` bit dữ liệu), cộng hai `smx_delay` (`P·25·2` bit và `8·3` bit). Bộ nhân, RAM: nằm trong block con.
 

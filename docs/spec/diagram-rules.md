@@ -29,7 +29,7 @@ Trong markdown: `![smx_core](fig/smx_core.svg)` (đường dẫn tương đối 
 3. Hai dây không chạy chồng lên nhau trên cùng một đoạn.
 4. Dây đi vòng quanh khối, không đi xuyên khối.
 5. Rẽ nhánh có chấm tròn đặc ở điểm rẽ. Hai dây cắt nhau không có chấm là không nối.
-6. Bus vẽ nét đậm hơn dây đơn, và ghi độ rộng trong nhãn, ví dụ `acc_writedata[31:0]` hoặc `q x P`.
+6. Trong sơ đồ kiến trúc, mọi dây nhiều bit ghi độ rộng dạng `tên[msb:lsb]`, ví dụ `addr[15:0]`. Mảng packed ghi đủ hai chiều: `c_in[7:0][8:0]`. Đoạn cắt bit ghi `[25:13]`. Dây 1 bit không ghi. Riêng mảng nhiều lane hoặc nhiều bank vẽ nét đậm. Sơ đồ mức hệ thống, và nhóm dây gom chung như `acc_*`, được phép không ghi độ rộng.
 7. Nên ít điểm bẻ và ít chỗ cắt nhau nhất có thể. Dây song song cách đều.
 
 **Khối**
@@ -49,6 +49,7 @@ Trong markdown: `![smx_core](fig/smx_core.svg)` (đường dẫn tương đối 
 14. Luồng dữ liệu đi từ trái sang phải hoặc từ trên xuống. Chỉ đi ngược chiều với đường hồi tiếp hoặc khi không còn chỗ.
 15. Port của khối nằm ở cạnh ngoài hình: đầu vào bên trái, đầu ra bên phải. Riêng cổng bus slave có cả đọc và ghi thì đặt cùng một cạnh.
 16. Mọi toạ độ nằm trên lưới 10 px.
+16b. Độ rộng ghi bằng số ở cấu hình nộp bài P = 8, N_SEG = 8, và trong hình có dòng ghi chú cấu hình đó. Thanh ghi cùng tầng pipeline căn cùng cột, với nhãn `stage n` phía trên.
 17. Phần lặp lại vẽ bản đầu, bản cuối và dấu ba chấm, kèm chỉ số, ví dụ `EC 0,0 ... EC 15,0`. Nếu cấu trúc các bản giống hệt nhau, được vẽ một khối và ghi `x P`.
 18. Tín hiệu đi tới rất nhiều khối thì ghi nhãn đích thay vì kéo dây tới từng khối. `clk`, `rst_n` không vẽ, và có một dòng ghi chú trong hình.
 19. Nền luôn trắng ở cả giao diện sáng và tối, vì nét đen không đọc được trên nền tối. Khi đưa vào trang tối thì đặt trong khung nền trắng.
@@ -68,15 +69,16 @@ Trong markdown: `![smx_core](fig/smx_core.svg)` (đường dẫn tương đối 
 | Dây đi xuyên khối | 4 |
 | Toạ độ lệch lưới | 16 |
 | Mũi tên kết thúc giữa khoảng trống, trừ khi khai báo là chân ra | 2, 15 |
-| Nhãn nằm đè lên dây hoặc khối, ước lượng theo độ dài chữ | 12 |
+| Nhãn nằm đè lên dây, khối hoặc biên phân cấp, ước lượng theo độ dài chữ | 12 |
 
 Các rule còn lại là chuyện trình bày, nên phải mở hình ra nhìn trước khi commit. Chấm rẽ nhánh ở rule 5 script không tự kiểm, phải đọc lại.
 
 ## 4. Trạng thái áp dụng
 
-| Hình | Trạng thái |
-|---|---|
-| `fig/smx_core.svg`, dùng trong `design-spec.md` mục 2.2 | Đã theo rule, là hình mẫu |
-| Các sơ đồ Mermaid hiện có trong `docs/spec/` và `docs/spec/blocks/` | Chưa chuyển |
+Mọi sơ đồ cấu trúc và FSM trong `docs/spec/` đã theo rule này, gồm 13 hình trong `docs/spec/fig/`. `docs/archive/` không chuyển vì là tài liệu đã huỷ.
 
-Hình mới phải theo rule này ngay. Hình cũ chuyển khi Chau yêu cầu, hoặc khi sửa đáng kể tài liệu chứa hình đó.
+Sinh lại tất cả:
+
+```bash
+cd docs/spec/fig && for f in *.py; do [ "$f" = schematic.py ] || python3 "$f"; done
+```

@@ -1,0 +1,30 @@
+"""smx_buf at P = 8: 2 banks x 4 byte lanes, simple dual-port. Run: python3 docs/spec/fig/smx_buf.py"""
+from schematic import Sheet
+
+s = Sheet("smx_buf", 1060, 440)
+s.boundary(150, 20, 760, 390, "smx_buf")
+
+s.box(190, 60, 100, 70, "write enable", "wr_en[b] & wr_be[i]")
+s.box(480, 60, 180, 70, "mem[0:1023][7:0]", "g_bank[0].g_byte[0]")
+s.box(480, 230, 180, 70, "mem[0:1023][7:0]", "g_bank[1].g_byte[3]")
+s.note(470, 180, "... 8 RAMs, one per bank and byte ...")
+
+s.wire([(20, 80), (190, 80)], "wr_en[1:0]")
+s.wire([(20, 110), (190, 110)], "wr_be[3:0]")
+s.wire([(290, 90), (480, 90)], "we[0][0]")
+s.dot(330, 90)
+s.wire([(330, 90), (330, 280), (480, 280)], "we[1][3]", at=1)
+s.wire([(20, 150), (430, 150), (430, 110), (480, 110)], "wr_addr[9:0]")
+s.dot(430, 150)
+s.wire([(430, 150), (430, 250), (480, 250)])
+s.wire([(20, 190), (400, 190), (400, 120), (480, 120)], "wr_data[63:0]")
+s.dot(400, 190)
+s.wire([(400, 190), (400, 270), (480, 270)])
+s.wire([(20, 340), (700, 340), (700, 100), (660, 100)], "rd_addr[9:0]")
+s.dot(570, 340)
+s.wire([(570, 340), (570, 300)])
+s.wire([(660, 80), (1040, 80)], "rd_data[7:0]", lx=930, port=True)
+s.wire([(660, 260), (1040, 260)], "rd_data[63:56]", lx=930, port=True)
+s.note(360, 376, "Byte i of bank b writes wr_data[8(4b+i)+7 : 8(4b+i)].")
+s.note(360, 396, "Read is registered: BUF_LAT = 1. Drawn at P = 8. clk is not drawn.")
+s.save(__file__)

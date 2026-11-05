@@ -57,19 +57,7 @@ Phạm vi `c`: `[−127, 127]`, khớp giả định `smx_maxtree` ("lane mask n
 
 ## 5. Cấu trúc bên trong
 
-```mermaid
-flowchart LR
-  Q["q_in 8b"] --> RQ["s1_q_q"]
-  K["k_in 16b"] --> EXT["{1'b0, k}"] --> RK["s1_k_q 17b signed"]
-  RQ --> MUL["× 8x17 signed"]
-  RK --> MUL
-  MUL --> RP["s2_prod_q 25b"]
-  RP --> RU["s3_u_q → u_out"]
-  RP -- "[24:16]" --> ADD["+ (|[15:0])"]
-  RP -- "[15:0]" --> ADD
-  ADD --> RC["s3_c_q → c_out"]
-  V["in_valid"] --> V1["s1_vld_q"] --> V2["s2_vld_q"] --> V3["vld_q → out_valid"]
-```
+![smx_scale](../fig/smx_scale.svg)
 
 Thanh ghi: tầng 1 `s1_q_q` 8, `s1_k_q` 17; tầng 2 `s2_prod_q` 25; tầng 3 `s3_u_q` 25, `s3_c_q` 9; valid 3. `s1_*` là thanh ghi đầu vào và `s2_prod_q` là thanh ghi đầu ra của bộ nhân, để Quartus gói vào DSP. Mọi thanh ghi dữ liệu nằm trong `always_ff @(posedge clk)` không reset, chuỗi valid nằm trong khối riêng có reset (`smx_exp2.md` mục 5.1, quy tắc 2).
 

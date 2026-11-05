@@ -1,7 +1,7 @@
 # Architecture — `smx` (v1.0)
 
 > Kiến trúc mức top, làm khung cho tài liệu từng block `docs/spec/blocks/*.md` (viết bằng Claude Code CLI theo `_TEMPLATE.md`). Số học bit-exact: `docs/requirements.md` mục 4 và `model/softmax_ref.py`. Các mục `A1–A5` ở cuối đã chốt (2026-10-31); nguồn ở `docs/PROJECT.md` mục 7.1.
-> Sơ đồ: mermaid (sửa tay được). Dạng sóng/timing chu kỳ sẽ dùng WaveDrom trong `docs/spec/wave/`.
+> Sơ đồ theo `docs/spec/diagram-rules.md`. Dạng sóng/timing chu kỳ dùng WaveDrom trong `docs/spec/wave/`.
 > Hợp đồng chi tiết giữa các block: `docs/spec/cross-block.md`; khi khác file này về chi tiết thì `cross-block.md` được ưu tiên.
 
 ## 1. Ranh giới và phân vai
@@ -9,42 +9,13 @@
 - **`smx_core` (Chau — ưu tiên số 1):** CSR, X_BUF, Y_BUF, controller, datapath. Lộ cổng `acc_*` (REQ-IF-06) và conduit trạng thái.
 - **`smx_avalon` + `smx_hw.tcl` + hệ thống Platform Designer + script System Console (nhóm implement):** wrapper mỏng chỉ đổi tên `acc_*` ↔ Avalon `s0`. Ghi chú bàn giao: `docs/spec/integration-notes.md`.
 
-```mermaid
-flowchart LR
-  PC[PC: Python + System Console] -- USB-Blaster --> JTAG[JTAG to Avalon<br/>Master Bridge]
-  JTAG --> AV[smx_avalon<br/>thin wrapper - implement team]
-  AV -- acc_* port, rdlat 2 --> CORE[smx_core<br/>Chau]
-  CORE -- status_busy/done/err --> LED[LEDs - optional]
-```
+![smx_system](fig/smx_system.svg)
 
 ## 2. Cấu trúc bên trong `smx_core`
 
-Sơ đồ vẽ ở P = 8. Decode `acc_*` nằm trong `smx_csr`. Bản đầy đủ có sideband: `docs/spec/design-spec.md` mục 2.2.
+Sơ đồ vẽ ở P = 8, N_SEG = 8. Decode `acc_*` nằm trong `smx_csr`.
 
-```mermaid
-flowchart LR
-  ACC[acc_* port] --> CSR[smx_csr<br/>decode, rdata mux 2-cycle<br/>CTRL STATUS LEN ROWS<br/>SCALE_K CYCLE_CNT HW_PARAM]
-  CSR -- x_wr --> XB[X_BUF: smx_buf<br/>2 bank x 32b x 1024, byte-en]
-  XB -- x_rd_data --> CSR
-  YB[Y_BUF: smx_buf<br/>2 bank x 32b x 1024] -- y_rd_data --> CSR
-
-  CSR -- start, L, R --> CTRL[smx_ctrl<br/>FSM + addr gen + lane mask]
-  CTRL -- run_done --> CSR
-  CTRL -- rd addr --> XB
-  CTRL -- group tag --> SB[sideband<br/>shift register in smx_core]
-  SB -- events --> CTRL
-  XB -- 64b = P x int8 --> SC[smx_scale x P<br/>u = q*K ; c = ceil u]
-  CSR -- K --> SC
-  SC -- c --> MX[smx_maxtree<br/>Mg ; M = max M,Mg]
-  SC -- u --> EX[smx_exp2 x P<br/>d = u - M ; PWL 2^F ; shift]
-  MX -- M running / final --> EX
-  EX -- E pass1 --> SM[smx_sumacc<br/>sum tree + renorm acc]
-  SM -- sum --> DV[smx_divider<br/>floor 2^40/sum]
-  DV -- Rcp --> NM[smx_norm x P<br/>E*Rcp round sat]
-  EX -- E pass2 --> NM
-  NM -- 64b = P x uint8 --> YB
-  CTRL -- wr addr --> YB
-```
+![smx_core](fig/smx_core.svg)
 
 | Block | Chức năng | Phần cứng chính |
 |---|---|---|
@@ -62,19 +33,7 @@ flowchart LR
 
 ## 3. Điều khiển
 
-```mermaid
-stateDiagram-v2
-  [*] --> IDLE
-  IDLE --> P1_RUN: start / r=0
-  P1_RUN --> P1_DRAIN: last group issued
-  P1_DRAIN --> DIV: sum_last
-  DIV --> DIV_WAIT: div_start
-  DIV_WAIT --> P2_RUN: div_done
-  P2_RUN --> P2_DRAIN: last group issued
-  P2_DRAIN --> NEXT_ROW: y_last
-  NEXT_ROW --> P1_RUN: r+1 < R
-  NEXT_ROW --> IDLE: r+1 == R / run_done
-```
+![smx_fsm](fig/smx_fsm.svg)
 
 `smx_csr` kiểm LEN, ROWS trước khi phát `start`: START sai cấu hình đặt DONE = 1, ERR = 1 mà BUSY không lên, nên FSM không thấy lần chạy đó.
 

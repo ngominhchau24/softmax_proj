@@ -62,50 +62,11 @@ Thanh ghi: `r` (4 bit, về 0 khi `start`, +1 ở NEXT_ROW), `g` (về 0 khi `st
 
 Cấu trúc:
 
-```mermaid
-flowchart LR
-  START["start"] --> FSM["state_q<br/>8 trạng thái"]
-  EVT["sum_last, div_done, y_last"] --> FSM
-  LEN["len"] --> GEO["len - 1<br/>g_last_idx, last_lane"]
-  ROWS["rows"] --> RCMP{"r == rows - 1"}
-  FSM --> G["g_q"]
-  FSM --> R["r_q"]
-  G --> GCMP{"g == g_last_idx"}
-  GEO --> GCMP
-  GCMP --> FSM
-  R --> RCMP
-  RCMP --> FSM
-  YV["y_valid"] --> YG["yg_q"]
-  FSM --> YG
-  GEO --> ENL["en_last"]
-  ENL --> EN["grp_en"]
-  GCMP --> EN
-  FSM --> EN
-  FSM --> TAG["grp_valid, grp_pass2,<br/>grp_first, grp_last, div_start"]
-  GCMP --> TAG
-  R --> ADDR["grp_addr = {r, g}"]
-  G --> ADDR
-  R --> YADDR["y_wr_addr = {r, yg}"]
-  YG --> YADDR
-  FSM --> DONE["run_done"]
-  RCMP --> DONE
-```
+![smx_ctrl](../fig/smx_ctrl.svg)
 
 Mọi ngõ ra đều tổ hợp từ trạng thái và thanh ghi. FSM:
 
-```mermaid
-stateDiagram-v2
-  [*] --> IDLE
-  IDLE --> P1_RUN: start / r=0, g=0, yg=0
-  P1_RUN --> P1_DRAIN: g == G-1 / g=0
-  P1_DRAIN --> DIV: sum_last
-  DIV --> DIV_WAIT: div_start = 1
-  DIV_WAIT --> P2_RUN: div_done
-  P2_RUN --> P2_DRAIN: g == G-1 / g=0
-  P2_DRAIN --> NEXT_ROW: y_last
-  NEXT_ROW --> P1_RUN: r != R-1 / r+1, yg=0
-  NEXT_ROW --> IDLE: r == R-1 / run_done = 1
-```
+![smx_fsm](../fig/smx_fsm.svg)
 
 Thanh ghi: 3 bit trạng thái (Quartus mã hoá one-hot 8 bit), `r` 4 bit, `g` và `yg` `GW` bit. Không có bộ nhân, RAM.
 

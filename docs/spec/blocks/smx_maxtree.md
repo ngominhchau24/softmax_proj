@@ -65,35 +65,7 @@ Lane mask được chọn bằng `in_en[i] ? c_in[i] : NEG_INF` ngay đầu tầ
 
 Chia tầng bắt buộc theo cross-block mục 4.2: đo Fitter trên probe cho thấy cả cây ở một tầng chỉ đạt 90 MHz ở P = 16, chia đều đạt 117 MHz.
 
-```mermaid
-flowchart LR
-  subgraph S1["Tầng 1 (comb → reg)"]
-    C["c_in[P]"] --> MSK["mask: in_en ? c : -256"]
-    EN["in_en"] --> MSK
-    MSK --> T["cây max<br/>log2(P)-1 mức<br/>(signed 9b)"]
-    T --> A["s1_a_q"]
-    T --> B["s1_b_q"]
-    F["in_first"] --> F1["s1_first_q"]
-    V["in_valid"] --> V1["s1_vld_q"]
-  end
-  subgraph S2["Tầng 2 (comb → reg)"]
-    A --> MG["Mg = max(a, b)"]
-    B --> MG
-    MG --> CMP["Mg > M ?"]
-    M["m_q"] --> CMP
-    F1 --> UP["up = first | (Mg > M)"]
-    CMP --> UP
-    UP --> MN["Mnew = up ? Mg : M"]
-    MN --> M
-    MG --> SUB["Mg - M"]
-    M --> SUB
-    SUB --> DM["dm_q = (first|~up) ? 0 : diff[7:0]"]
-    UP --> DM
-    V1 --> V2["vld_q → out_valid"]
-  end
-  M --> MO["m_out"]
-  DM --> DO["dm_out"]
-```
+![smx_maxtree](../fig/smx_maxtree.svg)
 
 Thanh ghi (độ rộng không phụ thuộc P):
 

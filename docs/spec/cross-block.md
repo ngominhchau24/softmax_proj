@@ -19,24 +19,7 @@
 
 ## 2. Luồng dữ liệu
 
-```mermaid
-flowchart LR
-  CTRL[smx_ctrl] -- "grp_addr" --> XB[X_BUF]
-  CTRL -- "valid pass2 first last en" --> SB[sideband delay<br/>trong smx_core]
-  XB -- "q x P" --> SC[smx_scale x P]
-  SC -- "c x P" --> MT[smx_maxtree]
-  SC -- "u x P" --> UD[smx_delay<br/>MAXTREE_LAT]
-  UD --> EX[smx_exp2 x P]
-  MT -- "m_out" --> EX
-  MT -- "dm_out" --> DD[smx_delay<br/>EXP2_LAT]
-  EX -- "E x P, lượt 1" --> SA[smx_sumacc]
-  DD --> SA
-  SA -- "sum_out" --> DV[smx_divider]
-  DV -- "rcp_out" --> NM[smx_norm x P]
-  EX -- "E x P, lượt 2" --> NM
-  NM -- "y x P" --> YB[Y_BUF]
-  CTRL -- "y_wr_addr" --> YB
-```
+![smx_core](fig/smx_core.svg)
 
 ## 3. Latency và căn pipeline
 
@@ -263,19 +246,7 @@ Thẻ `valid` nằm trong shift register sideband có reset của `smx_core`.
 
 ## 5. FSM và công thức `CYCLE_CNT`
 
-```mermaid
-stateDiagram-v2
-  [*] --> IDLE
-  IDLE --> P1_RUN: start / r = 0
-  P1_RUN --> P1_DRAIN: nhóm cuối đã phát
-  P1_DRAIN --> DIV: sum_last
-  DIV --> DIV_WAIT: một chu kỳ, div_start = 1
-  DIV_WAIT --> P2_RUN: div_done
-  P2_RUN --> P2_DRAIN: nhóm cuối đã phát
-  P2_DRAIN --> NEXT_ROW: y_last
-  NEXT_ROW --> P1_RUN: r + 1 < R / r = r + 1
-  NEXT_ROW --> IDLE: r + 1 == R / run_done = 1
-```
+![smx_fsm](fig/smx_fsm.svg)
 
 Với `G = ⌈L/P⌉`, `t0` là chu kỳ phát nhóm đầu của lượt 1, `PIPE = BUF_LAT + SCALE_LAT + MAXTREE_LAT + EXP2_LAT`:
 

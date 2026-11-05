@@ -85,21 +85,7 @@ Không có số học. Mọi phép so sánh là số nguyên không dấu; khôn
 
 ## 5. Cấu trúc bên trong
 
-```mermaid
-flowchart LR
-  A["acc_addr/write/read/wd/be"] --> DEC["giải mã 13 bit<br/>csr / X / Y / undef"]
-  DEC --> WR["ghi thanh ghi<br/>(byte-enable, cổng BUSY)"]
-  DEC --> XW["x_wr_en one-hot<br/>x_wr_addr, x_wr_data lặp"]
-  DEC --> RA["buf_rd_addr = w/BANKS<br/>(tổ hợp)"]
-  WR --> REG["len/rows/k, BUSY/DONE/ERR,<br/>CYCLE_CNT, start_q"]
-  RUN["run_done"] --> REG
-  REG --> MUX["csr_val (giá trị tại chu kỳ n)"]
-  DEC -- "acc_read" --> S1["tầng 1: s1_csr/x/y_q,<br/>s1_val_q, s1_bank_q"]
-  MUX --> S1
-  S1 --> S2["tầng 2: mux nguồn<br/>csr | X bank | Y bank | 0"]
-  XR["x_rd_data / y_rd_data<br/>(smx_buf, trễ 1)"] --> S2
-  S2 --> RD["rd_q = acc_readdata"]
-```
+![smx_csr](../fig/smx_csr.svg)
 
 FSM trạng thái thực chất là hai bit BUSY/DONE với ERR: IDLE (0,0), BUSY (1,0), DONE (0,1), vì BUSY và DONE loại trừ nhau. Thanh ghi: LEN 10, ROWS 5, K 16, CYCLE_CNT 32, BUSY/DONE/ERR/start, ba bit chọn nguồn, `s1_val_q` 32, `s1_bank_q` `BANKS`, `rd_q` 32. Không có bộ nhớ, không có bộ nhân.
 

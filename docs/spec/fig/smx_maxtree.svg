@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 460" width="1720" height="460" font-family="Arial, Helvetica, sans-serif" fill="#000">
+<title>smx_maxtree</title>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0.8 L7.5,4 L0,7.2 z" fill="#000"/></marker></defs>
+<rect width="1720" height="460" fill="#fff"/>
+<rect x="130" y="10" width="1460" height="420" fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="7 4"/>
+<text x="138" y="422" font-size="11" text-anchor="start">smx_maxtree</text>
+<text x="530" y="24" font-size="11" text-anchor="start">stage 1</text>
+<text x="830" y="30" font-size="11" text-anchor="start">stage 2</text>
+<rect x="170" y="70" width="110" height="90" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="225" y="112" font-size="13" text-anchor="middle">lane mask</text>
+<text x="225" y="128" font-size="11" text-anchor="middle">en ? c : -256</text>
+<rect x="400" y="70" width="130" height="90" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="465" y="112" font-size="13" text-anchor="middle">max tree</text>
+<text x="465" y="128" font-size="11" text-anchor="middle">2 compare levels</text>
+<rect x="630" y="20" width="90" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="675" y="44" font-size="13" text-anchor="middle">s1_first_q</text>
+<rect x="630" y="70" width="90" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="675" y="94" font-size="13" text-anchor="middle">s1_a_q</text>
+<rect x="630" y="130" width="90" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="675" y="154" font-size="13" text-anchor="middle">s1_b_q</text>
+<rect x="830" y="70" width="110" height="100" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="885" y="117" font-size="13" text-anchor="middle">compare</text>
+<text x="885" y="133" font-size="11" text-anchor="middle">mg = max(a, b)</text>
+<rect x="1040" y="30" width="110" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1095" y="57" font-size="13" text-anchor="middle">up</text>
+<text x="1095" y="73" font-size="11" text-anchor="middle">first | mg &gt; m_q</text>
+<rect x="1040" y="170" width="110" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1095" y="197" font-size="13" text-anchor="middle">subtract</text>
+<text x="1095" y="213" font-size="11" text-anchor="middle">mg - m_q</text>
+<rect x="1250" y="90" width="90" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1295" y="117" font-size="13" text-anchor="middle">mux</text>
+<text x="1295" y="133" font-size="11" text-anchor="middle">up ? mg : m_q</text>
+<rect x="1250" y="170" width="90" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1295" y="197" font-size="13" text-anchor="middle">dm select</text>
+<text x="1295" y="213" font-size="11" text-anchor="middle">first | ~up: 0</text>
+<rect x="1420" y="90" width="90" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1465" y="124" font-size="13" text-anchor="middle">m_q</text>
+<rect x="1420" y="180" width="90" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1465" y="204" font-size="13" text-anchor="middle">dm_q</text>
+<rect x="630" y="320" width="90" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="675" y="344" font-size="13" text-anchor="middle">s1_vld_q</text>
+<rect x="1420" y="320" width="90" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1465" y="344" font-size="13" text-anchor="middle">vld_q</text>
+<polyline points="20,90 170,90" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="25" y="85" font-size="11" text-anchor="start">c_in[7:0][8:0]</text>
+<polyline points="20,140 170,140" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="135" font-size="11" text-anchor="start">in_en[7:0]</text>
+<polyline points="20,40 630,40" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="35" font-size="11" text-anchor="start">in_first</text>
+<polyline points="280,110 400,110" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="285" y="105" font-size="11" text-anchor="start">lvl[0][7:0][8:0]</text>
+<polyline points="530,90 630,90" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="535" y="85" font-size="11" text-anchor="start">lvl[2][0][8:0]</text>
+<polyline points="530,150 630,150" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="535" y="145" font-size="11" text-anchor="start">lvl[2][1][8:0]</text>
+<polyline points="720,90 830,90" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="725" y="85" font-size="11" text-anchor="start">s1_a_q[8:0]</text>
+<polyline points="720,150 830,150" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="725" y="145" font-size="11" text-anchor="start">s1_b_q[8:0]</text>
+<polyline points="720,40 1040,40" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="725" y="35" font-size="11" text-anchor="start">s1_first_q</text>
+<circle cx="800" cy="40" r="2.8" fill="#000"/>
+<polyline points="800,40 800,280 1300,280 1300,230" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1110" y="275" font-size="11" text-anchor="start">s1_first_q</text>
+<polyline points="940,120 1250,120" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="950" y="115" font-size="11" text-anchor="start">mg[8:0]</text>
+<circle cx="990" cy="120" r="2.8" fill="#000"/>
+<polyline points="990,120 990,60 1040,60" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="1000" cy="120" r="2.8" fill="#000"/>
+<polyline points="1000,120 1000,190 1040,190" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="1150,60 1290,60 1290,90" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1155" y="55" font-size="11" text-anchor="start">up</text>
+<circle cx="1290" cy="60" r="2.8" fill="#000"/>
+<polyline points="1290,60 1410,60 1410,190 1340,190" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="1150,200 1250,200" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1155" y="195" font-size="11" text-anchor="start">diff[8:0]</text>
+<polyline points="1340,120 1420,120" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1345" y="115" font-size="11" text-anchor="start">mnew[8:0]</text>
+<polyline points="1340,210 1420,210" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1345" y="205" font-size="11" text-anchor="start">[7:0]</text>
+<polyline points="1510,120 1700,120" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1610" y="115" font-size="11" text-anchor="start">m_out[8:0]</text>
+<polyline points="1510,200 1700,200" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1610" y="195" font-size="11" text-anchor="start">dm_out[7:0]</text>
+<circle cx="1540" cy="120" r="2.8" fill="#000"/>
+<polyline points="1540,120 1540,250 1020,250 1020,80 1040,80" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1060" y="245" font-size="11" text-anchor="start">m_q[8:0]</text>
+<circle cx="1020" cy="210" r="2.8" fill="#000"/>
+<polyline points="1020,210 1040,210" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<circle cx="1210" cy="250" r="2.8" fill="#000"/>
+<polyline points="1210,250 1210,140 1250,140" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="20,340 630,340" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="335" font-size="11" text-anchor="start">in_valid</text>
+<polyline points="720,340 1420,340" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1120" y="335" font-size="11" text-anchor="start">s1_vld_q</text>
+<circle cx="1400" cy="340" r="2.8" fill="#000"/>
+<polyline points="1400,340 1400,140 1420,140" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="1460,300 1460,220" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="1400,300 1460,300" fill="none" stroke="#000" stroke-width="1.2"/>
+<circle cx="1400" cy="300" r="2.8" fill="#000"/>
+<polyline points="1510,340 1700,340" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1610" y="335" font-size="11" text-anchor="start">out_valid</text>
+<text x="600" y="420" font-size="11" text-anchor="start">Drawn at P = 8. Latency MAXTREE_LAT = 2. m_q and dm_q load only when s1_vld_q = 1. clk and rst_n are not drawn.</text>
+</svg>

@@ -45,13 +45,7 @@ Không có số học. Ghi ở cạnh clock `n` nếu `wr_en[b] & wr_be[i]` thì
 
 ## 5. Cấu trúc bên trong
 
-```mermaid
-flowchart LR
-  WA["wr_en[b] & wr_be[i], wr_addr"] --> M["g_bank[b].g_byte[i]<br/>logic [7:0] mem [0:DEPTH-1]"]
-  WD["wr_data[b][8i +: 8]"] --> M
-  RA[rd_addr] --> M
-  M --> RD["rd_data[b][8i +: 8]<br/>thanh ghi đầu ra"]
-```
+![smx_buf](../fig/smx_buf.svg)
 
 Mỗi bank và mỗi byte có một mảng `logic [7:0] mem [0:DEPTH-1]` riêng trong `generate` lồng nhau, `genvar` khai báo ngoài vòng lặp. Lý do: RAM kiểu `logic [3:0][7:0] mem [DEPTH]` trong `generate` bị Quartus 18.1 âm thầm chuyển thành flip-flop (hợp đồng mục 4.7). Cách này cho `BANKS × 4` RAM rộng 8 bit, mỗi RAM có write-enable riêng nên byte-enable hoạt động mà không cần read-modify-write. P = 4 có một bank và không có part-select độ rộng 0 vì chỉ chọn `[b][8i +: 8]`.
 

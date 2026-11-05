@@ -436,18 +436,7 @@ Nhờ mục 5.3, hai lượt dùng chung phần cứng: `smx_scale` và `smx_exp
 
 Phương án khác là lưu $E$ của lượt 1 rồi dịch theo $M$ cuối. Cách đó cần thêm một buffer rộng hơn X_BUF; đọc lại thì không tốn bộ nhớ thêm, đổi lại là phép tính lặp. SoftGen cũng rút ra bài học đọc lại từ bộ nhớ [TL].
 
-```mermaid
-flowchart LR
-  X["X_BUF: q"] --> SC["u = q*K<br/>c = ceil(u)"]
-  SC --> MT["Lượt 1: M, dM"]
-  SC --> EX["E = 2^d<br/>d = u - M"]
-  MT --> EX
-  EX -- "lượt 1" --> SA["sum = (sum >> dM) + tổng E"]
-  SA --> DV["Rcp = 2^40 / sum"]
-  EX -- "lượt 2" --> NM["y = (E*Rcp + 2^31) >> 32"]
-  DV --> NM
-  NM --> Y["Y_BUF: y"]
-```
+![softmax_flow](fig/softmax_flow.svg)
 
 ## 10. Ví dụ trọn vẹn
 

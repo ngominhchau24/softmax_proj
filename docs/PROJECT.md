@@ -185,6 +185,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-05: Chau yêu cầu sơ đồ theo kiểu sơ đồ vi mạch, dây thẳng bẻ góc vuông. Thêm `docs/spec/diagram-rules.md` và `docs/spec/fig/schematic.py` (SVG đặt tay, tự kiểm rule). Bỏ Mermaid `flowchart` và `stateDiagram` cho hình mới, vì đã thử Mermaid 12.2 với `look: classic`: có góc vuông nhưng dây chạy trùng nhau và nhãn đè lên dây. Hình mẫu: `fig/smx_core.svg`. Sơ đồ cũ chưa chuyển.
 
+- 2026-11-05: Chau duyệt kiểu sơ đồ. Chuyển toàn bộ sơ đồ cấu trúc và FSM trong `docs/spec/` sang `docs/spec/fig/` (13 hình). Thêm rule ghi độ rộng dạng `addr[15:0]` trên dây, tính ở P = 8, N_SEG = 8.
+
 ## 11. Tài liệu tham khảo chính
 
 Danh sách đầy đủ ở `docs/research/softmax-survey.md` mục 7. Cốt lõi: Milakov & Gimelshein 2018 (online normalizer); Kim et al., I-BERT, ICML 2021; Stevens et al., Softermax, DAC 2021; Li & Gu, I-ViT/Shiftmax, ICCV 2023; Wei et al., SoftGen, ASAP 2020; Wang et al., log-sum-exp, APCCAS 2018; Wang et al., SOLE, 2025. Tài liệu nền accelerator (Kung 1982, TPU 2017, Eyeriss 2016, Sze 2017, Jacob 2018) ở `docs/archive/gemm-sa-proposal.md` mục tham khảo.

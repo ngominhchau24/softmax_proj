@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240" font-family="Arial, Helvetica, sans-serif" fill="#000">
+<title>smx_divider_fsm</title>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0.8 L7.5,4 L0,7.2 z" fill="#000"/></marker></defs>
+<rect width="880" height="240" fill="#fff"/>
+<rect x="200" y="80" width="120" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="260" y="107" font-size="13" text-anchor="middle">IDLE</text>
+<text x="260" y="123" font-size="11" text-anchor="middle">busy_q = 0</text>
+<rect x="560" y="80" width="120" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="620" y="107" font-size="13" text-anchor="middle">BUSY</text>
+<text x="620" y="123" font-size="11" text-anchor="middle">busy_q = 1</text>
+<polyline points="120,110 200,110" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="125" y="105" font-size="11" text-anchor="start">reset</text>
+<polyline points="320,100 560,100" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="325" y="95" font-size="11" text-anchor="start">start / load, cnt = 0</text>
+<polyline points="560,120 320,120" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="325" y="134" font-size="11" text-anchor="start">cnt == 26 / load rcp_q, done_q = 1</text>
+<polyline points="680,100 760,100 760,40 620,40 620,80" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="630" y="35" font-size="11" text-anchor="start">cnt &lt; 26 / next bit</text>
+<polyline points="680,120 760,120 760,180 620,180 620,140" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="620" y="194" font-size="11" text-anchor="start">start / reload (undefined use)</text>
+</svg>

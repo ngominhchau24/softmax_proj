@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 440" width="1060" height="440" font-family="Arial, Helvetica, sans-serif" fill="#000">
+<title>smx_buf</title>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0.8 L7.5,4 L0,7.2 z" fill="#000"/></marker></defs>
+<rect width="1060" height="440" fill="#fff"/>
+<rect x="150" y="20" width="760" height="390" fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="7 4"/>
+<text x="158" y="402" font-size="11" text-anchor="start">smx_buf</text>
+<rect x="190" y="60" width="100" height="70" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="240" y="92" font-size="13" text-anchor="middle">write enable</text>
+<text x="240" y="108" font-size="11" text-anchor="middle">wr_en[b] &amp; wr_be[i]</text>
+<rect x="480" y="60" width="180" height="70" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="570" y="92" font-size="13" text-anchor="middle">mem[0:1023][7:0]</text>
+<text x="570" y="108" font-size="11" text-anchor="middle">g_bank[0].g_byte[0]</text>
+<rect x="480" y="230" width="180" height="70" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="570" y="262" font-size="13" text-anchor="middle">mem[0:1023][7:0]</text>
+<text x="570" y="278" font-size="11" text-anchor="middle">g_bank[1].g_byte[3]</text>
+<text x="470" y="180" font-size="11" text-anchor="start">... 8 RAMs, one per bank and byte ...</text>
+<polyline points="20,80 190,80" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="75" font-size="11" text-anchor="start">wr_en[1:0]</text>
+<polyline points="20,110 190,110" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="105" font-size="11" text-anchor="start">wr_be[3:0]</text>
+<polyline points="290,90 480,90" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="295" y="85" font-size="11" text-anchor="start">we[0][0]</text>
+<circle cx="330" cy="90" r="2.8" fill="#000"/>
+<polyline points="330,90 330,280 480,280" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="335" y="275" font-size="11" text-anchor="start">we[1][3]</text>
+<polyline points="20,150 430,150 430,110 480,110" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="145" font-size="11" text-anchor="start">wr_addr[9:0]</text>
+<circle cx="430" cy="150" r="2.8" fill="#000"/>
+<polyline points="430,150 430,250 480,250" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="20,190 400,190 400,120 480,120" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="185" font-size="11" text-anchor="start">wr_data[63:0]</text>
+<circle cx="400" cy="190" r="2.8" fill="#000"/>
+<polyline points="400,190 400,270 480,270" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="20,340 700,340 700,100 660,100" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="335" font-size="11" text-anchor="start">rd_addr[9:0]</text>
+<circle cx="570" cy="340" r="2.8" fill="#000"/>
+<polyline points="570,340 570,300" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<polyline points="660,80 1040,80" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="930" y="75" font-size="11" text-anchor="start">rd_data[7:0]</text>
+<polyline points="660,260 1040,260" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="930" y="255" font-size="11" text-anchor="start">rd_data[63:56]</text>
+<text x="360" y="376" font-size="11" text-anchor="start">Byte i of bank b writes wr_data[8(4b+i)+7 : 8(4b+i)].</text>
+<text x="360" y="396" font-size="11" text-anchor="start">Read is registered: BUF_LAT = 1. Drawn at P = 8. clk is not drawn.</text>
+</svg>
