@@ -25,12 +25,9 @@ Handshake (valid/ready, start/done, hay pipeline cố định không stall) và 
 Công thức bit-exact từng bước, đối chiếu từng dòng với golden model. Nêu rõ làm tròn, cắt bỏ, bão hoà, xử lý lane không hợp lệ.
 
 ## 5. Cấu trúc bên trong
-Sơ đồ mermaid (flowchart cho datapath, stateDiagram-v2 nếu có FSM). Liệt kê thanh ghi pipeline, bộ nhân, bộ nhớ.
+Sơ đồ theo `docs/spec/diagram-rules.md`: dây thẳng bẻ góc vuông, vẽ bằng `docs/spec/fig/<block_name>.py`, gồm cả FSM nếu có. Liệt kê thanh ghi pipeline, bộ nhân, bộ nhớ.
 
-```mermaid
-flowchart LR
-  A[in] --> B[stage 1] --> C[out]
-```
+![<block_name>](../fig/<block_name>.svg)
 
 ## 6. Timing
 - Latency (chu kỳ) từ đầu vào hợp lệ tới đầu ra, throughput.

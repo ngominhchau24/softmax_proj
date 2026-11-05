@@ -36,6 +36,7 @@ Câu hỏi khác đang chờ Chau:
 
 - **Reset trên board:** A2 đã chốt là deassert do test drive, lõi không có bộ đồng bộ. `integration-notes.md` đang tạm ghi trên hệ thống thật là trách nhiệm của bên lái `rst_n`; chưa xác nhận.
 - **Worktree cũ:** có xoá 9 worktree đã merge trong `.claude/worktrees` (98 MB) không. Chưa xoá.
+- **Sơ đồ cũ:** `docs/spec/diagram-rules.md` đã có hiệu lực cho hình mới, nhưng các sơ đồ Mermaid hiện có chưa chuyển. Chau chưa quyết có chuyển hết không; trang artifact cũng chưa cập nhật theo.
 - **PR vào `main`:** chỉ mở khi Chau yêu cầu.
 - **Tài liệu trên claude.ai:** nhắc Chau tải lại docs lên Project; repo không tự đồng bộ.
 - **Đề tài và lịch:** tên đề tài trong sheet nhóm 6, ngày nộp chính xác (`PROJECT.md` mục 9).
@@ -62,7 +63,7 @@ Theo thứ tự, khi Chau không chỉ định khác. Lịch ở `PROJECT.md` m�
 - **Git:** commit và push sau mỗi bước đã kiểm chứng, trên nhánh làm việc; không push thẳng `main`.
 - **Tác vụ tự chạy tiếp:** "Resume softmax core work after quota" đang **tắt**, và gắn với phiên cũ `session_018kvwhthqKq5fC6j8brjM6B`. Phiên mới cần cơ chế này thì tạo tác vụ mới. Nó chỉ chạy khi máy bật và phiên còn sống.
 - **`/tmp` mất khi tắt máy:** bench riêng của reviewer và script dựng trang tổng quan đều nằm ở đó, không có trong repo. Đừng tìm lại. Muốn sửa trang: dùng `Artifact` `action: read` với URL ở trên rồi publish lại vào cùng URL.
-- **Máy này không có browser** cho `mmdc` và Playwright. Sơ đồ mermaid mới chỉ được kiểm cú pháp, chưa xem hình.
+- **Xem hình trên máy này:** không có browser cho `mmdc` và Playwright, nhưng có Firefox: `firefox --headless --no-remote --profile <thư mục tạm> --window-size W,H --screenshot <scratch>/x.png file:///...`. Ghi ảnh ra scratch, vì repo chặn đọc file PNG.
 - **Trang tổng quan là bản chụp:** khi spec đổi đáng kể thì publish lại.
 
 ## Kiểm tra nhanh đầu phiên

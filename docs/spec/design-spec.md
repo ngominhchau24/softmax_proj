@@ -55,42 +55,7 @@ flowchart LR
 
 ### 2.2. Bên trong `smx_core`
 
-```mermaid
-flowchart LR
-  ACC["acc_*"] --> CSR["smx_csr<br/>decode, thanh ghi, đọc 2 tầng"]
-  CSR -- "x_wr_*" --> XB["X_BUF<br/>smx_buf"]
-  CSR -- "len rows start" --> CT["smx_ctrl<br/>FSM, địa chỉ, lane mask"]
-  CT -- run_done --> CSR
-  CT -- grp_addr --> MUX{"BUSY?"}
-  CSR -- buf_rd_addr --> MUX
-  MUX --> XB
-  XB -- "q x P" --> SC["smx_scale x P<br/>u = q*K, c = ceil u"]
-  CSR -- k --> SC
-  SC -- "c x P" --> MT["smx_maxtree<br/>Mg, M, dM"]
-  SC -- "u x P" --> UD["smx_delay<br/>MAXTREE_LAT"]
-  UD --> EX["smx_exp2 x P<br/>E = 2^d, PWL + dịch"]
-  MT -- m_out --> EX
-  MT -- dm_out --> DD["smx_delay<br/>EXP2_LAT"]
-  EX -- "E x P, lượt 1" --> SA["smx_sumacc<br/>sum = sum >> dM + tổng E"]
-  DD --> SA
-  SA -- sum_out --> DV["smx_divider<br/>Rcp = 2^40 / sum"]
-  DV -- rcp_out --> NM["smx_norm x P<br/>y = E*Rcp, làm tròn, bão hoà"]
-  EX -- "E x P, lượt 2" --> NM
-  NM -- "y x P" --> YB["Y_BUF<br/>smx_buf"]
-  CT -- y_wr_addr --> YB
-  CSR -- buf_rd_addr --> YB
-  XB -- x_rd_data --> CSR
-  YB -- y_rd_data --> CSR
-  CT -- "thẻ nhóm" --> SB["sideband<br/>shift register"]
-  SB -. "valid pass2 first en" .-> SC
-  SB -. "..." .-> MT
-  SB -. "..." .-> EX
-  SB -. "..." .-> SA
-  SB -. "..." .-> NM
-  SB -- "sum_last y_valid y_last" --> CT
-  CT -- div_start --> DV
-  DV -- div_done --> CT
-```
+![smx_core](fig/smx_core.svg)
 
 ## 3. Giao diện
 

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 700" width="1420" height="700" font-family="Arial, Helvetica, sans-serif" fill="#000">
+<title>smx_core</title>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0.8 L7.5,4 L0,7.2 z" fill="#000"/></marker></defs>
+<rect width="1420" height="700" fill="#fff"/>
+<rect x="160" y="30" width="1230" height="650" fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="7 4"/>
+<text x="168" y="672" font-size="11" text-anchor="start">smx_core</text>
+<rect x="200" y="100" width="130" height="200" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="265" y="197" font-size="13" text-anchor="middle">smx_csr</text>
+<text x="265" y="213" font-size="11" text-anchor="middle">decode, registers</text>
+<rect x="200" y="450" width="130" height="120" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="265" y="507" font-size="13" text-anchor="middle">smx_ctrl</text>
+<text x="265" y="523" font-size="11" text-anchor="middle">FSM, address, mask</text>
+<rect x="460" y="100" width="100" height="80" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="510" y="137" font-size="13" text-anchor="middle">X_BUF</text>
+<text x="510" y="153" font-size="11" text-anchor="middle">smx_buf</text>
+<rect x="460" y="220" width="100" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="510" y="244" font-size="13" text-anchor="middle">BUSY mux</text>
+<rect x="660" y="100" width="120" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="720" y="127" font-size="13" text-anchor="middle">smx_scale</text>
+<text x="720" y="143" font-size="11" text-anchor="middle">x P</text>
+<rect x="660" y="310" width="120" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="720" y="332" font-size="13" text-anchor="middle">smx_delay</text>
+<text x="720" y="348" font-size="11" text-anchor="middle">MAXTREE_LAT</text>
+<rect x="870" y="100" width="120" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="930" y="134" font-size="13" text-anchor="middle">smx_maxtree</text>
+<rect x="870" y="310" width="120" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="930" y="332" font-size="13" text-anchor="middle">smx_exp2</text>
+<text x="930" y="348" font-size="11" text-anchor="middle">x P</text>
+<rect x="1040" y="110" width="120" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1100" y="127" font-size="13" text-anchor="middle">smx_delay</text>
+<text x="1100" y="143" font-size="11" text-anchor="middle">EXP2_LAT</text>
+<rect x="1040" y="310" width="120" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1100" y="339" font-size="13" text-anchor="middle">smx_sumacc</text>
+<rect x="1220" y="310" width="120" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1280" y="339" font-size="13" text-anchor="middle">smx_divider</text>
+<rect x="1220" y="420" width="120" height="50" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1280" y="442" font-size="13" text-anchor="middle">smx_norm</text>
+<text x="1280" y="458" font-size="11" text-anchor="middle">x P</text>
+<rect x="1220" y="510" width="120" height="70" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="1280" y="542" font-size="13" text-anchor="middle">Y_BUF</text>
+<text x="1280" y="558" font-size="11" text-anchor="middle">smx_buf</text>
+<rect x="540" y="470" width="130" height="60" fill="#fff" stroke="#000" stroke-width="1.5"/>
+<text x="605" y="497" font-size="13" text-anchor="middle">sideband</text>
+<text x="605" y="513" font-size="11" text-anchor="middle">shift register</text>
+<polyline points="20,110 200,110" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="105" font-size="11" text-anchor="start">acc_addr[12:0]</text>
+<polyline points="20,130 200,130" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="125" font-size="11" text-anchor="start">acc_write</text>
+<polyline points="20,150 200,150" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="145" font-size="11" text-anchor="start">acc_writedata[31:0]</text>
+<polyline points="20,170 200,170" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="165" font-size="11" text-anchor="start">acc_byteenable[3:0]</text>
+<polyline points="20,190 200,190" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="185" font-size="11" text-anchor="start">acc_read</text>
+<polyline points="200,220 20,220" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="215" font-size="11" text-anchor="start">acc_readdata[31:0]</text>
+<polyline points="200,240 20,240" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="235" font-size="11" text-anchor="start">status_busy</text>
+<polyline points="200,260 20,260" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="255" font-size="11" text-anchor="start">status_done</text>
+<polyline points="200,280 20,280" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="25" y="275" font-size="11" text-anchor="start">status_err</text>
+<polyline points="220,450 220,300" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="215" y="379" font-size="11" text-anchor="end">run_done</text>
+<polyline points="250,300 250,450" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="255" y="379" font-size="11" text-anchor="start">len, rows, start</text>
+<polyline points="330,120 460,120" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="335" y="115" font-size="11" text-anchor="start">x_wr_*</text>
+<polyline points="460,160 330,160" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="335" y="155" font-size="11" text-anchor="start">x_rd_data, BANKS x 32</text>
+<polyline points="330,240 460,240" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="370" y="235" font-size="11" text-anchor="start">buf_rd_addr</text>
+<polyline points="510,220 510,180" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="515" y="204" font-size="11" text-anchor="start">x_rd_addr</text>
+<polyline points="330,470 510,470 510,260" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="465" font-size="11" text-anchor="start">grp_addr</text>
+<circle cx="350" cy="240" r="2.8" fill="#000"/>
+<polyline points="350,240 350,600 1250,600 1250,580" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="595" font-size="11" text-anchor="start">buf_rd_addr</text>
+<polyline points="1220,570 370,570 370,280 330,280" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="390" y="565" font-size="11" text-anchor="start">y_rd_data, BANKS x 32</text>
+<polyline points="330,540 1220,540" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="535" font-size="11" text-anchor="start">y_wr_addr</text>
+<polyline points="270,100 270,60 720,60 720,100" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="275" y="55" font-size="11" text-anchor="start">k</text>
+<polyline points="560,130 660,130" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="565" y="125" font-size="11" text-anchor="start">q_lane, P x 8</text>
+<polyline points="780,130 870,130" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="785" y="125" font-size="11" text-anchor="start">c_lane, P x 9</text>
+<polyline points="720,160 720,310" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="725" y="239" font-size="11" text-anchor="start">u_lane, P x 25</text>
+<polyline points="780,340 870,340" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="785" y="335" font-size="11" text-anchor="start">u_dly, P x 25</text>
+<polyline points="930,160 930,310" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="935" y="239" font-size="11" text-anchor="start">m_out</text>
+<polyline points="990,130 1040,130" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="995" y="125" font-size="11" text-anchor="start">dm_out</text>
+<polyline points="1100,150 1100,310" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1105" y="234" font-size="11" text-anchor="start">dm_dly</text>
+<polyline points="990,330 1040,330" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<polyline points="1160,330 1220,330" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1165" y="325" font-size="11" text-anchor="start">sum_out</text>
+<polyline points="1280,360 1280,420" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="1285" y="394" font-size="11" text-anchor="start">rcp_out</text>
+<circle cx="1020" cy="330" r="2.8" fill="#000"/>
+<polyline points="1020,330 1020,450 1220,450" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="1025" y="445" font-size="11" text-anchor="start">e_lane, P x 16</text>
+<polyline points="1280,470 1280,510" fill="none" stroke="#000" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="1285" y="494" font-size="11" text-anchor="start">y_lane, P x 8</text>
+<polyline points="330,490 540,490" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="485" font-size="11" text-anchor="start">group tag</text>
+<polyline points="540,510 330,510" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="505" font-size="11" text-anchor="start">sum_last, y_valid, y_last</text>
+<polyline points="670,500 830,500" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="675" y="495" font-size="11" text-anchor="start">valid, pass2, first, en</text>
+<text x="838" y="504" font-size="11" text-anchor="start">to scale, maxtree, exp2, sumacc, norm; y_valid to Y_BUF write enable</text>
+<polyline points="270,570 270,640 1370,640 1370,330 1340,330" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="635" font-size="11" text-anchor="start">div_start</text>
+<polyline points="1340,350 1360,350 1360,620 310,620 310,570" fill="none" stroke="#000" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="390" y="615" font-size="11" text-anchor="start">div_done</text>
+<text x="800" y="668" font-size="11" text-anchor="start">clk and rst_n reach every block and are not drawn. Shown for any P; BANKS = P/4.</text>
+</svg>
