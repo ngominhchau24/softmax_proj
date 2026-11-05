@@ -19,17 +19,22 @@ flowchart LR
 
 ## 2. Cấu trúc bên trong `smx_core`
 
+Sơ đồ vẽ ở P = 8. Decode `acc_*` nằm trong `smx_csr`. Bản đầy đủ có sideband: `docs/spec/design-spec.md` mục 2.2.
+
 ```mermaid
 flowchart LR
-  ACC[acc_* port] --> DEC[addr decode<br/>+ rdata mux, 2-cycle]
-  DEC --> CSR[smx_csr<br/>CTRL STATUS LEN ROWS<br/>SCALE_K CYCLE_CNT HW_PARAM]
-  DEC --> XB[X_BUF: smx_buf<br/>2 bank x 32b x 1024, byte-en]
-  YB[Y_BUF: smx_buf<br/>2 bank x 32b x 1024] --> DEC
+  ACC[acc_* port] --> CSR[smx_csr<br/>decode, rdata mux 2-cycle<br/>CTRL STATUS LEN ROWS<br/>SCALE_K CYCLE_CNT HW_PARAM]
+  CSR -- x_wr --> XB[X_BUF: smx_buf<br/>2 bank x 32b x 1024, byte-en]
+  XB -- x_rd_data --> CSR
+  YB[Y_BUF: smx_buf<br/>2 bank x 32b x 1024] -- y_rd_data --> CSR
 
-  CSR -- start, L, R, K --> CTRL[smx_ctrl<br/>FSM + addr gen + lane mask]
+  CSR -- start, L, R --> CTRL[smx_ctrl<br/>FSM + addr gen + lane mask]
   CTRL -- run_done --> CSR
   CTRL -- rd addr --> XB
+  CTRL -- group tag --> SB[sideband<br/>shift register in smx_core]
+  SB -- events --> CTRL
   XB -- 64b = P x int8 --> SC[smx_scale x P<br/>u = q*K ; c = ceil u]
+  CSR -- K --> SC
   SC -- c --> MX[smx_maxtree<br/>Mg ; M = max M,Mg]
   SC -- u --> EX[smx_exp2 x P<br/>d = u - M ; PWL 2^F ; shift]
   MX -- M running / final --> EX

@@ -111,6 +111,7 @@ make dump | view | clean
 
 - `docs/PROJECT.md`: quyết định D1–D17, bảng nguồn từng số liệu (mục 7.1), nhật ký (mục 10).
 - `docs/requirements.md`: REQ-* đầy đủ, bản đồ thanh ghi chi tiết, kịch bản verify (REQ-VER-02).
+- `docs/spec/design-spec.md`: bản gộp, đọc một file để hiểu thiết kế: hoạt động từng bước, interface, sơ đồ, số đo.
 - `docs/spec/architecture.md`: sơ đồ top, FSM, điểm găng timing.
 - `docs/spec/integration-notes.md`: bàn giao cho nhóm implement.
 - `docs/spec/target-workload.md`: DeiT-Tiny — ánh xạ lên smx, lượng tử hoá điểm, kế hoạch đánh giá E1–E3, phương án đã loại.

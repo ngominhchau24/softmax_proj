@@ -60,6 +60,39 @@ Thanh ghi: `r` (4 bit, về 0 khi `start`, +1 ở NEXT_ROW), `g` (về 0 khi `st
 
 ## 5. Cấu trúc bên trong
 
+Cấu trúc:
+
+```mermaid
+flowchart LR
+  START["start"] --> FSM["state_q<br/>8 trạng thái"]
+  EVT["sum_last, div_done, y_last"] --> FSM
+  LEN["len"] --> GEO["len - 1<br/>g_last_idx, last_lane"]
+  ROWS["rows"] --> RCMP{"r == rows - 1"}
+  FSM --> G["g_q"]
+  FSM --> R["r_q"]
+  G --> GCMP{"g == g_last_idx"}
+  GEO --> GCMP
+  GCMP --> FSM
+  R --> RCMP
+  RCMP --> FSM
+  YV["y_valid"] --> YG["yg_q"]
+  FSM --> YG
+  GEO --> ENL["en_last"]
+  ENL --> EN["grp_en"]
+  GCMP --> EN
+  FSM --> EN
+  FSM --> TAG["grp_valid, grp_pass2,<br/>grp_first, grp_last, div_start"]
+  GCMP --> TAG
+  R --> ADDR["grp_addr = {r, g}"]
+  G --> ADDR
+  R --> YADDR["y_wr_addr = {r, yg}"]
+  YG --> YADDR
+  FSM --> DONE["run_done"]
+  RCMP --> DONE
+```
+
+Mọi ngõ ra đều tổ hợp từ trạng thái và thanh ghi. FSM:
+
 ```mermaid
 stateDiagram-v2
   [*] --> IDLE
