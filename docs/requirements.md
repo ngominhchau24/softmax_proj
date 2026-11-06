@@ -47,7 +47,7 @@ Ký hiệu: `>>` là dịch phải số học (floor), mọi đại lượng là
 - **REQ-ARI-05 Lượt 1 (online normalization với IntMax).** Duyệt nhóm g = 0, 1, … gồm các chỉ số `[gP, min(gP+P, L))` theo thứ tự tăng:
   `Mg = max c_k` trong nhóm; `Mnew = Mg` với nhóm đầu, ngược lại `max(M, Mg)`;
   `sum = (sum >> (Mnew − M)) + Σ_nhóm E(u_k − Mnew·2¹⁶)`; `M = Mnew`.
-  `sum` không dấu, ≥ 25 bit (≤ 512·2¹⁶). Thứ tự nhóm và phép dịch cắt bỏ là một phần của đặc tả (ảnh hưởng bit-exact).
+  `sum` không dấu, ≥ 25 bit (≤ 512·2¹⁵ = 2²⁴). Thứ tự nhóm và phép dịch cắt bỏ là một phần của đặc tả (ảnh hưởng bit-exact).
 - **REQ-ARI-06 Nghịch đảo.** `Rcp = ⌊2⁴⁰ / sum⌋` (27 bit; vì `sum ≥ 2¹⁴` khi kết thúc lượt 1).
 - **REQ-ARI-07 Lượt 2.** Với mỗi k < L: `e = E(u_k − M·2¹⁶)` (M là giá trị cuối lượt 1, tính lại từ X_BUF), `y = min(255, (e·Rcp + 2³¹) >> 32)`. Đầu ra UINT8, giá trị thực `y/256`.
 - **REQ-ARI-08 Bão hoà.** Xác suất 1,0 không biểu diễn được; bão hoà về 255. Không có trường hợp tràn nào khác (đã chứng minh bằng độ rộng ở trên).

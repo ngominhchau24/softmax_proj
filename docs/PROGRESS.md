@@ -2,7 +2,7 @@
 
 > Đọc đầu phiên, trước khi bắt đầu việc. Cập nhật file này trong cùng commit khi trạng thái đổi: xong một việc, có quyết định mới, hoặc có việc mới phải chờ. Chỉ ghi trạng thái hiện tại; lịch sử nằm ở `git log` và `docs/PROJECT.md` mục 10.
 
-**Cập nhật lần cuối:** 2026-11-05. **Nhánh:** `rtl/smx-core`, đã push, chưa có PR vào `main`. RTL, số học và bản đồ thanh ghi không đổi kể từ commit tích hợp `ea2f8cd`.
+**Cập nhật lần cuối:** 2026-11-06. A3 đã duyệt và áp dụng; các file trong `docs/spec/` đã đánh số 01–09 theo thứ tự đọc. **Nhánh:** `rtl/smx-core`, đã push, chưa có PR vào `main`. RTL, số học và bản đồ thanh ghi không đổi kể từ commit tích hợp `ea2f8cd`.
 
 ## Phiên gần nhất dừng ở đâu
 
@@ -31,7 +31,6 @@ Chưa có gì trong `rtl/avalon/`, `ip/`, `sw/`: wrapper và hệ thống thuộ
 | Mục | Cần gì | Việc phải làm sau khi có trả lời |
 |---|---|---|
 | A1 | Duyệt `03-design-spec.md` và 9 tài liệu block, trừ `smx_exp2` đã `APPROVED` | Chỉ khi Chau xác nhận mới đổi sang `APPROVED`, rồi cập nhật tracker |
-| A3 | Có sửa cận `sum` trong REQ-ARI-05 thành `≤ 512·2¹⁵` không | Sửa `requirements.md` mục 4, ghi Nhật ký, cập nhật mục 7.1 của `PROJECT.md` |
 | A4 | Có ghi lưu ý span 0x8000 không | Thêm vào `08-integration-notes.md` |
 | A5 | Giữ `tag_q` trong M10K không; đề xuất giữ | Nếu đổi: sửa RTL, chạy lại regress và Fitter |
 | A6 | Có ghi lưu ý LEN, ROWS vượt trường không báo ERR không | Thêm vào `08-integration-notes.md` |

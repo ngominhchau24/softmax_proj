@@ -354,7 +354,7 @@ $$
 
 Cận này đạt được: ở $K = 0$, mọi $u = 0$, $d = 0$, $E = 2^{15}$, nên sum đúng bằng $2^{24}$ khi $L = 512$ [GM]. Giá trị $2^{24}$ cần 25 bit, đúng bằng `SUM_W`.
 
-Câu trong REQ-ARI-05 đang ghi "≤ 512·2¹⁶". Viết vậy là cận lỏng hơn cần thiết, tương ứng $2^{25}$ và 26 bit. Mục A3 đề xuất sửa thành $512 \cdot 2^{15}$. Đây chỉ là sửa câu chữ: số học, RTL và độ rộng tối thiểu 25 bit đều không đổi.
+Câu trong REQ-ARI-05 trước đây ghi "≤ 512·2¹⁶" (đã sửa theo A3, Chau duyệt 2026-11-06). Viết vậy là cận lỏng hơn cần thiết, tương ứng $2^{25}$ và 26 bit. Câu giờ ghi $512 \cdot 2^{15}$. Đây chỉ là sửa câu chữ: số học, RTL và độ rộng tối thiểu 25 bit đều không đổi.
 
 **Cận dưới.** Xét nhóm cuối cùng làm $M$ tăng, hoặc nhóm đầu nếu $M$ không tăng về sau. Nhóm đó chứa phần tử có $c_k = M$, tức $d \in (-2^{16}, 0]$. Khi đó $I \in \{-1, 0\}$ và $E_0 \ge C_0 = 2^{15}$, nên $E \ge 2^{15} \gg 1 = 2^{14}$. Số hạng này được cộng **sau** phép dịch của nhóm đó và về sau $\Delta M = 0$, nên không bị dịch nữa. Vậy
 
@@ -610,7 +610,7 @@ Tóm tắt từ `docs/research/softmax-survey.md` mục 3 [TL]. Lựa chọn ở
 
 ## 14. Liên hệ với các mục A
 
-Đọc xong tới đây là đủ nền số học. Trong các mục A còn lại, chỉ A3 liên quan tới toán; A5, A6, A7 không đổi kết quả số học.
+Đọc xong tới đây là đủ nền số học. A3 đã đóng; các mục A còn lại (A5, A6, A7) không đổi kết quả số học.
 
 | Mục | Liên hệ | Cần nắm gì |
 |---|---|---|

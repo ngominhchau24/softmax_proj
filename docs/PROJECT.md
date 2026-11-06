@@ -131,6 +131,7 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 | A4 | X/Y tách riêng | [TL] SoftGen [6]: đánh đổi diện tích–tính linh hoạt khi lưu dữ liệu trung gian; [TK] ưu tiên khả năng debug |
 | A5 | Tham số P, quét 4/8/16 | [TL] SoftGen [6]: generator tham số hoá để khám phá không gian thiết kế; [TK] |
 | — | P = 8: 24 DSP, 1 681 ALUT, 21 M10K, 122–134 MHz qua 3 seed; 182 chu kỳ/hàng ở L = 512; vòng tích luỹ không phải đường găng nhất | Fitter Quartus 18.1 (`syn/fit.sh`) và mô phỏng `CYCLE_CNT`, 2026-11-04; thay ước lượng cũ ~16 DSP, ~176 chu kỳ/hàng |
+| REQ-ARI-05 | `sum ≤ 512·2¹⁵ = 2²⁴`, 25 bit | [GM] E ≤ 2¹⁵ (UQ1.15), đạt đúng 2²⁴ ở K = 0, L = 512; chứng minh ở `docs/spec/01-softmax-theory.md` mục 7.4 |
 | D18 | DeiT-Tiny: 197 token, 3 head, 12 layer, ~5M tham số | [TL] DeiT [13] — cần đối chiếu; [ĐC] trọng số `timm` |
 | D18 | Không cần mask, có mốc integer-only trên cùng mô hình | [TL] I-ViT [4] báo cáo DeiT-T; [TK] ViT không dùng attention mask → khớp B6 |
 | D18 | 104 chu kỳ/hàng, 61 503 chu kỳ mỗi layer mỗi ảnh; ~231 KiB JTAG | chu kỳ: công thức `CYCLE_CNT` đã kiểm bằng mô phỏng; JTAG: [TK], đo bằng băng thông thật |
@@ -186,6 +187,8 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 - 2026-11-05: Chau yêu cầu sơ đồ theo kiểu sơ đồ vi mạch, dây thẳng bẻ góc vuông. Thêm `docs/spec/09-diagram-rules.md` và `docs/spec/fig/schematic.py` (SVG đặt tay, tự kiểm rule). Bỏ Mermaid `flowchart` và `stateDiagram` cho hình mới, vì đã thử Mermaid 12.2 với `look: classic`: có góc vuông nhưng dây chạy trùng nhau và nhãn đè lên dây. Hình mẫu: `fig/smx_core.svg`. Sơ đồ cũ chưa chuyển.
 
 - 2026-11-05: Chau duyệt kiểu sơ đồ. Chuyển toàn bộ sơ đồ cấu trúc và FSM trong `docs/spec/` sang `docs/spec/fig/` (14 hình). Thêm rule ghi độ rộng dạng `addr[15:0]` trên dây, tính ở P = 8, N_SEG = 8.
+- 2026-11-06: Chau duyệt A3: sửa câu cận `sum` trong REQ-ARI-05 từ `≤ 512·2¹⁶` thành `≤ 512·2¹⁵ = 2²⁴` (cận cũ 2²⁵ cần 26 bit, mâu thuẫn với "≥ 25 bit" cùng câu). Chỉ sửa câu chữ: golden model, RTL, `SUM_W = 25`, bản đồ thanh ghi và VERSION (0x10) không đổi. Đổi tên file trong `docs/spec/` thành 01–09 theo thứ tự đọc.
+
 ## 11. Tài liệu tham khảo chính
 
 Danh sách đầy đủ ở `docs/research/softmax-survey.md` mục 7. Cốt lõi: Milakov & Gimelshein 2018 (online normalizer); Kim et al., I-BERT, ICML 2021; Stevens et al., Softermax, DAC 2021; Li & Gu, I-ViT/Shiftmax, ICCV 2023; Wei et al., SoftGen, ASAP 2020; Wang et al., log-sum-exp, APCCAS 2018; Wang et al., SOLE, 2025. Tài liệu nền accelerator (Kung 1982, TPU 2017, Eyeriss 2016, Sze 2017, Jacob 2018) ở `docs/archive/gemm-sa-proposal.md` mục tham khảo.

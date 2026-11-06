@@ -283,7 +283,6 @@ Chi tiết ở `docs/spec/07-open-decisions.md`.
 | Mục | Nội dung | Ai |
 |---|---|---|
 | A1 | Duyệt tài liệu 9 block mới và file này | Chau |
-| A3 | Sửa cận `sum` trong REQ-ARI-05 thành `≤ 512·2¹⁵` | Chau |
 | A4 | Span Platform Designer có thể là 0x8000 | Chau, rồi nhóm implement |
 | A5 | Giữ `tag_q` trong M10K hay không | Chau |
 | A6 | LEN, ROWS vượt độ rộng trường không báo ERR | Chau |
