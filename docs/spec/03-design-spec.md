@@ -2,7 +2,7 @@
 
 | Trường | Giá trị |
 |---|---|
-| Trạng thái | DRAFT, chờ Chau duyệt cùng tài liệu block (`open-decisions.md` A1) |
+| Trạng thái | DRAFT, chờ Chau duyệt cùng tài liệu block (`07-open-decisions.md` A1) |
 | Phạm vi | Lõi `smx_core`: CSR, X_BUF, Y_BUF, controller, datapath. Không gồm wrapper Avalon, hệ thống Platform Designer, phần mềm demo |
 | Phiên bản giao diện | `HW_PARAM.VERSION = 0x10` (requirements v1.0, đóng băng) |
 | Nhánh RTL | `rtl/smx-core` |
@@ -13,15 +13,15 @@ File này gộp các phần cần đọc để hiểu thiết kế từ đầu �
 |---|---|
 | Số học | `model/softmax_ref.py`, rồi `docs/requirements.md` mục 4 |
 | Giao diện ngoài, bản đồ thanh ghi | `docs/requirements.md` mục 5 |
-| Port, latency, căn pipeline giữa các block | `docs/spec/cross-block.md` |
+| Port, latency, căn pipeline giữa các block | `docs/spec/05-cross-block.md` |
 | Port và cấu trúc từng block | `docs/spec/blocks/<block>.md` mục 3, 5 |
-| Việc chưa chốt | `docs/spec/open-decisions.md` |
+| Việc chưa chốt | `docs/spec/07-open-decisions.md` |
 
 Loại số liệu: **[GM]** từ golden model, **[SIM]** từ mô phỏng RTL, **[QTS]** từ báo cáo Quartus, **[TK]** suy luận thiết kế.
 
 ## 1. Tổng quan
 
-`smx_core` tính softmax theo hàng cho điểm attention đã lượng tử hoá. Đầu vào là INT8, đầu ra là UINT8 với thang 1/256. Một lần chạy xử lý R hàng, mỗi hàng L phần tử, và mọi hàng trong lần chạy dùng chung một hệ số `K`. Target workload là softmax trong MHSA của DeiT-Tiny, L = 197 (`target-workload.md`).
+`smx_core` tính softmax theo hàng cho điểm attention đã lượng tử hoá. Đầu vào là INT8, đầu ra là UINT8 với thang 1/256. Một lần chạy xử lý R hàng, mỗi hàng L phần tử, và mọi hàng trong lần chạy dùng chung một hệ số `K`. Target workload là softmax trong MHSA của DeiT-Tiny, L = 197 (`02-target-workload.md`).
 
 Ba ý chính của kiến trúc:
 
@@ -43,7 +43,7 @@ Kết quả đo ở P = 8: 182 chu kỳ/hàng khi L = 512 và 104 chu kỳ/hàng
 
 ### 2.1. Ranh giới hệ thống
 
-Lõi chỉ biết cổng `acc_*`. Wrapper và hệ thống thuộc nhóm implement (`integration-notes.md`).
+Lõi chỉ biết cổng `acc_*`. Wrapper và hệ thống thuộc nhóm implement (`08-integration-notes.md`).
 
 ![smx_system](fig/smx_system.svg)
 
@@ -209,7 +209,7 @@ Chỉ thanh ghi điều khiển có reset (valid, FSM, CSR); thanh ghi dữ li�
 
 ## 5. Các block
 
-Port và sơ đồ bên trong của từng block nằm ở `docs/spec/blocks/<block>.md` mục 3 và 5, chỉ `smx_delay` nằm ở `cross-block.md` mục 4.10.
+Port và sơ đồ bên trong của từng block nằm ở `docs/spec/blocks/<block>.md` mục 3 và 5, chỉ `smx_delay` nằm ở `05-cross-block.md` mục 4.10.
 
 | Block | Số bản | Vai trò | Latency | Phần cứng chính |
 |---|---|---|---|---|
@@ -278,7 +278,7 @@ Quartus Prime Lite 18.1, 5CSXFC6D6F31C6, clock 100 MHz, `syn/fit.sh` [QTS]. Tài
 
 ## 8. Việc còn mở
 
-Chi tiết ở `docs/spec/open-decisions.md`.
+Chi tiết ở `docs/spec/07-open-decisions.md`.
 
 | Mục | Nội dung | Ai |
 |---|---|---|

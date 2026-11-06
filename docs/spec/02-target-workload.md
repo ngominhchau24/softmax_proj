@@ -43,7 +43,7 @@ Một **hàng** của `smx` = một query token i của một head h trong một
 | Chu kỳ / layer / ảnh | 591 × 104 + 39 = 61 503 (≈ 0,62 ms @ 100 MHz) | tính từ công thức `CYCLE_CNT = R·T_row + 1` đã kiểm bằng mô phỏng; chưa đo trên board |
 | Dữ liệu JTAG / layer / ảnh | ghi ⌈197/4⌉ = 50 word/hàng, đọc 50 word/hàng → 591 × 400 B ≈ 231 KiB | [TK]; X_BUF stride 512 B/hàng nhưng chỉ ghi 50 word đầu |
 
-Với băng thông JTAG cỡ chục–trăm KB/s (`integration-notes.md`, chưa đo), một layer của một ảnh mất cỡ giây đến chục giây trên board. Chấp nhận được cho demo vài ảnh; **không** chạy cả tập dữ liệu trên board (xem mục 5).
+Với băng thông JTAG cỡ chục–trăm KB/s (`08-integration-notes.md`, chưa đo), một layer của một ảnh mất cỡ giây đến chục giây trên board. Chấp nhận được cho demo vài ảnh; **không** chạy cả tập dữ liệu trên board (xem mục 5).
 
 ## 4. Lượng tử hoá đầu vào của softmax
 

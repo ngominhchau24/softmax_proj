@@ -5,14 +5,14 @@
 | Trạng thái | DRAFT — Chau ủy quyền viết RTL trước khi duyệt (2026-11-03), chưa duyệt |
 | File RTL | `rtl/core/smx_maxtree.sv` |
 | Testbench | `tb/tb_smx_maxtree.sv`, vector từ `model/vec_maxtree.py` |
-| Yêu cầu liên quan | REQ-ARI-02, REQ-ARI-05, REQ-FUN-03, REQ-PRF-01, REQ-PRF-02 (số học IntMax và online normalization); hợp đồng `docs/spec/cross-block.md` mục 4.2 |
+| Yêu cầu liên quan | REQ-ARI-02, REQ-ARI-05, REQ-FUN-03, REQ-PRF-01, REQ-PRF-02 (số học IntMax và online normalization); hợp đồng `docs/spec/05-cross-block.md` mục 4.2 |
 | Golden model | `softmax_row` trong `model/softmax_ref.py`: `Mg` (dòng 91), `Mnew` (92), `dM` (93), `M = Mnew` (96); các giá trị theo nhóm nằm ở `info["groups"]` (dòng 97) |
 
 ## 1. Chức năng
 
 Block nhận một nhóm P giá trị `c = ⌈u/2¹⁶⌉` mỗi chu kỳ, tìm max của các lane hợp lệ (`Mg`), cập nhật max chạy của hàng `M`, và đưa ra `Mnew` cùng bước nhảy `dM = Mnew − M`. `m_out` đi vào `smx_exp2` để mỗi nhóm tính E theo `Mnew` của chính nó (REQ-ARI-05); `dm_out` đi qua đường trễ `EXP2_LAT` đến `smx_sumacc` để dịch tổng cũ.
 
-Vị trí trong datapath (`architecture.md` mục 2, `cross-block.md` mục 2): sau `smx_scale` (nhận `c`), song song với đường trễ của `u`. Chỉ hoạt động ở lượt 1. Ở lượt 2 `in_valid = 0`, block giữ `m_out` là M cuối hàng, và cùng dây đó cấp M cho `smx_exp2`.
+Vị trí trong datapath (`04-architecture.md` mục 2, `05-cross-block.md` mục 2): sau `smx_scale` (nhận `c`), song song với đường trễ của `u`. Chỉ hoạt động ở lượt 1. Ở lượt 2 `in_valid = 0`, block giữ `m_out` là M cuối hàng, và cùng dây đó cấp M cho `smx_exp2`.
 
 Không làm: tính `c`, tính E, cộng dồn, đếm nhóm. Block không biết lượt hay hàng; nó chỉ tin `in_valid`, `in_first`, `in_en` do `smx_core` rút từ thẻ sideband.
 

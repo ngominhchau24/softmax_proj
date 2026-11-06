@@ -5,12 +5,12 @@
 | Trạng thái | DRAFT — Chau ủy quyền viết RTL trước khi duyệt (2026-11-03), chưa duyệt |
 | File RTL | `rtl/core/smx_divider.sv` |
 | Testbench | `tb/tb_smx_divider.sv`, vector từ `model/vec_divider.py` |
-| Yêu cầu liên quan | REQ-ARI-06 (Rcp = ⌊2⁴⁰/sum⌋), REQ-PRF-03 (ROW_OVERHEAD), `cross-block.md` mục 4.5 |
+| Yêu cầu liên quan | REQ-ARI-06 (Rcp = ⌊2⁴⁰/sum⌋), REQ-PRF-03 (ROW_OVERHEAD), `05-cross-block.md` mục 4.5 |
 | Golden model | `softmax_ref.reciprocal(s)` = `(1 << RECIP_SHIFT) // s` |
 
 ## 1. Chức năng
 
-Block tính `Rcp = ⌊2⁴⁰ / sum⌋` một lần mỗi hàng, giữa lượt 1 và lượt 2 (`architecture.md`, đường DIV). Đây là bộ chia khôi phục (restoring) nối tiếp, mỗi chu kỳ ra một bit thương, 27 chu kỳ lặp. Một phép chia mỗi hàng nên không cần pipeline hoá hay chia song song; chi phí là 28 chu kỳ trong `ROW_OVERHEAD`, đã tính sẵn trong `smx_pkg::DIV_LAT`. Block không kiểm khoảng hợp lệ của `sum` (đó là bảo đảm của lõi: `2¹⁴ ≤ sum ≤ 2²⁴`), không xử lý `sum = 0`.
+Block tính `Rcp = ⌊2⁴⁰ / sum⌋` một lần mỗi hàng, giữa lượt 1 và lượt 2 (`04-architecture.md`, đường DIV). Đây là bộ chia khôi phục (restoring) nối tiếp, mỗi chu kỳ ra một bit thương, 27 chu kỳ lặp. Một phép chia mỗi hàng nên không cần pipeline hoá hay chia song song; chi phí là 28 chu kỳ trong `ROW_OVERHEAD`, đã tính sẵn trong `smx_pkg::DIV_LAT`. Block không kiểm khoảng hợp lệ của `sum` (đó là bảo đảm của lõi: `2¹⁴ ≤ sum ≤ 2²⁴`), không xử lý `sum = 0`.
 
 ## 2. Tham số
 
@@ -35,7 +35,7 @@ Block không có tham số module, nên không phụ thuộc `P` hay `N_SEG`. M�
 | `done` | out | 1 | | xung một chu kỳ, đúng `DIV_LAT` chu kỳ sau `start` |
 | `rcp_out` | out | 27 | không dấu | hợp lệ từ `done`, giữ nguyên đến `done` kế tiếp |
 
-Handshake là `start`/`done`, không có `ready`: bên gọi (`smx_ctrl`) tự bảo đảm không phát `start` khi đang chia. Quy ước reset: chỉ `busy`, bộ đếm và `done` có reset; thanh ghi dữ liệu không reset (`cross-block.md` mục 1.4). Reset giữa chừng huỷ phép chia đang chạy, `done` về 0 ngay (bất đồng bộ) và không bao giờ lên cho phép chia đó. `rcp_out` không bị xoá bởi reset (là thanh ghi dữ liệu); giá trị chỉ có nghĩa sau `done` đầu tiên sau reset.
+Handshake là `start`/`done`, không có `ready`: bên gọi (`smx_ctrl`) tự bảo đảm không phát `start` khi đang chia. Quy ước reset: chỉ `busy`, bộ đếm và `done` có reset; thanh ghi dữ liệu không reset (`05-cross-block.md` mục 1.4). Reset giữa chừng huỷ phép chia đang chạy, `done` về 0 ngay (bất đồng bộ) và không bao giờ lên cho phép chia đó. `rcp_out` không bị xoá bởi reset (là thanh ghi dữ liệu); giá trị chỉ có nghĩa sau `done` đầu tiên sau reset.
 
 **Hai quyết định ghi lại.** (a) `rcp_out` chỉ đổi tại `done`, không đổi trong lúc đang chia: hợp đồng ghi "giữ đến `start` kế tiếp", và đọc chặt nhất là giá trị cũ còn nguyên suốt phép chia mới. Chi phí là thanh ghi 27 bit riêng, tách khỏi thanh ghi dịch thương. (b) `start` khi đang bận (trước `done`) khởi động lại phép chia. Đây là dùng sai theo hợp đồng, nên hành vi chỉ để không treo; `start` ở đúng chu kỳ `done` và ngay sau đó đều hợp lệ và được kiểm.
 

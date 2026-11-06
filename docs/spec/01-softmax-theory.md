@@ -94,7 +94,7 @@ Hai dòng đầu của bảng trên cho thấy điều này. Đây là tính ch�
 
 ### 1.3. Softmax trong đề tài này
 
-Trong multi-head self-attention của DeiT-Tiny, mỗi head tính $A = \text{softmax}(QK^{\mathsf T} / \sqrt{64})$ theo hàng. Một hàng của lõi là một query token của một head, $L = 197$ phần tử (`docs/spec/target-workload.md`). Lõi chỉ thay phép softmax; phần còn lại của mạng vẫn là FP32 trên host.
+Trong multi-head self-attention của DeiT-Tiny, mỗi head tính $A = \text{softmax}(QK^{\mathsf T} / \sqrt{64})$ theo hàng. Một hàng của lõi là một query token của một head, $L = 197$ phần tử (`docs/spec/02-target-workload.md`). Lõi chỉ thay phép softmax; phần còn lại của mạng vẫn là FP32 trên host.
 
 ## 2. Vì sao softmax khó cho phần cứng
 
@@ -422,7 +422,7 @@ Bắt đầu $q_0 = 0$, $\text{rem}_0 = 2^{13}$. Bất biến đúng vì $2^{13}
 - Nếu $t \ge s$: $\text{rem} = t - s$ và bit thương là 1.
 - Ngược lại: $\text{rem} = t$ và bit thương là 0.
 
-Sau 27 bước, $q_{27}$ đúng là $\lfloor 2^{40} / s \rfloor$. Mỗi chu kỳ một bit, nên `DIV_LAT = 28`. Hợp đồng ghi đã kiểm vét cạn trên mọi $s \in [2^{14}, 2^{24}]$ (`cross-block.md` mục 4.5).
+Sau 27 bước, $q_{27}$ đúng là $\lfloor 2^{40} / s \rfloor$. Mỗi chu kỳ một bit, nên `DIV_LAT = 28`. Hợp đồng ghi đã kiểm vét cạn trên mọi $s \in [2^{14}, 2^{24}]$ (`05-cross-block.md` mục 4.5).
 
 ### 8.4. Bão hoà
 
@@ -591,7 +591,7 @@ Các chi tiết sau là một phần của đặc tả, đổi là mất bit-exa
 - Dùng $M_{\text{new}}$ của chính nhóm, không phải $M$ cũ, khi tính $E$ ở lượt 1. Dùng $M$ cũ thì $d$ có thể dương.
 - sum lấy từ online, không phải tổng $E$ cuối (mục 7.5).
 - Làm tròn $(E R_{cp} + 2^{31}) \gg 32$, rồi mới bão hoà.
-- `in_first` chỉ có hiệu lực khi `in_valid = 1`, vì thẻ `first` cũng lên ở lượt 2 (`cross-block.md` mục 4).
+- `in_first` chỉ có hiệu lực khi `in_valid = 1`, vì thẻ `first` cũng lên ở lượt 2 (`05-cross-block.md` mục 4).
 
 ## 13. So với các cách làm khác
 

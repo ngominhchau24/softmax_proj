@@ -15,7 +15,7 @@
       { "name": "div_done",  "wave": "0.............10..." }
     ]
   ],
-  "head": { "text": "smx_ctrl, G = 4 (schematic, not to scale): start in cycle n+1, first group in n+2; latencies are shortened, see cross-block.md section 5 for the real cycle counts" },
+  "head": { "text": "smx_ctrl, G = 4 (schematic, not to scale): start in cycle n+1, first group in n+2; latencies are shortened, see 05-cross-block.md section 5 for the real cycle counts" },
   "foot": { "text": "sum_last -> div_start: 1 cycle; div_done -> first pass-2 group: 1 cycle; y_last -> NEXT_ROW -> next t0: 1 cycle each; run_done in NEXT_ROW of the last row" },
   "config": { "hscale": 1 }
 }

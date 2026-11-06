@@ -10,7 +10,7 @@
 
 ## 1. Chức năng
 
-Một lane chuẩn hoá của lượt 2: nhận `E` (UQ1.15) từ `smx_exp2` và `Rcp = ⌊2⁴⁰/sum⌋` từ `smx_divider`, trả `y = min(255, (E·Rcp + 2³¹) >> 32)` dạng UINT8, giá trị thực `y/256`. Vị trí trong datapath: sau `smx_exp2` (lượt 2) và `smx_divider`, trước cổng ghi Y_BUF (`docs/spec/cross-block.md` mục 2).
+Một lane chuẩn hoá của lượt 2: nhận `E` (UQ1.15) từ `smx_exp2` và `Rcp = ⌊2⁴⁰/sum⌋` từ `smx_divider`, trả `y = min(255, (E·Rcp + 2³¹) >> 32)` dạng UINT8, giá trị thực `y/256`. Vị trí trong datapath: sau `smx_exp2` (lượt 2) và `smx_divider`, trước cổng ghi Y_BUF (`docs/spec/05-cross-block.md` mục 2).
 
 Module là **một lane**; `smx_core` sinh P bản, cùng chung `rcp_in`. Không có trạng thái giữa các phần tử (thuần pipeline). Không làm: tính E, chia, quyết định lượt hay địa chỉ ghi. Lane bị mask (`k ≥ L`) mang `E = 0` từ `smx_exp2` nên `y = 0`; REQ-FUN-03 cho phép ghi giá trị này vào Y_BUF.
 

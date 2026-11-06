@@ -1,4 +1,4 @@
-// smx_ctrl.sv - row/group sequencer of smx_core (docs/spec/cross-block.md 4.9, 5).
+// smx_ctrl.sv - row/group sequencer of smx_core (docs/spec/05-cross-block.md 4.9, 5).
 //
 // No arithmetic. Issues one group of P elements per cycle in pass 1 and pass 2 of
 // every row, and steps between phases on events from the datapath (sum_last,

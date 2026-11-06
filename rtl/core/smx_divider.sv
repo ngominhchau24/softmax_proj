@@ -4,7 +4,7 @@
 //   rem0 = 2^(RECIP_SH - RCP_W)                       (2^13)
 //   repeat RCP_W times: t = 2*rem; bit = (t >= sum); rem = bit ? t - sum : t; q = {q, bit}
 // Legal input: 2^14 <= sum <= 2^24 (so rem < sum <= 2^24 always, rem fits 24 bits).
-// Timing (cross-block.md 4.5), start at cycle s: load at the end of s, iterate in s+1..s+RCP_W,
+// Timing (05-cross-block.md 4.5), start at cycle s: load at the end of s, iterate in s+1..s+RCP_W,
 // done (one cycle) and the final rcp_out at s+DIV_LAT. rcp_out changes only at done.
 // A start while busy restarts the division (undefined use, but harmless).
 module smx_divider (

@@ -12,7 +12,7 @@
 
 Một lane tính `E = 2^(d/2¹⁶)` ở dạng UQ1.15 cho `d = u − M·2¹⁶ ≤ 0`: tách phần nguyên và phần lẻ, tra bảng PWL N_SEG đoạn cho `2^F`, nội suy bằng một phép nhân, dịch phải `−I` bit, và trả 0 khi `−I > 15`.
 
-Vị trí trong datapath (`docs/spec/architecture.md` mục 2): sau `smx_scale` (nhận `u`) và `smx_maxtree` (nhận `M`); đầu ra đi vào `smx_sumacc` ở lượt 1 và `smx_norm` ở lượt 2. Block **dùng chung cho cả hai lượt**; chỉ nguồn M (Mnew đang chạy hay M cuối hàng) và đích của E thay đổi, do `smx_core` và `smx_ctrl` quyết định.
+Vị trí trong datapath (`docs/spec/04-architecture.md` mục 2): sau `smx_scale` (nhận `u`) và `smx_maxtree` (nhận `M`); đầu ra đi vào `smx_sumacc` ở lượt 1 và `smx_norm` ở lượt 2. Block **dùng chung cho cả hai lượt**; chỉ nguồn M (Mnew đang chạy hay M cuối hàng) và đích của E thay đổi, do `smx_core` và `smx_ctrl` quyết định.
 
 Module là **một lane**; `smx_core` sinh P bản bằng `generate`, cùng chung `m_in` (câu hỏi mở Q1).
 
@@ -29,7 +29,7 @@ Không làm: tính `u` hay `c`, tìm max, cộng dồn, chuẩn hoá. Không có
 | `C_W` | 9 | `smx_pkg::C_W` | `M` có dấu |
 | `E_W` | 16 | `smx_pkg::E_W` | `E` UQ1.15 |
 | `EXP_CUTOFF` | 15 | `smx_pkg::EXP_CUTOFF` | cố định 15 vì `E₀ < 2¹⁶` |
-| `EXP2_LAT` (mới) | 3 | thêm vào `smx_pkg` | latency cố định; `smx_core` dùng để căn pipeline (Q2, `cross-block.md` mục 1) |
+| `EXP2_LAT` (mới) | 3 | thêm vào `smx_pkg` | latency cố định; `smx_core` dùng để căn pipeline (Q2, `05-cross-block.md` mục 1) |
 
 ## 3. Giao diện
 
@@ -91,7 +91,7 @@ RTL dùng trực tiếp `s = M − u[24:16] = −I` (lượng dịch), nên khô
 - Trên toàn bộ `d ∈ [−17·2¹⁶, 0]` (1 114 113 điểm, N = 8): `max E = 32768 = 2¹⁵`, đạt duy nhất tại `d = 0`. Với `d ∈ (−2¹⁶, 0]`: `E ≥ 16384`. Tại `I = −15`: `E ≤ 1`; tại `I = −16`: `E = 0` (cutoff).
 - 300 000 cặp `(u, M)` hợp lệ ngẫu nhiên: dạng tách bit ở §4.1 khớp `exp2_neg(u − (M << 16))`, **0 sai khác**.
 
-Hệ quả cho block sau (ghi lại, không quyết ở đây): `E ≤ 2¹⁵` nên `sum ≤ L_MAX·2¹⁵ = 2²⁴` (25 bit); `SUM_W` đã giảm từ 26 xuống 25 trong `smx_pkg` (`open-decisions.md` B1).
+Hệ quả cho block sau (ghi lại, không quyết ở đây): `E ≤ 2¹⁵` nên `sum ≤ L_MAX·2¹⁵ = 2²⁴` (25 bit); `SUM_W` đã giảm từ 26 xuống 25 trong `smx_pkg` (`07-open-decisions.md` B1).
 
 ### 4.4. Lane không hợp lệ
 

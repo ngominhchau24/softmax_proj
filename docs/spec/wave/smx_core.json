@@ -19,6 +19,6 @@
     ]
   ],
   "head": { "text": "smx_core, one row, L = 2P (G = 2), schematic and not to scale: latencies of PIPE, SUMACC, NORM and DIV (real ones in smx_pkg) are shortened. Phases: pass 1 groups, drain, sum_last, div_start, div_done, pass 2 groups, y_valid, y_last, DONE." },
-  "foot": { "text": "Real cycle counts: T_row = 2*G + ROW_OVERHEAD, CYCLE_CNT = R*T_row + 1 (cross-block.md section 5). Sideband taps: BUF_LAT, +SCALE_LAT, +MAXTREE_LAT, +EXP2_LAT, then +SUMACC_LAT for sum_last and +NORM_LAT for y_valid." },
+  "foot": { "text": "Real cycle counts: T_row = 2*G + ROW_OVERHEAD, CYCLE_CNT = R*T_row + 1 (05-cross-block.md section 5). Sideband taps: BUF_LAT, +SCALE_LAT, +MAXTREE_LAT, +EXP2_LAT, then +SUMACC_LAT for sum_last and +NORM_LAT for y_valid." },
   "config": { "hscale": 1 }
 }

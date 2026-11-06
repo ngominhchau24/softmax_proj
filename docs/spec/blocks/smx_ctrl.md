@@ -72,7 +72,7 @@ Thanh ghi: 3 bit trạng thái (Quartus mã hoá one-hot 8 bit), `r` 4 bit, `g` 
 
 ## 6. Timing
 
-Với `start` ở chu kỳ `n+1` (chu kỳ đầu BUSY), nhóm đầu ở `t0 = n+2`. Các đoạn và công thức `T_row = 2·G + ROW_OVERHEAD`, `CYCLE_CNT = R·T_row + 1` đúng như `cross-block.md` mục 5; testbench đo trực tiếp (số chu kỳ từ chu kỳ `start` tới `run_done` gồm cả hai = `R·T_row + 1`) và so với `smx_pkg::ROW_OVERHEAD` (= 54). Dạng sóng: `docs/spec/wave/smx_ctrl.json` (minh hoạ, thu nhỏ latency).
+Với `start` ở chu kỳ `n+1` (chu kỳ đầu BUSY), nhóm đầu ở `t0 = n+2`. Các đoạn và công thức `T_row = 2·G + ROW_OVERHEAD`, `CYCLE_CNT = R·T_row + 1` đúng như `05-cross-block.md` mục 5; testbench đo trực tiếp (số chu kỳ từ chu kỳ `start` tới `run_done` gồm cả hai = `R·T_row + 1`) và so với `smx_pkg::ROW_OVERHEAD` (= 54). Dạng sóng: `docs/spec/wave/smx_ctrl.json` (minh hoạ, thu nhỏ latency).
 
 Đường găng: so sánh `g == G−1` (8 bit, từ `len`) kết hợp lấy `grp_en`; chưa có số Fmax thật vì chưa chạy Fitter (không chạy theo chỉ dẫn). Nếu cần, đăng ký sẵn `G−1` ở chu kỳ `start` (len ổn định khi BUSY) mà không đổi timing đầu ra.
 

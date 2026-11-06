@@ -7,7 +7,7 @@
 // M10K read-during-write behaviour is not relied upon beyond that).
 // No reset, no initial: unwritten words read X in simulation.
 //
-// Memory coding (docs/spec/cross-block.md section 4.7, mandatory): one
+// Memory coding (docs/spec/05-cross-block.md section 4.7, mandatory): one
 // logic [7:0] mem [0:DEPTH-1] per bank and per byte lane inside nested generate.
 // A packed word array such as logic [3:0][7:0] mem [DEPTH] inside generate is silently
 // turned into flip-flops by Quartus 18.1.

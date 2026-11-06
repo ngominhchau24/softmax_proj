@@ -10,7 +10,7 @@
 
 ## 1. Chức năng
 
-`smx_core` là top của lõi: nối CSR, X_BUF, Y_BUF, `smx_ctrl` và datapath (`smx_scale`, `smx_maxtree`, `smx_exp2`, `smx_sumacc`, `smx_divider`, `smx_norm`, mỗi block lane có `P` bản), cộng phần sideband duy nhất mà hợp đồng giao cho nó: một shift register mang thẻ nhóm từ `smx_ctrl` tới đúng tầng pipeline cần (`cross-block.md` mục 1.2 và 3). Không có phép tính số học trong block này; mọi số học nằm ở block con. Ngoài ra nó có hai mux địa chỉ/ghi (mục 4) và hai đường trễ dữ liệu `smx_delay` (u và dm).
+`smx_core` là top của lõi: nối CSR, X_BUF, Y_BUF, `smx_ctrl` và datapath (`smx_scale`, `smx_maxtree`, `smx_exp2`, `smx_sumacc`, `smx_divider`, `smx_norm`, mỗi block lane có `P` bản), cộng phần sideband duy nhất mà hợp đồng giao cho nó: một shift register mang thẻ nhóm từ `smx_ctrl` tới đúng tầng pipeline cần (`05-cross-block.md` mục 1.2 và 3). Không có phép tính số học trong block này; mọi số học nằm ở block con. Ngoài ra nó có hai mux địa chỉ/ghi (mục 4) và hai đường trễ dữ liệu `smx_delay` (u và dm).
 
 Nó không chứa Avalon: cổng ngoài là `acc_*` (REQ-IF-06) cùng conduit `status_*` (REQ-IF-10); `smx_avalon` là việc của nhóm implement.
 
@@ -28,8 +28,8 @@ Nội bộ (không ghi đè): `BANKS = P/4`, `ADDR_W = $clog2(8192/P)`, `TW = 3 
 | Port | Hướng | Độ rộng | Mô tả |
 |---|---|---|---|
 | `clk` | in | 1 | |
-| `rst_n` | in | 1 | active-low, assert bất đồng bộ; lõi không có bộ đồng bộ, bên lái phải deassert đồng bộ (trong mô phỏng là testbench, `open-decisions.md` A2) |
-| `acc_addr` | in | 13 | word address (mục 4.1 của `cross-block.md`) |
+| `rst_n` | in | 1 | active-low, assert bất đồng bộ; lõi không có bộ đồng bộ, bên lái phải deassert đồng bộ (trong mô phỏng là testbench, `07-open-decisions.md` A2) |
+| `acc_addr` | in | 13 | word address (mục 4.1 của `05-cross-block.md`) |
 | `acc_write` | in | 1 | |
 | `acc_writedata` | in | 32 | |
 | `acc_byteenable` | in | 4 | |
@@ -97,9 +97,9 @@ Dạng sóng: `docs/spec/wave/smx_core.json`, một hàng `L` ngắn, thu nhỏ 
 | 8 | 1,809 ns | M10K của `tag_q` (bit `en`) → `smx_maxtree.s1_a_q`; `s3_c_q` → `s1_a_q` là 2,037 ns |
 | 16 | 0,789 ns | `tag_q`, `s3_c_q` → `smx_maxtree.s1_a_q` (0,790 ns) |
 
-Vòng tích luỹ `sum_q`, điểm găng dự đoán trong `architecture.md` mục 4, không phải đường găng nhất ở P = 8, 16. Ở P = 8, Quartus chuyển các chuỗi không reset thành `altshift_taps` trong M10K: `tag_q` bit `en` (`tag_q_rtl_0`, 8 bit × 4) và `tag_q` bit `pass2` gộp với `u_u_dly` và `s3_u_q` của `smx_scale` (`tag_q_rtl_1`, 193 bit × 3). Ngõ ra RAM chậm nên đường `en` → tầng 1 cây max thành găng nhất. Quyết định xử lý: `open-decisions.md` A5.
+Vòng tích luỹ `sum_q`, điểm găng dự đoán trong `04-architecture.md` mục 4, không phải đường găng nhất ở P = 8, 16. Ở P = 8, Quartus chuyển các chuỗi không reset thành `altshift_taps` trong M10K: `tag_q` bit `en` (`tag_q_rtl_0`, 8 bit × 4) và `tag_q` bit `pass2` gộp với `u_u_dly` và `s3_u_q` của `smx_scale` (`tag_q_rtl_1`, 193 bit × 3). Ngõ ra RAM chậm nên đường `en` → tầng 1 cây max thành găng nhất. Quyết định xử lý: `07-open-decisions.md` A5.
 
-Hold dương ở cả bốn góc (nhỏ nhất 0,027 ns, P = 8, slow 0 °C). Các số trên chỉ gồm đường thanh ghi tới thanh ghi, vì SDC chỉ có clock; `acc_*` và `rst_n` không được ràng buộc nên Fitter không tối ưu chúng (`open-decisions.md` A7).
+Hold dương ở cả bốn góc (nhỏ nhất 0,027 ns, P = 8, slow 0 °C). Các số trên chỉ gồm đường thanh ghi tới thanh ghi, vì SDC chỉ có clock; `acc_*` và `rst_n` không được ràng buộc nên Fitter không tối ưu chúng (`07-open-decisions.md` A7).
 
 ## 7. Tài nguyên ước tính
 
@@ -150,7 +150,7 @@ Rà soát độc lập 2026-11-03 (bench riêng, không nằm trong repo; báo c
 
 ## 9. Câu hỏi mở / quyết định cần duyệt
 
-- [ ] Q1. Sideband dùng một shift register chung sâu 12 ô, mỗi tap đọc đúng ô cần, thay vì nhiều đường trễ nhỏ. Khuyến nghị giữ: một chỗ sửa khi đổi latency. Quartus đưa một phần chuỗi này vào M10K và đó là đường găng nhất ở P = 8 (mục 6), nhưng tắt suy luận không cho lợi Fmax rõ ràng qua 3 seed (`open-decisions.md` A5).
+- [ ] Q1. Sideband dùng một shift register chung sâu 12 ô, mỗi tap đọc đúng ô cần, thay vì nhiều đường trễ nhỏ. Khuyến nghị giữ: một chỗ sửa khi đổi latency. Quartus đưa một phần chuỗi này vào M10K và đó là đường găng nhất ở P = 8 (mục 6), nhưng tắt suy luận không cho lợi Fmax rõ ràng qua 3 seed (`07-open-decisions.md` A5).
 - [ ] Q2. `status_busy` chọn địa chỉ X_BUF là một mux nhỏ trên đường tới RAM. Fitter không xếp đường này vào nhóm găng nhất ở mục 6, nên khuyến nghị giữ nguyên.
 
 ## 10. Lịch sử

@@ -12,7 +12,7 @@
 
 Bộ tích luỹ của lượt 1. Mỗi chu kỳ nhận một nhóm P giá trị `E` (UQ1.15) cùng `dM = Mnew − M` của nhóm, cộng P lane bằng cây cộng hai tầng, rồi cập nhật tổng chạy của hàng: nhóm đầu thì lấy thẳng tổng cây, các nhóm sau thì dịch phải tổng cũ `dM` bit (cắt bỏ, tức hiệu chỉnh về max mới) rồi cộng tổng cây. Cuối hàng `sum_out` là mẫu số của `smx_divider`.
 
-Vị trí: sau `smx_exp2` (lượt 1), trước `smx_divider` (`docs/spec/architecture.md` mục 2, `cross-block.md` 4.4). Block không biết hàng, lượt hay `L`; `smx_ctrl` lấy sự kiện `sum_last` từ thẻ `last` đã trễ `SUMACC_LAT`. Không làm: tính E, tìm max, chia.
+Vị trí: sau `smx_exp2` (lượt 1), trước `smx_divider` (`docs/spec/04-architecture.md` mục 2, `05-cross-block.md` 4.4). Block không biết hàng, lượt hay `L`; `smx_ctrl` lấy sự kiện `sum_last` từ thẻ `last` đã trễ `SUMACC_LAT`. Không làm: tính E, tìm max, chia.
 
 ## 2. Tham số
 

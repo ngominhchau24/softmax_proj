@@ -3,7 +3,7 @@
 // The datapath is modelled behaviourally: the testbench delays grp_* by the pipeline
 // latencies and feeds sum_last, div_done, y_valid, y_last back (event-driven loop).
 // Independently, build_expected() computes from (L, R) the exact cycle of every
-// output (cross-block.md section 5) and every cycle is compared against it.
+// output (05-cross-block.md section 5) and every cycle is compared against it.
 // Latencies run in three configurations: smx_pkg, an extreme minimum, and a large one,
 // to prove smx_ctrl has no hidden dependency on them.
 // Block has no vectors; +VECDIR is accepted and ignored.

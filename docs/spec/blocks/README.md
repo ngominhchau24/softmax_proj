@@ -5,7 +5,7 @@ Mỗi block có một tài liệu `docs/spec/blocks/<block>.md` theo `_TEMPLATE.
 Trạng thái: `TODO` → `DRAFT` → `REVIEW` → `APPROVED` → `RTL` → `UT-PASS` (unit test khớp golden) → `INTEGRATED`.
 **Không viết RTL cho block chưa `APPROVED`.** Đổi trạng thái thì cập nhật bảng này cùng lúc.
 
-Ngoại lệ ngày 2026-11-03: theo yêu cầu của Chau, các block còn lại được viết cả tài liệu lẫn RTL trước cổng duyệt. Cột Trạng thái ghi tiến độ RTL; tài liệu các block này **chưa được duyệt** (`docs/spec/open-decisions.md` A1). Hợp đồng chung: `docs/spec/cross-block.md`.
+Ngoại lệ ngày 2026-11-03: theo yêu cầu của Chau, các block còn lại được viết cả tài liệu lẫn RTL trước cổng duyệt. Cột Trạng thái ghi tiến độ RTL; tài liệu các block này **chưa được duyệt** (`docs/spec/07-open-decisions.md` A1). Hợp đồng chung: `docs/spec/05-cross-block.md`.
 
 | # | Block | Vai trò | Phụ thuộc | Trạng thái | Ghi chú |
 |---|---|---|---|---|---|
@@ -19,4 +19,4 @@ Ngoại lệ ngày 2026-11-03: theo yêu cầu của Chau, các block còn lại
 | 8 | `smx_csr` | thanh ghi, START/DONE/ERR, CYCLE_CNT, decode `acc_*` | smx_pkg | INTEGRATED | P, N_SEG = 4/8/16; `map_check` P = 8: 192 ALUT, 136 FF; chỉ Analysis & Synthesis, chưa có Fitter |
 | 9 | `smx_ctrl` | FSM hàng/lượt, địa chỉ, lane mask | tất cả trên | INTEGRATED | 271 tổ hợp L, R ở mỗi P; `map_check` P = 8: 72 ALUT, 24 FF; chỉ Analysis & Synthesis, chưa có Fitter |
 | 10 | `smx_core` | top lõi, nối các block | tất cả | UT-PASS | 2026-11-04 PASS ở P, N_SEG = 4/8/16; Fitter P = 8: 1 681 ALUT, 24 DSP, 21 M10K, ≥ 122 MHz qua 3 seed; số đầy đủ ở `smx_core.md` mục 6, 7 |
-| — | `smx_delay` | tiện ích trễ dữ liệu | — | INTEGRATED | không có tài liệu riêng (`cross-block.md` mục 4.10); kiểm qua testbench `smx_core` |
+| — | `smx_delay` | tiện ích trễ dữ liệu | — | INTEGRATED | không có tài liệu riêng (`05-cross-block.md` mục 4.10); kiểm qua testbench `smx_core` |

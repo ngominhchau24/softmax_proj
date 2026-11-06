@@ -1,4 +1,4 @@
-"""schematic.py - hand-placed block diagrams as SVG, rules in docs/spec/diagram-rules.md.
+"""schematic.py - hand-placed block diagrams as SVG, rules in docs/spec/09-diagram-rules.md.
 
 A figure is a small Python file next to this one: it creates a Sheet, places boxes, routes wires by
 explicit points, and calls save(). save() refuses to write a figure that breaks a checkable rule:

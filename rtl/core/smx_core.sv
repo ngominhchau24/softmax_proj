@@ -1,6 +1,6 @@
 // smx_core.sv - top of the softmax core: CSR, X_BUF, Y_BUF, controller and datapath.
 // Wiring plus the sideband tag pipeline only; no arithmetic here.
-// Contract: docs/spec/cross-block.md sections 2, 3, 4.10. Ports: REQ-IF-06 and REQ-IF-10.
+// Contract: docs/spec/05-cross-block.md sections 2, 3, 4.10. Ports: REQ-IF-06 and REQ-IF-10.
 module smx_core #(
   parameter int P     = smx_pkg::P,       // lanes: 4, 8 or 16
   parameter int N_SEG = smx_pkg::N_SEG    // PWL segments: 4, 8 or 16
@@ -24,7 +24,7 @@ module smx_core #(
   localparam int ADDR_W = $clog2(8192 / P);
   localparam int TW     = 3 + P;          // data tag bits: {en, last, first, pass2}
 
-  // ---- tap points of the sideband, in cycles after smx_ctrl issues a group (cross-block.md 3) ----
+  // ---- tap points of the sideband, in cycles after smx_ctrl issues a group (05-cross-block.md 3) ----
   localparam int T_SCALE = smx_pkg::BUF_LAT;                    // q at smx_scale
   localparam int T_MAXT  = T_SCALE + smx_pkg::SCALE_LAT;        // c at smx_maxtree
   localparam int T_EXP   = T_MAXT + smx_pkg::MAXTREE_LAT;       // u, m at smx_exp2

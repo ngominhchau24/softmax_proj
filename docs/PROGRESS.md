@@ -6,7 +6,7 @@
 
 ## Phiên gần nhất dừng ở đâu
 
-Không có việc nào đang làm dở: mọi thay đổi đã commit và push, không có tác vụ nền. Phiên 2026-11-05 kết thúc sau khi chuyển xong sơ đồ sang kiểu vuông góc. Bước tiếp theo thuộc về Chau: đọc `docs/spec/softmax-theory.md`, rồi trả lời các mục A ở dưới. Khi bắt đầu phiên mới, hỏi Chau đã đọc tới đâu và có trả lời nào chưa, đừng tự chuyển sang việc khác.
+Không có việc nào đang làm dở: mọi thay đổi đã commit và push, không có tác vụ nền. Phiên 2026-11-05 kết thúc sau khi chuyển xong sơ đồ sang kiểu vuông góc. Bước tiếp theo thuộc về Chau: đọc `docs/spec/01-softmax-theory.md`, rồi trả lời các mục A ở dưới. Khi bắt đầu phiên mới, hỏi Chau đã đọc tới đâu và có trả lời nào chưa, đừng tự chuyển sang việc khác.
 
 ## Trạng thái
 
@@ -17,35 +17,35 @@ RTL `smx_core` đã tích hợp và qua Fitter. Tài liệu vẫn là DRAFT, nê
 | RTL 10 block + `smx_delay` | Xong, khớp golden | `rtl/core/`, `docs/spec/blocks/README.md` |
 | `tb_smx_core` | PASS ở P, N_SEG = 4/8/16; 11/11 mutation bị bắt ở P = N_SEG = 8 | `tb/tb_smx_core.sv`, `model/vec_core.py` |
 | Fitter | Đạt ≥ 100 MHz; P = 8 và 16 chạy 3 seed, P = 4 chạy 1 seed, N_SEG = 8 | `syn/fit.sh`, `docs/spec/blocks/smx_core.md` mục 6, 7 |
-| Spec gộp | Xong, DRAFT | `docs/spec/design-spec.md` |
+| Spec gộp | Xong, DRAFT | `docs/spec/03-design-spec.md` |
 | Trang tổng quan | Đã publish, riêng tư, đã có hình mới | https://claude.ai/artifact/3DFqbxKoc9vqgVEwhHirCx |
-| Sơ đồ | Xong: mọi sơ đồ cấu trúc và FSM đã chuyển, Chau đã duyệt kiểu vẽ | `docs/spec/diagram-rules.md`, `docs/spec/fig/` (14 hình), hình mẫu https://claude.ai/artifact/KdXrpjvPAcWa2vqQCf61E3 |
-| Tài liệu lý thuyết softmax | Xong, Chau đang đọc trước khi duyệt các mục A | `docs/spec/softmax-theory.md`, bản web https://claude.ai/artifact/ScwHoNtA1WWJKCqLboefGu |
+| Sơ đồ | Xong: mọi sơ đồ cấu trúc và FSM đã chuyển, Chau đã duyệt kiểu vẽ | `docs/spec/09-diagram-rules.md`, `docs/spec/fig/` (14 hình), hình mẫu https://claude.ai/artifact/KdXrpjvPAcWa2vqQCf61E3 |
+| Tài liệu lý thuyết softmax | Xong, Chau đang đọc trước khi duyệt các mục A | `docs/spec/01-softmax-theory.md`, bản web https://claude.ai/artifact/ScwHoNtA1WWJKCqLboefGu |
 
 Chưa có gì trong `rtl/avalon/`, `ip/`, `sw/`: wrapper và hệ thống thuộc nhóm implement, không tự viết (`CLAUDE.md`).
 
 ## Đang chờ Chau
 
-Đừng tự quyết các mục này. Chi tiết và đề xuất: `docs/spec/open-decisions.md` phần A. Chau đọc `docs/spec/softmax-theory.md` trước rồi mới duyệt; mục 14 của file đó nối từng mục A với phần toán liên quan.
+Đừng tự quyết các mục này. Chi tiết và đề xuất: `docs/spec/07-open-decisions.md` phần A. Chau đọc `docs/spec/01-softmax-theory.md` trước rồi mới duyệt; mục 14 của file đó nối từng mục A với phần toán liên quan.
 
 | Mục | Cần gì | Việc phải làm sau khi có trả lời |
 |---|---|---|
-| A1 | Duyệt `design-spec.md` và 9 tài liệu block, trừ `smx_exp2` đã `APPROVED` | Chỉ khi Chau xác nhận mới đổi sang `APPROVED`, rồi cập nhật tracker |
+| A1 | Duyệt `03-design-spec.md` và 9 tài liệu block, trừ `smx_exp2` đã `APPROVED` | Chỉ khi Chau xác nhận mới đổi sang `APPROVED`, rồi cập nhật tracker |
 | A3 | Có sửa cận `sum` trong REQ-ARI-05 thành `≤ 512·2¹⁵` không | Sửa `requirements.md` mục 4, ghi Nhật ký, cập nhật mục 7.1 của `PROJECT.md` |
-| A4 | Có ghi lưu ý span 0x8000 không | Thêm vào `integration-notes.md` |
+| A4 | Có ghi lưu ý span 0x8000 không | Thêm vào `08-integration-notes.md` |
 | A5 | Giữ `tag_q` trong M10K không; đề xuất giữ | Nếu đổi: sửa RTL, chạy lại regress và Fitter |
-| A6 | Có ghi lưu ý LEN, ROWS vượt trường không báo ERR không | Thêm vào `integration-notes.md` |
-| A7 | Có ghi yêu cầu ràng buộc timing `acc_*` không | Thêm vào `integration-notes.md` |
+| A6 | Có ghi lưu ý LEN, ROWS vượt trường không báo ERR không | Thêm vào `08-integration-notes.md` |
+| A7 | Có ghi yêu cầu ràng buộc timing `acc_*` không | Thêm vào `08-integration-notes.md` |
 
 Câu hỏi khác đang chờ Chau:
 
-- **Reset trên board:** A2 đã chốt là deassert do test drive, lõi không có bộ đồng bộ. `integration-notes.md` đang tạm ghi trên hệ thống thật là trách nhiệm của bên lái `rst_n`; chưa xác nhận.
+- **Reset trên board:** A2 đã chốt là deassert do test drive, lõi không có bộ đồng bộ. `08-integration-notes.md` đang tạm ghi trên hệ thống thật là trách nhiệm của bên lái `rst_n`; chưa xác nhận.
 - **Độ chi tiết sơ đồ:** có khối nào cần vẽ chi tiết hơn không. Ứng viên là `smx_csr`, đang gom khối thanh ghi và cổng X_BUF. Mặc định giữ nguyên.
 - **Worktree cũ:** có xoá 9 worktree đã merge trong `.claude/worktrees` (98 MB) không. Chưa xoá.
 - **PR vào `main`:** chỉ mở khi Chau yêu cầu.
 - **Tài liệu trên claude.ai:** nhắc Chau tải lại docs lên Project; repo không tự đồng bộ.
 - **Đề tài và lịch:** tên đề tài trong sheet nhóm 6, ngày nộp chính xác (`PROJECT.md` mục 9).
-- **Đánh giá DeiT-Tiny:** tập dữ liệu, cách hiệu chuẩn S, layer chạy trên board (`target-workload.md` mục 8).
+- **Đánh giá DeiT-Tiny:** tập dữ liệu, cách hiệu chuẩn S, layer chạy trên board (`02-target-workload.md` mục 8).
 
 ## Đang chờ nhóm khác
 
@@ -56,10 +56,10 @@ Câu hỏi khác đang chờ Chau:
 
 Theo thứ tự, khi Chau không chỉ định khác. Lịch ở `PROJECT.md` mục 8.
 
-1. Áp dụng các trả lời ở bảng trên, cập nhật `open-decisions.md` và `integration-notes.md`.
+1. Áp dụng các trả lời ở bảng trên, cập nhật `07-open-decisions.md` và `08-integration-notes.md`.
 2. Rà sâu `smx_scale`, `smx_exp2`, `smx_norm` và đối chiếu tài liệu từng block với RTL. Phần này chưa làm xong: báo cáo của reviewer độc lập bị mất; port và hướng đã so bằng script, độ rộng thì chưa.
 3. Quét số đo cho báo cáo: thêm seed ở P = 4, chạy Fitter ở N_SEG = 4 và 16, ghi số vào `smx_core.md`.
-4. Đánh giá DeiT-Tiny bằng golden model: E1, E2 (`target-workload.md` mục 5), sau khi có trả lời ở trên.
+4. Đánh giá DeiT-Tiny bằng golden model: E1, E2 (`02-target-workload.md` mục 5), sau khi có trả lời ở trên.
 5. Hỗ trợ nhóm implement chạy trên board và E3 khi họ sẵn sàng.
 6. Báo cáo và demo, hạn khoảng 2026-12-21.
 
@@ -69,7 +69,7 @@ Theo thứ tự, khi Chau không chỉ định khác. Lịch ở `PROJECT.md` m�
 - **Tác vụ tự chạy tiếp:** "Resume softmax core work after quota" đang **tắt**, và gắn với phiên cũ `session_018kvwhthqKq5fC6j8brjM6B`. Phiên mới cần cơ chế này thì tạo tác vụ mới. Nó chỉ chạy khi máy bật và phiên còn sống.
 - **`/tmp` mất khi tắt máy:** bench riêng của reviewer và script dựng ba trang artifact đều nằm ở đó, không có trong repo. Đừng tìm lại. Muốn sửa trang: dùng `Artifact` `action: read` với URL ở trên, sửa, rồi publish lại vào cùng URL để giữ link. Hai trang lớn nhúng SVG inline từ `docs/spec/fig/`; trang lý thuyết còn có công thức KaTeX render sẵn và font nhúng, lấy `katex`, `marked` từ `node_modules` của `@mermaid-js/mermaid-cli` trong `~/.local/lib/node_modules`.
 - **File chỉ có trên máy này:** `CLAUDE.md` và `.claude/commands/` nằm trong `.gitignore`. Chúng đã được cập nhật rule mới nhưng không có trên git. Chau xác nhận các phiên sau vẫn chạy local nên giữ nguyên.
-- **Vẽ sơ đồ:** theo `docs/spec/diagram-rules.md`. Không dùng Mermaid `flowchart` hay `stateDiagram`. Sau khi sinh hình, phải mở ảnh ra xem, vì script chỉ kiểm được phần quy tắc hình học.
+- **Vẽ sơ đồ:** theo `docs/spec/09-diagram-rules.md`. Không dùng Mermaid `flowchart` hay `stateDiagram`. Sau khi sinh hình, phải mở ảnh ra xem, vì script chỉ kiểm được phần quy tắc hình học.
 - **Xem hình trên máy này:** không có browser cho `mmdc` và Playwright, nhưng có Firefox. Bọc SVG vào một file HTML trong scratch rồi chạy `firefox --headless --no-remote --profile <thư mục tạm> --window-size W,H --screenshot <scratch>/x.png file:///<scratch>/x.html`. Ghi ảnh ra scratch, vì repo chặn đọc file PNG.
 - **Các trang artifact là bản chụp:** khi spec hoặc hình đổi đáng kể thì publish lại.
 

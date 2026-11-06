@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import softmax_ref as ref  # noqa: E402
 
-SUM_MIN, SUM_MAX = 1 << 14, 1 << 24      # legal range, REQ-ARI-06 / cross-block.md 4.5
+SUM_MIN, SUM_MAX = 1 << 14, 1 << 24      # legal range, REQ-ARI-06 / 05-cross-block.md 4.5
 
 
 def add_args(p):

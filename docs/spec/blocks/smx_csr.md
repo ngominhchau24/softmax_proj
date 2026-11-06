@@ -6,7 +6,7 @@
 | File RTL | `rtl/core/smx_csr.sv` |
 | Testbench | `tb/tb_smx_csr.sv` |
 | Yêu cầu liên quan | REQ-IF-01..03, REQ-IF-06..09, REQ-IF-10, REQ-VER-03, REQ-VER-04 |
-| Golden model | Không có số học. Hành vi theo `docs/spec/cross-block.md` mục 4.8 và `docs/requirements.md` mục 5.2 |
+| Golden model | Không có số học. Hành vi theo `docs/spec/05-cross-block.md` mục 4.8 và `docs/requirements.md` mục 5.2 |
 
 ## 1. Chức năng
 
@@ -75,7 +75,7 @@ Không có số học. Mọi phép so sánh là số nguyên không dấu; khôn
 
 `run_done` ở chu kỳ `m` khi BUSY = 1: từ `m+1` BUSY = 0, DONE = 1. Quyết định chưa có trong hợp đồng: `run_done` khi BUSY = 0 bị bỏ qua (giữ bất biến DONE và BUSY không cùng 1 bằng cấu trúc, không dựa vào việc `smx_ctrl` không phát nhầm). Một START ở chu kỳ `m+1` thấy BUSY = 0 nên chạy bình thường; tại `m` thì thấy BUSY = 1 và bị bỏ qua.
 
-`CYCLE_CNT` tăng 1 ở mỗi chu kỳ BUSY = 1 kể cả chu kỳ `run_done`, tức bằng số chu kỳ BUSY (`m − n`), và giữ khi BUSY = 0. Nó về 0 ở mỗi START (hợp lệ hay không) khi BUSY = 0. Phép đếm này là phép đo công thức `R·T_row + 1` ở `cross-block.md` mục 5.
+`CYCLE_CNT` tăng 1 ở mỗi chu kỳ BUSY = 1 kể cả chu kỳ `run_done`, tức bằng số chu kỳ BUSY (`m − n`), và giữ khi BUSY = 0. Nó về 0 ở mỗi START (hợp lệ hay không) khi BUSY = 0. Phép đếm này là phép đo công thức `R·T_row + 1` ở `05-cross-block.md` mục 5.
 
 **Ghi:** LEN `[7:0]` theo `be[0]`, `[9:8]` theo `be[1]`; ROWS theo `be[0]`; SCALE_K `[7:0]` theo `be[0]`, `[15:8]` theo `be[1]`; cả ba bị bỏ qua khi BUSY = 1. X_BUF: `x_wr_en` bằng 0 khi BUSY = 1. STATUS, CYCLE_CNT, HW_PARAM, Y_BUF, bit khác của CTRL, vùng không định nghĩa: bỏ qua. Bit ngoài độ rộng đọc 0.
 

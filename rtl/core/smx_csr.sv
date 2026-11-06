@@ -1,6 +1,6 @@
 // smx_csr.sv - register file, acc_* address decode and two-stage read path of smx_core.
 //
-// Contract: docs/spec/cross-block.md section 4.8, register map: docs/requirements.md 5.2.
+// Contract: docs/spec/05-cross-block.md section 4.8, register map: docs/requirements.md 5.2.
 // acc_addr is a WORD address (13 bit); smx_pkg::CSR_* are BYTE offsets, so word = byte/4.
 //   0..6 CTRL STATUS LEN ROWS SCALE_K CYCLE_CNT HW_PARAM | 7..0x7FF undefined
 //   0x800..0xFFF X_BUF | 0x1000..0x17FF Y_BUF | 0x1800..0x1FFF undefined

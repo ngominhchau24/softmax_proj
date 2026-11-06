@@ -1,13 +1,13 @@
 # Architecture — `smx` (v1.0)
 
 > Kiến trúc mức top, làm khung cho tài liệu từng block `docs/spec/blocks/*.md` (viết bằng Claude Code CLI theo `_TEMPLATE.md`). Số học bit-exact: `docs/requirements.md` mục 4 và `model/softmax_ref.py`. Các mục `A1–A5` ở cuối đã chốt (2026-10-31); nguồn ở `docs/PROJECT.md` mục 7.1.
-> Sơ đồ theo `docs/spec/diagram-rules.md`. Dạng sóng/timing chu kỳ dùng WaveDrom trong `docs/spec/wave/`.
-> Hợp đồng chi tiết giữa các block: `docs/spec/cross-block.md`; khi khác file này về chi tiết thì `cross-block.md` được ưu tiên.
+> Sơ đồ theo `docs/spec/09-diagram-rules.md`. Dạng sóng/timing chu kỳ dùng WaveDrom trong `docs/spec/wave/`.
+> Hợp đồng chi tiết giữa các block: `docs/spec/05-cross-block.md`; khi khác file này về chi tiết thì `05-cross-block.md` được ưu tiên.
 
 ## 1. Ranh giới và phân vai
 
 - **`smx_core` (Chau — ưu tiên số 1):** CSR, X_BUF, Y_BUF, controller, datapath. Lộ cổng `acc_*` (REQ-IF-06) và conduit trạng thái.
-- **`smx_avalon` + `smx_hw.tcl` + hệ thống Platform Designer + script System Console (nhóm implement):** wrapper mỏng chỉ đổi tên `acc_*` ↔ Avalon `s0`. Ghi chú bàn giao: `docs/spec/integration-notes.md`.
+- **`smx_avalon` + `smx_hw.tcl` + hệ thống Platform Designer + script System Console (nhóm implement):** wrapper mỏng chỉ đổi tên `acc_*` ↔ Avalon `s0`. Ghi chú bàn giao: `docs/spec/08-integration-notes.md`.
 
 ![smx_system](fig/smx_system.svg)
 
@@ -37,7 +37,7 @@ Sơ đồ vẽ ở P = 8, N_SEG = 8. Decode `acc_*` nằm trong `smx_csr`.
 
 `smx_csr` kiểm LEN, ROWS trước khi phát `start`: START sai cấu hình đặt DONE = 1, ERR = 1 mà BUSY không lên, nên FSM không thấy lần chạy đó.
 
-Latency thiết kế mỗi hàng (L = 512, P = 8): `T_row = 2G + 54 = 182` chu kỳ (≤ 192 theo REQ-PRF-03). Công thức: `docs/spec/cross-block.md` mục 5; kiểm bằng `CYCLE_CNT`.
+Latency thiết kế mỗi hàng (L = 512, P = 8): `T_row = 2G + 54 = 182` chu kỳ (≤ 192 theo REQ-PRF-03). Công thức: `docs/spec/05-cross-block.md` mục 5; kiểm bằng `CYCLE_CNT`.
 
 ## 4. Điểm găng timing (mục tiêu 100 MHz)
 

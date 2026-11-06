@@ -1,7 +1,7 @@
 // tb_smx_csr.sv - self-checking unit testbench for smx_csr (simulation only).
 //
 // No arithmetic, so no vector files: expected values come from a cycle model written in this
-// file from the contract (docs/spec/cross-block.md 4.8), plus directed checks with literal
+// file from the contract (docs/spec/05-cross-block.md 4.8), plus directed checks with literal
 // expected values so the model cannot share a bug with the RTL.
 // Cycle convention: inputs are driven at a falling edge, one tick = one clock cycle. After a tick
 // the DUT shows the state of cycle n+1. X_BUF/Y_BUF are modelled as smx_buf does: rd_data is

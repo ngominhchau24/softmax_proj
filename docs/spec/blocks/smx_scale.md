@@ -10,7 +10,7 @@
 
 ## 1. Chức năng
 
-Một lane tính `u = q·K` (số có dấu Q8.16, 25 bit) và `c = ⌈u / 2¹⁶⌉` (số nguyên có dấu 9 bit) từ một phần tử INT8 `q` và hệ số `K` (UQ0.16) do HPS ghi vào `SCALE_K`. `u` đi tiếp vào đường trễ rồi vào `smx_exp2`; `c` đi vào `smx_maxtree` (`docs/spec/architecture.md` mục 2, `cross-block.md` mục 2). `smx_core` sinh P bản bằng `generate`, mỗi bản nhận cùng `k_in`.
+Một lane tính `u = q·K` (số có dấu Q8.16, 25 bit) và `c = ⌈u / 2¹⁶⌉` (số nguyên có dấu 9 bit) từ một phần tử INT8 `q` và hệ số `K` (UQ0.16) do HPS ghi vào `SCALE_K`. `u` đi tiếp vào đường trễ rồi vào `smx_exp2`; `c` đi vào `smx_maxtree` (`docs/spec/04-architecture.md` mục 2, `05-cross-block.md` mục 2). `smx_core` sinh P bản bằng `generate`, mỗi bản nhận cùng `k_in`.
 
 Không làm: tìm max, mũ, mask lane (lane `k ≥ L` được `in_en` xử lý ở `smx_maxtree` và `smx_exp2`), kiểm tra miền của `K`. Block không có trạng thái ngoài chuỗi valid.
 
@@ -91,7 +91,7 @@ Testbench kiểm `out_valid`, `u_out`, `c_out` đúng từng chu kỳ với `smx
 
 ## 9. Câu hỏi mở / quyết định cần duyệt
 
-- [x] **Q1** Không có tham số `P`, `N_SEG`; testbench vẫn nhận hai tham số này theo `cross-block.md` mục 6. Đề xuất đã áp dụng.
+- [x] **Q1** Không có tham số `P`, `N_SEG`; testbench vẫn nhận hai tham số này theo `05-cross-block.md` mục 6. Đề xuất đã áp dụng.
 - [ ] **Q2** Tách `u_out` và `c_out` cùng ở tầng 3 (`u` chỉ qua thanh ghi thêm một nhịp). Có thể bớt 25 FF nếu `smx_core` lấy `u` từ tầng 2 và tự trễ ít hơn một chu kỳ, nhưng sẽ làm `u_out` lệch `out_valid` so với hợp đồng. Khuyến nghị giữ như hợp đồng.
 
 ## 10. Lịch sử

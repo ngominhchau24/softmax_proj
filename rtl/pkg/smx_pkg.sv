@@ -24,7 +24,7 @@ package smx_pkg;
   localparam int OUT_SH     = 32;    // y = (E*Rcp + 2^31) >> 32
   localparam int Y_W        = 8;     // output uint8
 
-  // ---- block latencies in cycles, docs/spec/cross-block.md section 3 ----
+  // ---- block latencies in cycles, docs/spec/05-cross-block.md section 3 ----
   localparam int ACC_RD_LAT  = 2;    // acc_read to acc_readdata (REQ-IF-06)
   localparam int BUF_LAT     = 1;    // smx_buf read address to read data
   localparam int SCALE_LAT   = 3;    // smx_scale in_valid to out_valid
@@ -34,7 +34,7 @@ package smx_pkg;
   localparam int NORM_LAT    = 3;    // smx_norm in_valid to out_valid
   localparam int DIV_LAT     = 28;   // smx_divider start to done
   localparam int PIPE_LAT    = BUF_LAT + SCALE_LAT + MAXTREE_LAT + EXP2_LAT;  // read address to E
-  // T_row = 2*G + ROW_OVERHEAD, CYCLE_CNT = R*T_row + 1 (cross-block.md section 5)
+  // T_row = 2*G + ROW_OVERHEAD, CYCLE_CNT = R*T_row + 1 (05-cross-block.md section 5)
   localparam int ROW_OVERHEAD = 2*PIPE_LAT + SUMACC_LAT + NORM_LAT + DIV_LAT + 2;
 
   // ---- derived ----

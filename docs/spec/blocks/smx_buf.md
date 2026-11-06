@@ -5,7 +5,7 @@
 | Trạng thái | DRAFT — Chau ủy quyền viết RTL trước khi duyệt (2026-11-03), chưa duyệt |
 | File RTL | `rtl/core/smx_buf.sv` |
 | Testbench | `tb/tb_smx_buf.sv` |
-| Yêu cầu liên quan | REQ-IF-07 (bố trí buffer), REQ-IF-09, `docs/spec/cross-block.md` mục 4.7 |
+| Yêu cầu liên quan | REQ-IF-07 (bố trí buffer), REQ-IF-09, `docs/spec/05-cross-block.md` mục 4.7 |
 | Golden model | không có số học; chỉ là bộ nhớ. Bố trí địa chỉ theo REQ-IF-07 |
 
 ## 1. Chức năng

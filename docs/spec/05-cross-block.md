@@ -1,7 +1,7 @@
 # Cross-block contract — `smx_core`
 
-> Hợp đồng giữa các block của `smx_core`: port, căn pipeline, sự kiện điều khiển, công thức `CYCLE_CNT`. Tài liệu block chi tiết hoá nội bộ nhưng **không được lệch** file này; muốn đổi thì báo người giám sát để thống nhất rồi sửa ở đây trước. Khi file này khác `docs/spec/architecture.md` về chi tiết, file này được ưu tiên.
-> Số học: `model/softmax_ref.py` và `docs/requirements.md` mục 4. Giao diện ngoài: requirements mục 5 (đóng băng). Quyết định đã tự chốt và việc chờ Chau: `docs/spec/open-decisions.md`.
+> Hợp đồng giữa các block của `smx_core`: port, căn pipeline, sự kiện điều khiển, công thức `CYCLE_CNT`. Tài liệu block chi tiết hoá nội bộ nhưng **không được lệch** file này; muốn đổi thì báo người giám sát để thống nhất rồi sửa ở đây trước. Khi file này khác `docs/spec/04-architecture.md` về chi tiết, file này được ưu tiên.
+> Số học: `model/softmax_ref.py` và `docs/requirements.md` mục 4. Giao diện ngoài: requirements mục 5 (đóng băng). Quyết định đã tự chốt và việc chờ Chau: `docs/spec/07-open-decisions.md`.
 
 ## 1. Nguyên tắc
 
