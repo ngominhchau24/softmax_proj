@@ -49,7 +49,9 @@ modelsim.ini
 sim/log/
 sim/wave/
 
-# Harness và file gốc cục bộ (không đưa lên git)
-CLAUDE.md
-.claude/
+# Harness cục bộ: CLAUDE.md và .claude/commands/ nằm trên git; cấu hình quyền và worktree thì không
+.claude/settings.json
+.claude/settings.local.json
+.claude/worktrees/
+# File gốc cục bộ
 instruction/

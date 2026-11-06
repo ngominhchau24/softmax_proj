@@ -2,7 +2,7 @@
 
 > Đọc đầu phiên, trước khi bắt đầu việc. Cập nhật file này trong cùng commit khi trạng thái đổi: xong một việc, có quyết định mới, hoặc có việc mới phải chờ. Chỉ ghi trạng thái hiện tại; lịch sử nằm ở `git log` và `docs/PROJECT.md` mục 10.
 
-**Cập nhật lần cuối:** 2026-11-06. A3 đã duyệt và áp dụng; các file trong `docs/spec/` đã đánh số 01–09 theo thứ tự đọc. **Nhánh:** `rtl/smx-core`, đã push, chưa có PR vào `main`. RTL, số học và bản đồ thanh ghi không đổi kể từ commit tích hợp `ea2f8cd`.
+**Cập nhật lần cuối:** 2026-11-06. A3 đã duyệt và áp dụng; các file trong `docs/spec/` đã đánh số 01–09 theo thứ tự đọc. **Nhánh:** `main` đã fast-forward lên `rtl/smx-core`; mọi nhánh khác đã được gộp. RTL, số học và bản đồ thanh ghi không đổi kể từ commit tích hợp `ea2f8cd`.
 
 ## Phiên gần nhất dừng ở đâu
 
@@ -67,7 +67,7 @@ Theo thứ tự, khi Chau không chỉ định khác. Lịch ở `PROJECT.md` m�
 - **Git:** commit và push sau mỗi bước đã kiểm chứng, trên nhánh làm việc; không push thẳng `main`.
 - **Tác vụ tự chạy tiếp:** "Resume softmax core work after quota" đang **tắt**, và gắn với phiên cũ `session_018kvwhthqKq5fC6j8brjM6B`. Phiên mới cần cơ chế này thì tạo tác vụ mới. Nó chỉ chạy khi máy bật và phiên còn sống.
 - **`/tmp` mất khi tắt máy:** bench riêng của reviewer và script dựng ba trang artifact đều nằm ở đó, không có trong repo. Đừng tìm lại. Muốn sửa trang: dùng `Artifact` `action: read` với URL ở trên, sửa, rồi publish lại vào cùng URL để giữ link. Hai trang lớn nhúng SVG inline từ `docs/spec/fig/`; trang lý thuyết còn có công thức KaTeX render sẵn và font nhúng, lấy `katex`, `marked` từ `node_modules` của `@mermaid-js/mermaid-cli` trong `~/.local/lib/node_modules`.
-- **File chỉ có trên máy này:** `CLAUDE.md` và `.claude/commands/` nằm trong `.gitignore`. Chúng đã được cập nhật rule mới nhưng không có trên git. Chau xác nhận các phiên sau vẫn chạy local nên giữ nguyên.
+- **Harness trên git:** từ 2026-11-06 `CLAUDE.md` và `.claude/commands/` nằm trên git để người nhận bàn giao dùng chung (có mục "Vai trò"). Chỉ `.claude/settings.json` (quyền cục bộ) và `.claude/worktrees/` bị ignore.
 - **Vẽ sơ đồ:** theo `docs/spec/09-diagram-rules.md`. Không dùng Mermaid `flowchart` hay `stateDiagram`. Sau khi sinh hình, phải mở ảnh ra xem, vì script chỉ kiểm được phần quy tắc hình học.
 - **Xem hình trên máy này:** không có browser cho `mmdc` và Playwright, nhưng có Firefox. Bọc SVG vào một file HTML trong scratch rồi chạy `firefox --headless --no-remote --profile <thư mục tạm> --window-size W,H --screenshot <scratch>/x.png file:///<scratch>/x.html`. Ghi ảnh ra scratch, vì repo chặn đọc file PNG.
 - **Các trang artifact là bản chụp:** khi spec hoặc hình đổi đáng kể thì publish lại.
