@@ -1,0 +1,41 @@
+# Quartus settings for smx_core, P = 8, N_SEG = 8 (submission configuration).
+# Same settings as syn/fit.sh, but with a fixed project so the .sof can be rebuilt and tracked.
+# Ports are virtual pins: the IP connects to fabric, not to device pins. The SDC has only the
+# clock, so Fmax is register-to-register (acc_* and rst_n paths are not timed).
+set_global_assignment -name FAMILY "Cyclone V"
+set_global_assignment -name DEVICE 5CSXFC6D6F31C6
+set_global_assignment -name TOP_LEVEL_ENTITY smx_core
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 4
+set_global_assignment -name SEED 1
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name SDC_FILE smx.sdc
+
+# RTL, same order as sim/rtl.f (smx_pkg first, sub-blocks before parents)
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pkg/smx_pkg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_delay.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_exp2.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_scale.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_sumacc.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_divider.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_maxtree.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_norm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_buf.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_ctrl.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_csr.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/core/smx_core.sv
+
+set_parameter -name P 8
+set_parameter -name N_SEG 8
+
+set_instance_assignment -name VIRTUAL_PIN ON -to rst_n
+set_instance_assignment -name VIRTUAL_PIN ON -to acc_addr[*]
+set_instance_assignment -name VIRTUAL_PIN ON -to acc_write
+set_instance_assignment -name VIRTUAL_PIN ON -to acc_writedata[*]
+set_instance_assignment -name VIRTUAL_PIN ON -to acc_byteenable[*]
+set_instance_assignment -name VIRTUAL_PIN ON -to acc_read
+set_instance_assignment -name VIRTUAL_PIN ON -to acc_readdata[*]
+set_instance_assignment -name VIRTUAL_PIN ON -to status_busy
+set_instance_assignment -name VIRTUAL_PIN ON -to status_done
+set_instance_assignment -name VIRTUAL_PIN ON -to status_err
+
+set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
