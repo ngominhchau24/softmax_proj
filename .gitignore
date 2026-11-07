@@ -55,11 +55,3 @@ sim/wave/
 .claude/worktrees/
 # File gốc cục bộ
 instruction/
-
-# Quartus DE10 demo (syn/de10): generated Platform Designer system, build output; release .sof files are tracked
-syn/de10/output_files/
-syn/de10/db/
-syn/de10/incremental_db/
-syn/de10/qdb/
-syn/de10/smx_system/
-!syn/release/*.sof

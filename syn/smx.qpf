@@ -1,4 +1,0 @@
-# smx - Quartus Prime Lite 18.1 project for smx_core (IP alone, virtual pins).
-# Compile: cd syn && quartus_sh --flow compile smx     (or open this file in the Quartus GUI)
-QUARTUS_VERSION = "18.1"
-PROJECT_REVISION = "smx"
