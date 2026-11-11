@@ -3,16 +3,41 @@
 #   source sim/setup.sh                      (from the repo root)
 #   source setup.sh                          (from sim/)
 #
-# It sets vlib, vmap, vlog and vsim, the variables sim/Makefile reads.
-# The ModelSim folder (the one that holds vsim or vsim.exe) is taken from, in this order:
-#   1. MODELSIM_DIR, if you set it:  MODELSIM_DIR=/mnt/d/intelFPGA_lite/18.1/modelsim_ase/win32aloem source sim/setup.sh
-#   2. the usual Intel install folders on drives C and D (WSL) or under /opt and $HOME (Linux)
-#   3. vsim already on PATH
-# To make it permanent for your machine, add the MODELSIM_DIR line to ~/.bashrc.
+# It sets vlib, vmap, vlog and vsim, the variables sim/Makefile reads. ModelSim is taken from, in
+# this order:
+#   1. MODELSIM_DIR, the folder that holds vsim or vsim.exe, if you set it:
+#        MODELSIM_DIR=/mnt/c/intelFPGA_lite/18.1/modelsim_ase/win32aloem source sim/setup.sh
+#   2. vsim or vsim.exe already on PATH (under WSL the Windows PATH is visible, so a ModelSim that
+#      Windows finds by name is used as it is)
+#   3. the usual Intel install folders on drives C and D (WSL) or under /opt and $HOME (Linux)
+# To make a choice permanent for your machine, add an "export MODELSIM_DIR=..." line to ~/.bashrc.
 
+unset SMX_MODELSIM_INI SMX_MODELSIM_ROOT
 _smx_dir="${MODELSIM_DIR:-}"
+_smx_ok=0
 
+if [ -n "$_smx_dir" ] && [ ! -e "$_smx_dir/vsim.exe" ] && [ ! -e "$_smx_dir/vsim" ]; then
+  echo "setup.sh: no vsim or vsim.exe in MODELSIM_DIR=$_smx_dir"
+  _smx_dir=""
+fi
+
+# 2. tools on PATH, called by bare name
 if [ -z "$_smx_dir" ]; then
+  if command -v vsim >/dev/null 2>&1; then
+    unset vlib vmap vlog vsim                # Makefile defaults
+    echo "setup.sh: using vsim on PATH: $(command -v vsim)"
+    vsim -version
+    _smx_ok=1
+  elif command -v vsim.exe >/dev/null 2>&1; then
+    export vlib=vlib.exe vmap=vmap.exe vlog=vlog.exe vsim=vsim.exe
+    echo "setup.sh: using vsim.exe on PATH: $(command -v vsim.exe)"
+    vsim.exe -version
+    _smx_ok=1
+  fi
+fi
+
+# 3. usual install folders
+if [ "$_smx_ok" = 0 ] && [ -z "$_smx_dir" ]; then
   for _smx_d in \
       /mnt/[cd]/intelFPGA_lite/*/modelsim_ase/win32aloem \
       /mnt/[cd]/intelFPGA/*/modelsim_ase/win32aloem \
@@ -27,22 +52,13 @@ if [ -z "$_smx_dir" ]; then
   done
 fi
 
-if [ -n "$_smx_dir" ] && [ -e "$_smx_dir/vsim.exe" ]; then
-  _smx_ext=".exe"                            # Windows ModelSim called from WSL
-elif [ -n "$_smx_dir" ] && [ -e "$_smx_dir/vsim" ]; then
-  _smx_ext=""
-elif [ -n "$_smx_dir" ]; then
-  echo "setup.sh: no vsim or vsim.exe in $_smx_dir"
-  _smx_dir=""
-fi
-
-if [ -n "$_smx_dir" ]; then
-  unset SMX_MODELSIM_INI SMX_MODELSIM_ROOT
-  if [ -n "$_smx_ext" ]; then
-    # Windows ModelSim under WSL. Called by a /mnt/... path the tools cannot locate their own install
-    # folder, so call them by bare name through PATH, and let sim/Makefile write a modelsim.ini whose
-    # library paths are absolute Windows paths instead of $MODEL_TECH/..
-    case ":$PATH:" in *":$_smx_dir:"*) ;; *) export PATH="$_smx_dir:$PATH" ;; esac
+# 1. and 3.: a specific folder
+if [ "$_smx_ok" = 0 ] && [ -n "$_smx_dir" ]; then
+  if [ -e "$_smx_dir/vsim.exe" ]; then
+    # Windows ModelSim under WSL, not the one Windows finds by name. Called by a /mnt/... path the
+    # tools cannot locate their own install folder, so put the folder first on PATH, call them by
+    # bare name, and let sim/Makefile write a modelsim.ini with absolute Windows library paths.
+    export PATH="$_smx_dir:$PATH"
     export vlib=vlib.exe vmap=vmap.exe vlog=vlog.exe vsim=vsim.exe
     _smx_root="$(cd "$_smx_dir/.." && pwd)"
     if [ -f "$_smx_root/modelsim.ini" ] && command -v wslpath >/dev/null 2>&1; then
@@ -54,11 +70,10 @@ if [ -n "$_smx_dir" ]; then
   fi
   echo "setup.sh: ModelSim in $_smx_dir"
   "$vsim" -version
-elif command -v vsim >/dev/null 2>&1; then
-  unset vlib vmap vlog vsim SMX_MODELSIM_INI SMX_MODELSIM_ROOT # Makefile defaults: the tools on PATH
-  echo "setup.sh: using vsim on PATH: $(command -v vsim)"
-  vsim -version
-else
+  _smx_ok=1
+fi
+
+if [ "$_smx_ok" = 0 ]; then
   echo "setup.sh: ModelSim not found."
   echo "  Find the folder that holds vsim.exe in Windows Explorer, then run for example:"
   echo "  MODELSIM_DIR=/mnt/c/intelFPGA_lite/18.1/modelsim_ase/win32aloem source sim/setup.sh"
@@ -67,4 +82,4 @@ fi
 command -v make >/dev/null 2>&1    || echo "setup.sh: make is missing:  sudo apt install -y make"
 python3 -c "import numpy" 2>/dev/null || echo "setup.sh: python3 with numpy is missing:  sudo apt install -y python3-numpy"
 
-unset _smx_dir _smx_d _smx_ext _smx_root
+unset _smx_dir _smx_d _smx_ext _smx_root _smx_ok
