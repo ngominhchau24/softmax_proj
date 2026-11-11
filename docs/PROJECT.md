@@ -75,8 +75,7 @@ docs/      PROJECT.md, requirements.md, research/, spec/ (micro-arch, interface)
 model/     softmax_ref.py (golden, nguồn chân lý số học), sinh bảng PWL, sinh vector
 rtl/       pkg/smx_pkg.sv, core/, avalon/
 tb/        testbench tự viết cho sanity test (nhóm verify có môi trường riêng)
-sim/       Makefile để mô phỏng, chạy từ thư mục này
-scripts/   compile.f (= rtl.f + tb.f + testcase.f) và setup.sh cho bước compile
+sim/       Makefile và compile.f (= rtl.f + tb.f + testcase.f) để mô phỏng, chạy từ thư mục này
 ip/        smx_hw.tcl (Platform Designer component — nhóm implement)
 syn/       project Quartus chỉ cho IP (tài nguyên, Fmax)
 sw/        ví dụ mã HPS (driver /dev/mem) — tham khảo cho nhóm implement
@@ -189,7 +188,6 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-05: Chau duyệt kiểu sơ đồ. Chuyển toàn bộ sơ đồ cấu trúc và FSM trong `docs/spec/` sang `docs/spec/fig/` (14 hình). Thêm rule ghi độ rộng dạng `addr[15:0]` trên dây, tính ở P = 8, N_SEG = 8.
 - 2026-11-06: Chau duyệt A3: sửa câu cận `sum` trong REQ-ARI-05 từ `≤ 512·2¹⁶` thành `≤ 512·2¹⁵ = 2²⁴` (cận cũ 2²⁵ cần 26 bit, mâu thuẫn với "≥ 25 bit" cùng câu). Chỉ sửa câu chữ: golden model, RTL, `SUM_W = 25`, bản đồ thanh ghi và VERSION (0x10) không đổi. Đổi tên file trong `docs/spec/` thành 01–09 theo thứ tự đọc.
-- 2026-11-11: Theo yêu cầu của nhóm verify (tiendangphuoc), chuyển các file cho bước compile từ `sim/` sang `scripts/`: `compile.f`, `rtl.f`, `tb.f`, `testcase.f`, thêm `setup.sh` để trỏ flow tới ModelSim. `sim/Makefile` ở lại và vẫn chạy từ `sim/`; đường dẫn trong các file `.f` vẫn tính từ `sim/`. `syn/fit.sh` đọc `scripts/rtl.f`. Chưa chạy lại trên ModelSim và Quartus sau khi chuyển.
 
 ## 11. Tài liệu tham khảo chính
 

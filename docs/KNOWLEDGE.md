@@ -95,7 +95,7 @@ make run WAVE=1                      # chạy lại không compile, ghi wave/<ru
 make dump | view | clean
 ```
 
-- Danh sách file nằm ở `scripts/`, đường dẫn bên trong tính từ `sim/`: `compile.f` = `rtl.f` + `tb.f` + `testcase.f`. `source scripts/setup.sh` trỏ flow tới ModelSim. Block mới: thêm RTL vào `rtl.f` (sau `smx_pkg.sv`, khối con trước khối cha) và `tb_<block>.sv` vào `testcase.f`. Không viết script chạy riêng trong `tb/`.
+- `compile.f` = `rtl.f` + `tb.f` + `testcase.f`. Block mới: thêm RTL vào `rtl.f` (sau `smx_pkg.sv`, khối con trước khối cha) và `tb_<block>.sv` vào `testcase.f`. Không viết script chạy riêng trong `tb/`.
 - Test đạt khi log có `TB_RESULT: PASS`, nên mọi testbench phải in đúng dòng này. Log ở `sim/log/<testname>_p<P>_n<N_SEG>.log`, `sim/sim.log` trỏ tới lần chạy gần nhất.
 - Vector tự sinh vào `tb/vectors/smx_<block>/p<P>_n<N_SEG>/` bằng `model/gen_vectors.py <block>` (block mới: thêm `model/vec_<block>.py`, tự được nhận); `REGEN=1` để sinh lại. Sau khi đổi model hoặc `gen_vectors.py` phải chạy với `REGEN=1`, vì vector cũ không tự cập nhật.
 - Mọi testbench khai báo tham số `P`, `N_SEG` và nhận plusarg `+VECDIR`; mọi lệnh con của `gen_vectors.py` nhận `--p`, `--n-seg`, `--seed`, `--out`. Block mới khác các điều này thì sửa `Makefile`, không tách flow.

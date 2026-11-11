@@ -78,8 +78,7 @@ rtl/pkg/                smx_pkg.sv, pwl_n*.hex
 rtl/core/               smx_core và khối con
 rtl/avalon/             smx_avalon (wrapper mỏng — nhóm implement)
 tb/                     unit testbench tự kiểm; tb/vectors/ sinh từ golden model
-sim/                    Makefile để mô phỏng, chạy từ thư mục này
-scripts/                compile.f (= rtl.f + tb.f + testcase.f), setup.sh (trỏ flow tới ModelSim)
+sim/                    Makefile + compile.f (= rtl.f + tb.f + testcase.f) để mô phỏng
 ip/                     smx_hw.tcl (nhóm implement)
 syn/                    Quartus project chỉ cho IP
 sw/                     mã HPS tham khảo
@@ -92,7 +91,7 @@ python3 model/softmax_ref.py --selftest          # kiểm model + đo sai số
 python3 model/softmax_ref.py --gen-pwl 8         # in localparam bảng PWL
 python3 model/softmax_ref.py --gen-hex 8 rtl/pkg/pwl_n8.hex
 # Mô phỏng (ModelSim/Questa): một flow duy nhất ở sim/, chi tiết ở docs/KNOWLEDGE.md mục 7, lệnh /sim.
-# Không viết script chạy riêng; block mới thì thêm vào scripts/rtl.f và scripts/testcase.f:
+# Không viết script chạy riêng; block mới thì thêm vào rtl.f và testcase.f:
 cd sim && make testname=tb_smx_exp2 N_SEG=8      # clean + compile + run, fail thì make trả lỗi
 cd sim && make regress                           # compile, chạy N_SEG = 4 8 16
 cd sim && make run WAVE=1                        # chạy lại không compile, ghi wave/<run>.wlf

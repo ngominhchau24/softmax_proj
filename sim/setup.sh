@@ -1,11 +1,11 @@
 # setup.sh - point the sim/ flow at ModelSim. Source it once per terminal, do not execute it:
 #
-#   source scripts/setup.sh                      (from the repo root)
-#   source ../scripts/setup.sh               (from sim/)
+#   source sim/setup.sh                      (from the repo root)
+#   source setup.sh                          (from sim/)
 #
 # It sets vlib, vmap, vlog and vsim, the variables sim/Makefile reads.
 # The ModelSim folder (the one that holds vsim or vsim.exe) is taken from, in this order:
-#   1. MODELSIM_DIR, if you set it:  MODELSIM_DIR=/mnt/d/intelFPGA_lite/18.1/modelsim_ase/win32aloem source scripts/setup.sh
+#   1. MODELSIM_DIR, if you set it:  MODELSIM_DIR=/mnt/d/intelFPGA_lite/18.1/modelsim_ase/win32aloem source sim/setup.sh
 #   2. the usual Intel install folders on drives C and D (WSL) or under /opt and $HOME (Linux)
 #   3. vsim already on PATH
 # To make it permanent for your machine, add the MODELSIM_DIR line to ~/.bashrc.
@@ -50,7 +50,7 @@ elif command -v vsim >/dev/null 2>&1; then
 else
   echo "setup.sh: ModelSim not found."
   echo "  Find the folder that holds vsim.exe in Windows Explorer, then run for example:"
-  echo "  MODELSIM_DIR=/mnt/c/intelFPGA_lite/18.1/modelsim_ase/win32aloem source scripts/setup.sh"
+  echo "  MODELSIM_DIR=/mnt/c/intelFPGA_lite/18.1/modelsim_ase/win32aloem source sim/setup.sh"
 fi
 
 command -v make >/dev/null 2>&1    || echo "setup.sh: make is missing:  sudo apt install -y make"

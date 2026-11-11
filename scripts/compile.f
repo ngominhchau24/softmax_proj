@@ -1,3 +1,0 @@
--f ../scripts/rtl.f
--f ../scripts/tb.f
--f ../scripts/testcase.f
