@@ -41,10 +41,15 @@ if [ -n "$_smx_dir" ]; then
   export vmap="$_smx_dir/vmap$_smx_ext"
   export vlog="$_smx_dir/vlog$_smx_ext"
   export vsim="$_smx_dir/vsim$_smx_ext"
+  # Windows tools called from WSL do not find their own modelsim.ini; sim/Makefile copies this one
+  unset SMX_MODELSIM_INI
+  if [ -n "$_smx_ext" ] && [ -f "$_smx_dir/../modelsim.ini" ]; then
+    export SMX_MODELSIM_INI="$_smx_dir/../modelsim.ini"
+  fi
   echo "setup.sh: ModelSim in $_smx_dir"
   "$vsim" -version
 elif command -v vsim >/dev/null 2>&1; then
-  unset vlib vmap vlog vsim                  # Makefile defaults: the tools on PATH
+  unset vlib vmap vlog vsim SMX_MODELSIM_INI # Makefile defaults: the tools on PATH
   echo "setup.sh: using vsim on PATH: $(command -v vsim)"
   vsim -version
 else
