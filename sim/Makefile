@@ -1,5 +1,6 @@
 # Simulation flow, run from sim/. Same organisation as risc_v milestone3/10_sim:
-# compile.f = rtl.f + tb.f + testcase.f, and testname is the top module to run.
+# The file lists live in ../scripts: compile.f = rtl.f + tb.f + testcase.f, with paths relative to sim/.
+# testname is the top module to run. ../scripts/setup.sh points the flow at ModelSim.
 #
 #   make                                    clean, compile, run tb_smx_exp2 at P=8 N_SEG=8
 #   make testname=tb_smx_exp2 N_SEG=16      same, for another test or parameter
@@ -53,7 +54,7 @@ build:
 	mkdir -p wave
 	$(vlib) work
 	$(vmap) work work
-	$(vlog) -f compile.f
+	$(vlog) -f ../scripts/compile.f
 
 # gen_vectors.py writes .done last, so an interrupted run is regenerated.
 # Blocks without arithmetic have no model/vec_<block>.py and need no vectors.

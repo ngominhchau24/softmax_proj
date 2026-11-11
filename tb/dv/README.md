@@ -13,7 +13,7 @@ Verification chính thức của nhóm DV, tách khỏi các testbench tự ki�
 | `../../model/dv_common.py` | Ghi file vector; số học lấy từ `softmax_ref.softmax_row` |
 | `../../model/vec_dv_<test>.py` | Chọn kích thích cho từng test |
 
-Một testcase là một module top `tb/tb_smx_dv_<test>.sv` khai báo `P`, `N_SEG`, tạo `smx_dv_env env ()` rồi gọi task của nó. Thêm test mới: viết `tb/tb_smx_dv_<test>.sv`, thêm vào `sim/testcase.f`, và nếu cần vector thì thêm `model/vec_dv_<test>.py` (`sim/Makefile` tự gọi).
+Một testcase là một module top `tb/tb_smx_dv_<test>.sv` khai báo `P`, `N_SEG`, tạo `smx_dv_env env ()` rồi gọi task của nó. Thêm test mới: viết `tb/tb_smx_dv_<test>.sv`, thêm vào `scripts/testcase.f`, và nếu cần vector thì thêm `model/vec_dv_<test>.py` (`sim/Makefile` tự gọi).
 
 ## Danh sách test
 
@@ -31,6 +31,7 @@ Chờ wrapper Avalon: ý "không X/Z khi `readdatavalid`" của VER-03, và IF-0
 ## Chạy
 
 ```bash
+source scripts/setup.sh                               # một lần mỗi terminal: trỏ flow tới ModelSim
 cd sim && make testname=tb_smx_dv_sanity              # P = 8, N_SEG = 8
 cd sim && make regress testname=tb_smx_dv_sanity PS="4 8 16" N_SEGS="4 8 16"
 ```

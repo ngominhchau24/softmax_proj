@@ -2,7 +2,7 @@
 # fit.sh - full Quartus compile of smx_core alone, for resource and Fmax numbers.
 # Ports are virtual pins, since the IP connects to fabric, not to device pins. The SDC has only the
 # clock, so these numbers are register-to-register: acc_* and rst_n paths are not timed.
-# Files come from sim/rtl.f. Each run gets a git-ignored syn/fit/p<P>_n<N_SEG>_s<SEED>/.
+# Files come from scripts/rtl.f. Each run gets a git-ignored syn/fit/p<P>_n<N_SEG>_s<SEED>/.
 #
 # Usage: syn/fit.sh [P] [N_SEG] [SEED]        (default: 8 8 1)
 # Needs: quartus_sh (Quartus Prime Lite 18.1) on PATH.
@@ -19,7 +19,7 @@ rm -rf "${dir}" && mkdir -p "${dir}"
   echo 'set_global_assignment -name NUM_PARALLEL_PROCESSORS 4'
   echo "set_global_assignment -name SEED ${seed}"
   echo 'set_global_assignment -name SDC_FILE smx.sdc'
-  grep -v '^#' sim/rtl.f | sed "s|^\.\./|$(pwd)/|; s|^|set_global_assignment -name SYSTEMVERILOG_FILE |"
+  grep -v '^#' scripts/rtl.f | sed "s|^\.\./|$(pwd)/|; s|^|set_global_assignment -name SYSTEMVERILOG_FILE |"
   echo "set_parameter -name P ${p}"
   echo "set_parameter -name N_SEG ${n}"
   for port in rst_n acc_addr[*] acc_write acc_writedata[*] acc_byteenable[*] acc_read \

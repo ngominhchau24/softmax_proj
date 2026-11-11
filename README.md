@@ -82,7 +82,8 @@ rtl/
   core/                 smx_core và các block con
   avalon/               wrapper Avalon (chưa có, phần board)
 tb/                     testbench tự kiểm; tb/vectors/ do script sinh, không đưa lên git
-sim/                    flow mô phỏng ModelSim/Questa: Makefile, rtl.f, tb.f, testcase.f, compile.f
+sim/                    flow mô phỏng ModelSim/Questa: Makefile, chạy từ thư mục này
+scripts/                file cho bước compile: rtl.f, tb.f, testcase.f, compile.f, setup.sh (trỏ flow tới ModelSim)
 syn/                    script tổng hợp: fit.sh (Fitter nhiều seed), map_check.sh
 ip/                     smx_hw.tcl (chưa có, phần board)
 sw/                     mã host tham khảo (chưa có)
@@ -97,7 +98,7 @@ cd sim && make regress                           # compile và chạy N_SEG = 4 
 cd sim && make run WAVE=1                        # chạy lại không compile, ghi wave
 ```
 
-Block mới thì thêm vào `sim/rtl.f` và `sim/testcase.f`. Chi tiết flow: `docs/KNOWLEDGE.md` mục 7. Tổng hợp: `syn/fit.sh`, `syn/map_check.sh` (cần Quartus Prime Lite 18.1).
+Block mới thì thêm vào `scripts/rtl.f` và `scripts/testcase.f`. Chi tiết flow: `docs/KNOWLEDGE.md` mục 7. Tổng hợp: `syn/fit.sh`, `syn/map_check.sh` (cần Quartus Prime Lite 18.1).
 
 ## Quy tắc không được vi phạm
 
