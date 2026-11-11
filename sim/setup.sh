@@ -58,15 +58,23 @@ if [ "$_smx_ok" = 0 ] && [ -n "$_smx_dir" ]; then
     export PATH="$_smx_dir:$PATH"
     export vlib=vlib.exe vmap=vmap.exe vlog=vlog.exe vsim=vsim.exe
     _smx_root="$(cd "$_smx_dir/.." && pwd)"
-    if [ -f "$_smx_root/modelsim.ini" ] && command -v wslpath >/dev/null 2>&1; then
+    if [ ! -f "$_smx_root/modelsim.ini" ]; then
+      echo "setup.sh: WARNING no modelsim.ini in $_smx_root; files there:"
+      ls "$_smx_root" | head -20
+    elif ! command -v wslpath >/dev/null 2>&1; then
+      echo "setup.sh: WARNING wslpath not found, cannot write Windows paths into modelsim.ini"
+    else
       export SMX_MODELSIM_INI="$_smx_root/modelsim.ini"
       export SMX_MODELSIM_ROOT="$(wslpath -m "$_smx_root")"
+      echo "setup.sh: make build will write sim/modelsim.ini from $SMX_MODELSIM_INI"
+      echo "setup.sh: library root $SMX_MODELSIM_ROOT"
     fi
   else
     export vlib="$_smx_dir/vlib" vmap="$_smx_dir/vmap" vlog="$_smx_dir/vlog" vsim="$_smx_dir/vsim"
   fi
   echo "setup.sh: ModelSim in $_smx_dir"
   "$vsim" -version
+  echo "setup.sh: vlog = $(command -v "$vlog")"
   _smx_ok=1
 fi
 
