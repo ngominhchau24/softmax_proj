@@ -32,5 +32,11 @@ package smx_dv_pkg;
   // ---- timing ----
   localparam int ACC_RD_LAT    = 2;            // REQ-IF-02: read data two cycles after the command
   localparam int ROW_LAT_SLACK = 64;           // REQ-PRF-03: row latency <= 2*ceil(L/P) + 64
+  // Latency formula of docs/spec/05-cross-block.md section 5, the reference of REQ-VER-04:
+  //   T_row = 2*ceil(L/P) + ROW_OVERHEAD,  CYCLE_CNT = R * T_row + 1,  ROW_OVERHEAD = 54 for every P
+  localparam int ROW_OVERHEAD_SPEC = 54;
+
+  // word addresses below X_BUF and from here up are registers or undefined: a read never returns X
+  localparam int A_UNDEF_HI = 'h1800;
 
 endpackage

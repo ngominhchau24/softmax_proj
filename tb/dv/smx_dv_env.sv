@@ -53,6 +53,9 @@ module smx_dv_env #(
 
   smx_scoreboard sb ();
 
+  // protocol checker of REQ-VER-03, bound into the DUT as dut.u_dv_chk
+  smx_core_bind u_bind ();
+
   string testname = "tb_smx_dv";
   string vecdir;
   bit    mon_en   = 1'b0;
@@ -88,11 +91,21 @@ module smx_dv_env #(
     bfm.idle(1);
   endtask
 
+  // ---- reproducible random numbers: the same on every simulator for a given +SEED ----
+  int          seed = 1;
+  int unsigned rng_state = 1;
+  function automatic int unsigned rnd();
+    rng_state = rng_state * 32'd1664525 + 32'd1013904223;
+    return rng_state >> 8;
+  endfunction
+
   // first call of every test; vecfile = "" for a test without vectors
   task automatic init(input string name, input string vecfile);
     testname = name;
     if (!$value$plusargs("VECDIR=%s", vecdir)) vecdir = ".";
-    $display("%s: P=%0d N_SEG=%0d VECDIR=%s", testname, P, N_SEG, vecdir);
+    if (!$value$plusargs("SEED=%d", seed)) seed = 1;
+    rng_state = seed;
+    $display("%s: P=%0d N_SEG=%0d SEED=%0d VECDIR=%s", testname, P, N_SEG, seed, vecdir);
     if (vecfile != "") sb.open_vectors({vecdir, "/", vecfile});
     @(negedge clk);
     reset_dut();
@@ -102,29 +115,63 @@ module smx_dv_env #(
   // last call of every test
   task automatic finish(input string summary);
     sb.ctx = "end";
+    if (dut.u_dv_chk.n_err != 0)
+      sb.fail($sformatf("protocol checker reported %0d errors", dut.u_dv_chk.n_err));
+    $display("%s: checker saw %0d START, %0d while BUSY, %0d with bad LEN/ROWS, %0d reads checked for X",
+             testname, dut.u_dv_chk.n_start, dut.u_dv_chk.n_start_busy, dut.u_dv_chk.n_start_bad,
+             dut.u_dv_chk.n_rd_chk);
     sb.report(testname, P, N_SEG, summary);
     $finish;
   endtask
 
   // ---- software steps 1-2: X_BUF rows of the scoreboard run, then LEN, ROWS, SCALE_K ----
-  // Like software, writes ceil(L/4) whole words per row and pads the last word with zeros.
-  // Elements past that inside the last group stay unwritten, which REQ-FUN-03 allows.
+  // x_mode selects how X_BUF is written. Elements at i >= L must not matter (REQ-FUN-03):
+  //   0  like software: ceil(L/4) whole words per row, the last word padded with zeros; elements
+  //      past that inside the last group keep whatever X_BUF held before (X on first use)
+  //   1  every word of the last group is written, and the elements at i >= L carry hostile
+  //      garbage: 127 first (it would win the row maximum), then -128, then random bytes
+  //   2  like software with an 8-bit pointer: one write per element, last element first, a single
+  //      byte enable each, garbage on the three disabled byte lanes (REQ-IF-03, REQ-IF-07)
+  int x_mode = 0;
+
+  function automatic logic [7:0] tail_garbage(input int k);
+    if (k == 0) return 8'h7F;
+    if (k == 1) return 8'h80;
+    return 8'(rnd());
+  endfunction
+
   task automatic program_run();
     logic [31:0] d;
-    int nw;
-    nw = (sb.L + 3) / 4;
+    int nw, i;
     for (int r = 0; r < sb.R; r++) begin
-      for (int w = 0; w < nw; w++) begin
-        d = '0;
-        for (int b = 0; b < 4; b++)
-          if (w*4 + b < sb.L) d[b*8 +: 8] = sb.q[r * L_MAX + w*4 + b];
-        bfm.write(A_XBUF + r * ROW_WORDS + w, d, 4'hF);
+      if (x_mode == 2) begin
+        for (int e = sb.L - 1; e >= 0; e--) begin
+          d = 32'(rnd()) ^ 32'h7F80_7F80;
+          d[(e % 4)*8 +: 8] = sb.q[r * L_MAX + e];
+          bfm.write(A_XBUF + r * ROW_WORDS + e / 4, d, 4'(1 << (e % 4)));
+        end
+      end else begin
+        nw = (x_mode == 1) ? groups(sb.L) * P / 4 : (sb.L + 3) / 4;
+        for (int w = 0; w < nw; w++) begin
+          d = '0;
+          for (int b = 0; b < 4; b++) begin
+            i = w*4 + b;
+            if (i < sb.L)         d[b*8 +: 8] = sb.q[r * L_MAX + i];
+            else if (x_mode == 1) d[b*8 +: 8] = tail_garbage(i - sb.L);
+          end
+          bfm.write(A_XBUF + r * ROW_WORDS + w, d, 4'hF);
+        end
       end
     end
     bfm.write(A_LEN,     sb.L, 4'hF);
     bfm.write(A_ROWS,    sb.R, 4'hF);
     bfm.write(A_SCALE_K, sb.K, 4'hF);
   endtask
+
+  // CYCLE_CNT of a legal run by the formula of the spec (REQ-VER-04)
+  function automatic int spec_cycles(input int len, input int rows);
+    return rows * (2 * groups(len) + ROW_OVERHEAD_SPEC) + 1;
+  endfunction
 
   // ---- software step 3: returns in the cycle right after the START write ----
   task automatic start_run();

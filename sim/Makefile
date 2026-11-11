@@ -5,6 +5,8 @@
 #   make testname=tb_smx_exp2 N_SEG=16      same, for another test or parameter
 #   make regress                            compile, run every PS x N_SEGS combination
 #   make regress PS="4 8 16" N_SEGS=8       sweep P instead of N_SEG
+#   make dv                                 compile, run the whole DV suite (tb/dv/README.md)
+#   make run testname=tb_smx_dv_random SEED=7   another seed: new vectors, +SEED=7 to the bench
 #   make run WAVE=1                         run without recompiling, log wave/<run>.wlf
 #   make dump                               compile, open the GUI with main_wave.do
 #   make view                               compile, run with wave logging, open the .wlf
@@ -26,6 +28,8 @@ PS       ?= 8
 N_SEGS   ?= 4 8 16
 WAVE     ?= 0
 REGEN    ?= 0
+SEED     ?= 1
+DV_TESTS ?= tb_smx_dv_sanity tb_smx_dv_ver02 tb_smx_dv_proto tb_smx_dv_latency tb_smx_dv_reg tb_smx_dv_random
 
 vlib ?= vlib
 vmap ?= vmap
@@ -37,9 +41,11 @@ PYTHON ?= $(if $(wildcard $(HOME)/venvs/ml/bin/python),$(HOME)/venvs/ml/bin/pyth
 
 TESTNAME := $(testname)
 BLOCK    := $(patsubst tb_smx_%,%,$(TESTNAME))
-VECDIR   := ../tb/vectors/smx_$(BLOCK)/p$(P)_n$(N_SEG)
-RUN      := $(TESTNAME)_p$(P)_n$(N_SEG)
-SIMARGS  := -gP=$(P) -gN_SEG=$(N_SEG) work.$(TESTNAME) +VECDIR=$(VECDIR)
+# SEED = 1 keeps the plain names; another seed gets its own vectors and log
+SEEDTAG  := $(if $(filter-out 1,$(SEED)),_s$(SEED))
+VECDIR   := ../tb/vectors/smx_$(BLOCK)/p$(P)_n$(N_SEG)$(SEEDTAG)
+RUN      := $(TESTNAME)_p$(P)_n$(N_SEG)$(SEEDTAG)
+SIMARGS  := -gP=$(P) -gN_SEG=$(N_SEG) work.$(TESTNAME) +VECDIR=$(VECDIR) +SEED=$(SEED)
 
 # Logging every signal over 1.2M+ vectors makes a large .wlf, so plain runs log nothing
 ifeq ($(WAVE),1)
@@ -47,7 +53,7 @@ ifeq ($(WAVE),1)
   LOG_CMD := log -r /*;
 endif
 
-.PHONY: all build vectors run regress dump view clean
+.PHONY: all build vectors run regress dv dump view clean
 
 all: clean build run
 
@@ -67,7 +73,7 @@ build:
 vectors:
 	@if [ "$(BLOCK)" = exp2 ] || [ -f ../model/vec_$(BLOCK).py ]; then \
 	  if [ "$(REGEN)" = 1 ] || [ ! -f $(VECDIR)/.done ]; then \
-	    $(PYTHON) ../model/gen_vectors.py $(BLOCK) --p $(P) --n-seg $(N_SEG) --out $(VECDIR); \
+	    $(PYTHON) ../model/gen_vectors.py $(BLOCK) --p $(P) --n-seg $(N_SEG) --seed $(SEED) --out $(VECDIR); \
 	  fi; \
 	fi
 
@@ -84,6 +90,17 @@ regress: build
 	done; done; \
 	if [ $$fail = 0 ]; then echo "ALL PASS: $(TESTNAME) P = $(PS) N_SEG = $(N_SEGS)"; \
 	else echo "SOME FAILED, see sim/log/"; exit 1; fi
+
+# The DV suite (tb/dv/README.md): compile once, run every test of DV_TESTS, list the verdicts
+dv: build
+	@fail=0; for t in $(DV_TESTS); do \
+	  $(MAKE) --no-print-directory run testname=$$t || fail=1; \
+	done; \
+	echo; echo "DV suite P=$(P) N_SEG=$(N_SEG) SEED=$(SEED):"; \
+	for t in $(DV_TESTS); do \
+	  grep -h "TB_RESULT" log/$${t}_p$(P)_n$(N_SEG)$(SEEDTAG).log || echo "TB_RESULT: MISSING $$t"; \
+	done; \
+	if [ $$fail = 0 ]; then echo "DV ALL PASS"; else echo "DV SOME FAILED, see sim/log/"; exit 1; fi
 
 dump: build vectors
 	$(vsim) -gui -voptargs="+acc" $(SIMARGS) -do "do main_wave.do"

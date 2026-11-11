@@ -67,9 +67,19 @@ module smx_scoreboard;
     line = s;
   endtask
 
+  string vec_path = "";
+  int    n_runs_total = 0;                     // runs read over all passes of the file
+
+  // open the vector file; calling it again starts a new pass from the first run
   task automatic open_vectors(input string path);
     string line;
     bit    got;
+    if (fd != 0) begin
+      if (n_runs_read != n_runs)
+        fail($sformatf("only %0d of %0d vector runs were used", n_runs_read, n_runs));
+      $fclose(fd);
+    end
+    vec_path    = path;
     n_runs      = 0;
     n_runs_read = 0;
     fd = $fopen(path, "r");
@@ -128,6 +138,7 @@ module smx_scoreboard;
     end
     ctx = $sformatf("run%0d %s L=%0d R=%0d K=%0d", n_runs_read, name, L, R, K);
     n_runs_read++;
+    n_runs_total++;
     ok = 1'b1;
   endtask
 

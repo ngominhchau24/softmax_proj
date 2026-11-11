@@ -93,6 +93,8 @@ make regress                         # build một lần, chạy mọi tổ hợ
 make regress PS="4 8 16" N_SEGS=8    # quét P thay vì N_SEG
 make run WAVE=1                      # chạy lại không compile, ghi wave/<run>.wlf
 make dump | view | clean
+make dv                              # bộ test DV (tb/dv/README.md): build một lần, chạy 6 test
+make run testname=tb_smx_dv_random SEED=7   # seed khác 1: vector và log riêng, testbench nhận +SEED
 ```
 
 - `compile.f` = `rtl.f` + `tb.f` + `testcase.f`. Block mới: thêm RTL vào `rtl.f` (sau `smx_pkg.sv`, khối con trước khối cha) và `tb_<block>.sv` vào `testcase.f`. Không viết script chạy riêng trong `tb/`.
