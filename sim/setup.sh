@@ -7,8 +7,7 @@
 # this order:
 #   1. MODELSIM_DIR, the folder that holds vsim or vsim.exe, if you set it:
 #        MODELSIM_DIR=/mnt/c/intelFPGA_lite/18.1/modelsim_ase/win32aloem source sim/setup.sh
-#   2. vsim or vsim.exe already on PATH (under WSL the Windows PATH is visible, so a ModelSim that
-#      Windows finds by name is used as it is)
+#   2. vsim or vsim.exe already on PATH (under WSL the Windows PATH is visible)
 #   3. the usual Intel install folders on drives C and D (WSL) or under /opt and $HOME (Linux)
 # To make a choice permanent for your machine, add an "export MODELSIM_DIR=..." line to ~/.bashrc.
 
@@ -29,10 +28,7 @@ if [ -z "$_smx_dir" ]; then
     vsim -version
     _smx_ok=1
   elif command -v vsim.exe >/dev/null 2>&1; then
-    export vlib=vlib.exe vmap=vmap.exe vlog=vlog.exe vsim=vsim.exe
-    echo "setup.sh: using vsim.exe on PATH: $(command -v vsim.exe)"
-    vsim.exe -version
-    _smx_ok=1
+    _smx_dir="$(dirname "$(command -v vsim.exe)")"      # Windows ModelSim: handled as a folder below
   fi
 fi
 
@@ -55,9 +51,10 @@ fi
 # 1. and 3.: a specific folder
 if [ "$_smx_ok" = 0 ] && [ -n "$_smx_dir" ]; then
   if [ -e "$_smx_dir/vsim.exe" ]; then
-    # Windows ModelSim under WSL, not the one Windows finds by name. Called by a /mnt/... path the
-    # tools cannot locate their own install folder, so put the folder first on PATH, call them by
-    # bare name, and let sim/Makefile write a modelsim.ini with absolute Windows library paths.
+    # Windows ModelSim under WSL. Started from WSL the tools do not locate their own install
+    # folder: vmap cannot copy the default modelsim.ini and $MODEL_TECH in it does not resolve.
+    # So put the folder first on PATH, call the tools by bare name, and let sim/Makefile write a
+    # modelsim.ini from this install's default one, with absolute Windows library paths.
     export PATH="$_smx_dir:$PATH"
     export vlib=vlib.exe vmap=vmap.exe vlog=vlog.exe vsim=vsim.exe
     _smx_root="$(cd "$_smx_dir/.." && pwd)"
