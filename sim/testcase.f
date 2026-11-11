@@ -9,3 +9,4 @@
 ../tb/tb_smx_ctrl.sv
 ../tb/tb_smx_csr.sv
 ../tb/tb_smx_core.sv
+../tb/tb_smx_dv_sanity.sv

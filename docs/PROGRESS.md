@@ -49,7 +49,7 @@ Câu hỏi khác đang chờ Chau:
 ## Đang chờ nhóm khác
 
 - **Nhóm implement:** `smx_avalon`, `ip/smx_hw.tcl`, hệ thống Platform Designer, script System Console, đo băng thông JTAG. Câu hỏi còn mở: họ dùng JTAG to Avalon Master Bridge không.
-- **Nhóm verify:** verification chính thức, assertion REQ-VER-03. Câu hỏi còn mở: dùng ModelSim Starter hay Questa. Lỗi họ báo sẽ quay về RTL.
+- **Nhóm verify (tiendangphuoc):** đã bắt đầu từ 2026-11-11, dùng ModelSim, không UVM. Môi trường ở `tb/dv/`, kế hoạch 6 test và trạng thái ở `tb/dv/README.md`. Đã có `tb_smx_dv_sanity`; mới chạy thử bằng Verilator (2-state), chưa chạy trên ModelSim. Còn mở: bản ModelSim có hỗ trợ SVA và covergroup không, để chọn cách viết assertion REQ-VER-03. Lỗi họ báo sẽ quay về RTL.
 
 ## Việc tiếp theo
 
