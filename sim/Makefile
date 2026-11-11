@@ -15,8 +15,9 @@
 # Every model/gen_vectors.py subcommand takes --p, --n-seg, --seed and --out.
 # Run one job at a time per checkout: all of them share sim/work.
 # The tools can be overridden from the environment, e.g. export vlog=/path/to/vlog.exe
-# setup.sh does that. Under WSL it also sets SMX_MODELSIM_INI: the Windows vmap.exe cannot copy its
-# default modelsim.ini when called by a /mnt/... path, so build copies it here first.
+# setup.sh does that. Under WSL the Windows tools do not find their own install folder, so they
+# neither copy the default modelsim.ini nor resolve $$MODEL_TECH in it. setup.sh then sets
+# SMX_MODELSIM_INI and SMX_MODELSIM_ROOT, and build writes modelsim.ini here with absolute paths.
 
 testname ?= tb_smx_exp2
 P        ?= 8
@@ -54,9 +55,9 @@ build:
 	mkdir -p log
 	mkdir -p wave
 	$(vlib) work
-	@if [ ! -f modelsim.ini ] && [ -n "$(SMX_MODELSIM_INI)" ]; then \
-	  echo "copying $(SMX_MODELSIM_INI) to modelsim.ini"; \
-	  cp "$(SMX_MODELSIM_INI)" modelsim.ini && chmod u+w modelsim.ini; \
+	@if [ -n "$(SMX_MODELSIM_INI)" ]; then \
+	  echo "writing modelsim.ini from $(SMX_MODELSIM_INI), libraries under $(SMX_MODELSIM_ROOT)"; \
+	  sed 's|\$$MODEL_TECH/\.\.|$(SMX_MODELSIM_ROOT)|g' "$(SMX_MODELSIM_INI)" > modelsim.ini; \
 	fi
 	$(vmap) work work
 	$(vlog) -f compile.f

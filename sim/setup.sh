@@ -37,19 +37,25 @@ elif [ -n "$_smx_dir" ]; then
 fi
 
 if [ -n "$_smx_dir" ]; then
-  export vlib="$_smx_dir/vlib$_smx_ext"
-  export vmap="$_smx_dir/vmap$_smx_ext"
-  export vlog="$_smx_dir/vlog$_smx_ext"
-  export vsim="$_smx_dir/vsim$_smx_ext"
-  # Windows tools called from WSL do not find their own modelsim.ini; sim/Makefile copies this one
-  unset SMX_MODELSIM_INI
-  if [ -n "$_smx_ext" ] && [ -f "$_smx_dir/../modelsim.ini" ]; then
-    export SMX_MODELSIM_INI="$_smx_dir/../modelsim.ini"
+  unset SMX_MODELSIM_INI SMX_MODELSIM_ROOT
+  if [ -n "$_smx_ext" ]; then
+    # Windows ModelSim under WSL. Called by a /mnt/... path the tools cannot locate their own install
+    # folder, so call them by bare name through PATH, and let sim/Makefile write a modelsim.ini whose
+    # library paths are absolute Windows paths instead of $MODEL_TECH/..
+    case ":$PATH:" in *":$_smx_dir:"*) ;; *) export PATH="$_smx_dir:$PATH" ;; esac
+    export vlib=vlib.exe vmap=vmap.exe vlog=vlog.exe vsim=vsim.exe
+    _smx_root="$(cd "$_smx_dir/.." && pwd)"
+    if [ -f "$_smx_root/modelsim.ini" ] && command -v wslpath >/dev/null 2>&1; then
+      export SMX_MODELSIM_INI="$_smx_root/modelsim.ini"
+      export SMX_MODELSIM_ROOT="$(wslpath -m "$_smx_root")"
+    fi
+  else
+    export vlib="$_smx_dir/vlib" vmap="$_smx_dir/vmap" vlog="$_smx_dir/vlog" vsim="$_smx_dir/vsim"
   fi
   echo "setup.sh: ModelSim in $_smx_dir"
   "$vsim" -version
 elif command -v vsim >/dev/null 2>&1; then
-  unset vlib vmap vlog vsim SMX_MODELSIM_INI # Makefile defaults: the tools on PATH
+  unset vlib vmap vlog vsim SMX_MODELSIM_INI SMX_MODELSIM_ROOT # Makefile defaults: the tools on PATH
   echo "setup.sh: using vsim on PATH: $(command -v vsim)"
   vsim -version
 else
@@ -61,4 +67,4 @@ fi
 command -v make >/dev/null 2>&1    || echo "setup.sh: make is missing:  sudo apt install -y make"
 python3 -c "import numpy" 2>/dev/null || echo "setup.sh: python3 with numpy is missing:  sudo apt install -y python3-numpy"
 
-unset _smx_dir _smx_d _smx_ext
+unset _smx_dir _smx_d _smx_ext _smx_root
