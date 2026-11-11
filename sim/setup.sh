@@ -27,8 +27,16 @@ if [ -z "$_smx_dir" ]; then
     echo "setup.sh: using vsim on PATH: $(command -v vsim)"
     vsim -version
     _smx_ok=1
-  elif command -v vsim.exe >/dev/null 2>&1; then
-    _smx_dir="$(dirname "$(command -v vsim.exe)")"      # Windows ModelSim: handled as a folder below
+  else
+    # Windows ModelSim: take the first vsim.exe on PATH whose install has its default modelsim.ini,
+    # then handle it as a folder below. An install without that file cannot be set up from here.
+    for _smx_d in $(which -a vsim.exe 2>/dev/null | sed 's|/vsim\.exe$||' | awk '!seen[$0]++'); do
+      if [ -f "$_smx_d/../modelsim.ini" ]; then
+        _smx_dir="$_smx_d"
+        break
+      fi
+      echo "setup.sh: skipping $_smx_d (no modelsim.ini in its install folder)"
+    done
   fi
 fi
 
