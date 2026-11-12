@@ -115,7 +115,7 @@ dv: build
 dvview:
 	$(MAKE) --no-print-directory run ACC='-voptargs="+acc"' \
 	  LOG_CMD='log /$(TESTNAME)/env/*; log /$(TESTNAME)/env/dut/u_dv_chk/*;'
-	$(vsim) -view wave/$(RUN).wlf -do "do wave_dv.do"
+	$(vsim) -view wave/$(RUN).wlf -do "set TOP $(TESTNAME); do wave_dv.do"
 
 dump: build vectors
 	$(vsim) -gui -voptargs="+acc" $(SIMARGS) -do "do main_wave.do"
