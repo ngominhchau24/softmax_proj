@@ -58,6 +58,7 @@ module smx_dv_env #(
 
   string testname = "tb_smx_dv";
   string vecdir;
+  string vcdfile;
   bit    mon_en   = 1'b0;
   int    n_runs_done = 0;
 
@@ -106,6 +107,12 @@ module smx_dv_env #(
     if (!$value$plusargs("SEED=%d", seed)) seed = 1;
     rng_state = seed;
     $display("%s: P=%0d N_SEG=%0d SEED=%0d VECDIR=%s", testname, P, N_SEG, seed, vecdir);
+    // +VCD=<file>: dump the DUT ports, for the waveform figures of the report (make run VCD=1)
+    if ($value$plusargs("VCD=%s", vcdfile)) begin
+      $dumpfile(vcdfile);
+      $dumpvars(0, clk, rst_n, acc_addr, acc_write, acc_writedata, acc_byteenable, acc_read,
+                acc_readdata, status_busy, status_done, status_err);
+    end
     if (vecfile != "") sb.open_vectors({vecdir, "/", vecfile});
     @(negedge clk);
     reset_dut();

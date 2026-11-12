@@ -34,6 +34,12 @@
 \usepackage{graphicx}
 \graphicspath{{../figures/}}
 \usepackage{booktabs}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\scriptsize, breaklines=true, breakatwhitespace=true,
+        columns=fullflexible, keepspaces=true, frame=single, framesep=4pt,
+        xleftmargin=4pt, xrightmargin=4pt, aboveskip=8pt, belowskip=4pt}
+% Nhật ký của một testcase: chỉ chèn khi file có trong docs/report/logs/
+\newcommand{\smxlog}[2]{\IfFileExists{logs/#1}{\noindent\textit{#2}\lstinputlisting{logs/#1}}{}}
 \usepackage{titlesec}
 \usepackage{hyperref}
 

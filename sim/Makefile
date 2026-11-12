@@ -7,6 +7,7 @@
 #   make regress PS="4 8 16" N_SEGS=8       sweep P instead of N_SEG
 #   make dv                                 compile, run the whole DV suite (tb/dv/README.md)
 #   make run testname=tb_smx_dv_random SEED=7   another seed: new vectors, +SEED=7 to the bench
+#   make run testname=tb_smx_dv_proto VCD=1     DV tests only: dump the DUT ports to wave/<run>.vcd
 #   make run WAVE=1                         run without recompiling, log wave/<run>.wlf
 #   make dump                               compile, open the GUI with main_wave.do
 #   make view                               compile, run with wave logging, open the .wlf
@@ -29,6 +30,7 @@ N_SEGS   ?= 4 8 16
 WAVE     ?= 0
 REGEN    ?= 0
 SEED     ?= 1
+VCD      ?= 0
 DV_TESTS ?= tb_smx_dv_sanity tb_smx_dv_ver02 tb_smx_dv_proto tb_smx_dv_latency tb_smx_dv_reg tb_smx_dv_random
 
 vlib ?= vlib
@@ -46,6 +48,11 @@ SEEDTAG  := $(if $(filter-out 1,$(SEED)),_s$(SEED))
 VECDIR   := ../tb/vectors/smx_$(BLOCK)/p$(P)_n$(N_SEG)$(SEEDTAG)
 RUN      := $(TESTNAME)_p$(P)_n$(N_SEG)$(SEEDTAG)
 SIMARGS  := -gP=$(P) -gN_SEG=$(N_SEG) work.$(TESTNAME) +VECDIR=$(VECDIR) +SEED=$(SEED)
+
+# VCD=1: the DV environment dumps the DUT ports to wave/<run>.vcd (docs/report/tools/dv_waves.py)
+ifeq ($(VCD),1)
+  SIMARGS += +VCD=wave/$(RUN).vcd
+endif
 
 # Logging every signal over 1.2M+ vectors makes a large .wlf, so plain runs log nothing
 ifeq ($(WAVE),1)

@@ -41,6 +41,7 @@ make build                                 # chỉ compile
 make run testname=tb_smx_dv_proto          # chỉ chạy một test, không compile lại
 make run testname=tb_smx_dv_random SEED=7  # seed khác: vector mới, log riêng
 make run testname=tb_smx_dv_proto WAVE=1   # ghi wave/<run>.wlf
+make run testname=tb_smx_dv_proto VCD=1    # xuất cổng DUT ra wave/<run>.vcd, để vẽ hình bằng docs/report/tools/dv_waves.py
 ```
 
 Test đạt khi log có `TB_RESULT: PASS`; `make dv` kết thúc bằng `DV ALL PASS`. Log ở `sim/log/`. Sau khi sửa `model/vec_dv_*.py` hoặc `dv_common.py`, chạy thêm `REGEN=1`.

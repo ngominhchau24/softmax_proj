@@ -1,0 +1,8 @@
+DV suite P=8 N_SEG=8 SEED=1:
+# TB_RESULT: PASS tb_smx_dv_sanity P=8 N_SEG=8: 2337 checks, 9 runs, 617 writes, 606 reads
+# TB_RESULT: PASS tb_smx_dv_ver02 P=8 N_SEG=8: 69412 checks, 267 runs, 104 of them with both tail modes, coverage 43/43 bins
+# TB_RESULT: PASS tb_smx_dv_proto P=8 N_SEG=8: 3287 checks, 7 bad STARTs, 5 STARTs while BUSY, 3 vector runs
+# TB_RESULT: PASS tb_smx_dv_latency P=8 N_SEG=8: 68604 checks, 168 runs over 56 (L, R) shapes, longest row 182 cycles
+# TB_RESULT: PASS tb_smx_dv_reg P=8 N_SEG=8: 2003 checks, 5 runs written element by element, 1533 writes, 809 reads
+# TB_RESULT: PASS tb_smx_dv_random P=8 N_SEG=8: 167267 checks, 120 runs in two passes, 20 resets in mid-run, seed 1
+DV ALL PASS
