@@ -134,7 +134,7 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
 
-Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-latency} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-reg} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Hình \ref{fig:dv-random} được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
 
 \begin{figure}[htbp]
   \centering
@@ -173,8 +173,8 @@ Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-latency} là ảnh chụp cử
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_reg_byteenable.pdf}
-  \caption{\texttt{reg}: \texttt{byteenable} trên thanh ghi LEN. Sau khi ghi F0F0F0F0h với đủ bốn byte, (1) giá trị 0F0F0F0Fh được ghi với \texttt{byteenable} = 0101. (2) LEN đọc về 00Fh: byte 0 nhận giá trị mới, còn hai bit 9 và 8, thuộc byte 1, giữ giá trị cũ.}
+  \includegraphics[width=\textwidth]{dv_reg_byteenable_modelsim.png}
+  \caption{\texttt{reg} trên ModelSim: \texttt{byteenable} trên thanh ghi LEN (địa chỉ 0002h). Giá trị F0F0F0F0h được ghi với \texttt{byteenable} = 1111, rồi 0F0F0F0Fh được ghi với \texttt{byteenable} = 0101, tức chỉ byte 0 và byte 2. Lệnh đọc ngay sau đó trả về 0000000Fh sau hai chu kỳ: byte 0 nhận giá trị mới 0Fh, còn hai bit 9 và 8 của LEN, thuộc byte 1, giữ giá trị cũ; các bit ngoài trường $[9{:}0]$ đọc về 0. Phía sau là mẫu \texttt{byteenable} kế tiếp, 0110.}
   \label{fig:dv-reg}
 \end{figure}
 
