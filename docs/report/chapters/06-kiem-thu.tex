@@ -134,7 +134,7 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
 
-Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-proto-busy} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-latency} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
 
 \begin{figure}[htbp]
   \centering
@@ -166,8 +166,8 @@ Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-proto-busy} là ảnh chụp c
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_latency_cycle_cnt.pdf}
-  \caption{\texttt{latency}: lần chạy ngắn nhất, $L = 1$, $R = 1$. BUSY kéo dài $2 \cdot 1 + 54 + 1 = 57$ chu kỳ. (1) \texttt{CYCLE\_CNT} đọc về 39h, bằng 57.}
+  \includegraphics[width=\textwidth]{dv_latency_cycle_cnt_modelsim.png}
+  \caption{\texttt{latency} trên ModelSim: lần chạy ngắn nhất, $L = 1$, $R = 1$. Sau lệnh START, \texttt{status\_busy} kéo dài đúng $2 \cdot 1 + 54 + 1 = 57$ chu kỳ, thể hiện ở \texttt{busy\_cnt} đếm từ 1 đến 57. Khi BUSY xuống, \texttt{status\_done} lên. Bốn lệnh đọc sau đó lần lượt lấy STATUS (0001h), \texttt{CYCLE\_CNT} (0005h), Y\_BUF (1000h) và \texttt{CYCLE\_CNT} lần nữa; test so cả hai lần đọc \texttt{CYCLE\_CNT} với công thức.}
   \label{fig:dv-latency}
 \end{figure}
 
