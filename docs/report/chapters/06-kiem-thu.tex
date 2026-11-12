@@ -134,7 +134,7 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
 
-Hình \ref{fig:dv-sanity} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
+Hình \ref{fig:dv-sanity} và \ref{fig:dv-ver02} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
 
 \begin{figure}[htbp]
   \centering
@@ -145,8 +145,8 @@ Hình \ref{fig:dv-sanity} là ảnh chụp cửa sổ Wave của ModelSim. Trong
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_ver02_tail.pdf}
-  \caption{\texttt{ver02}: ghi X\_BUF với phần đuôi chứa giá trị rác, $L = 1$. (1) Trong word đầu tiên, byte thấp 80h là phần tử duy nhất của hàng; ba byte còn lại là 7Fh, 80h và một byte ngẫu nhiên, nằm ngoài độ dài $L$. (2) Lệnh START. Kết quả $Y$ vẫn phải khớp golden model.}
+  \includegraphics[width=\textwidth]{dv_ver02_tail_modelsim.png}
+  \caption{\texttt{ver02} trên ModelSim: nạp một lần chạy có phần đuôi chứa giá trị rác, $L = 1$, $R = 2$. Word đầu của hàng 0 được ghi vào địa chỉ 0800h với giá trị 59807F80h: byte thấp 80h là phần tử duy nhất của hàng, ba byte còn lại (7Fh, 80h và 59h) nằm ngoài độ dài $L$. Tiếp theo là word thứ hai của hàng 0, hai word của hàng 1 (0880h, 0881h), rồi $\text{LEN} = 1$, $\text{ROWS} = 2$, $\text{SCALE\_K} = 0$ và lệnh START ở địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp. Kết quả $Y$ vẫn phải khớp golden model.}
   \label{fig:dv-ver02}
 \end{figure}
 
