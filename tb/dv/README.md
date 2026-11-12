@@ -28,6 +28,8 @@ Một testcase là một module top `tb/tb_smx_dv_<test>.sv` khai báo `P`, `N_S
 | 5 | `tb_smx_dv_reg` | IF-03, IF-07, IF-08 | 16 mẫu byteenable trên LEN, ROWS, SCALE_K và X_BUF ở mọi bank; địa chỉ không định nghĩa đọc 0, ghi bị bỏ qua, không alias; thanh ghi chỉ đọc và Y_BUF không ghi được; ghi X_BUF từng phần tử qua từng byte lane rồi so Y |
 | 6 | `tb_smx_dv_random` | VER-01, FUN-05 | 60 run ngẫu nhiên theo `SEED`, chạy hai lượt với lịch sử khác nhau; ở lượt hai, cứ ba run thì một run bị reset bất đồng bộ giữa chừng (sau khi khởi động với SCALE_K sai) rồi chạy lại |
 
+| 7 | `tb_smx_dv_corner` | VER-01, ARI-05, ARI-06, FUN-02 | Corner số học: `sum` ở cận dưới 2¹⁴ (Rcp = 2²⁶ dùng đủ 27 bit) và cận trên 2²⁴; max nhảy 254 ở nhóm sau nhóm đầu, gồm nhóm thứ hai và nhóm cuối; mọi độ dài hàng từ 1 đến 512. Giá trị `sum` do bộ sinh vector khẳng định bằng golden model; test kiểm hình dạng hàng và fail nếu thiếu kịch bản hay thiếu độ dài nào |
+
 Chờ wrapper Avalon: ý "không X/Z khi `readdatavalid`" của VER-03 ở mức bus (luật R8 đã kiểm phần tương đương trên `acc_readdata`), và IF-01/02/11.
 
 ## Chạy
@@ -35,7 +37,7 @@ Chờ wrapper Avalon: ý "không X/Z khi `readdatavalid`" của VER-03 ở mức
 Từ thư mục gốc, một lần mỗi terminal: `source sim/setup.sh`. Sau đó trong `sim/`:
 
 ```bash
-make dv                                    # compile, chạy cả 6 test ở P = 8, N_SEG = 8, in bảng kết quả
+make dv                                    # compile, chạy cả 7 test ở P = 8, N_SEG = 8, in bảng kết quả
 make dv P=4                                # tham số khác: P = 4, 8, 16 và N_SEG = 4, 8, 16
 make build                                 # chỉ compile
 make run testname=tb_smx_dv_proto          # chỉ chạy một test, không compile lại
@@ -60,6 +62,7 @@ Test đạt khi log có `TB_RESULT: PASS`; `make dv` kết thúc bằng `DV ALL 
 
 - ModelSim Intel 10.5b (`make dv`, 2026-11-12, do tiendangphuoc chạy và báo lại): cả 6 test PASS ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8; `tb_smx_dv_random` PASS thêm ở SEED = 2 và 3. Ở P = N_SEG = 8 số phép so trùng với Verilator. `bind` và checker chạy được trên bản này.
 - Verilator 5.020 (2 trạng thái, không thấy X/Z): cả 6 test PASS ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8.
+- `tb_smx_dv_corner` (thêm 2026-11-12): PASS dưới Verilator ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8; chưa chạy trên ModelSim. Ba lỗi cài thử bị nó bắt: bỏ phép dịch `sum`, mask lane đuôi, và mất bit cao nhất của Rcp trong `smx_divider`. Lỗi thứ ba **lọt qua `tb_smx_dv_ver02`** và chỉ bị test này bắt, vì chỉ lộ ra khi `sum` = 2¹⁴.
 - Cài lỗi thử trên bản sao RTL, P = N_SEG = 8, Verilator: 12/12 bị bắt (làm tròn `smx_norm`, đếm `CYCLE_CNT`, ghi LEN khi BUSY, ghi X_BUF khi BUSY, `cfg_ok` luôn đúng, mask lane đuôi, phép dịch `sum`, cờ `first` của `sum`, START khi BUSY, byteenable LEN, alias địa chỉ CSR, thiếu reset LEN).
 
 ## Lỗi tìm được

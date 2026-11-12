@@ -15,3 +15,4 @@
 ../tb/tb_smx_dv_latency.sv
 ../tb/tb_smx_dv_reg.sv
 ../tb/tb_smx_dv_random.sv
+../tb/tb_smx_dv_corner.sv

@@ -32,7 +32,7 @@ WAVE     ?= 0
 REGEN    ?= 0
 SEED     ?= 1
 VCD      ?= 0
-DV_TESTS ?= tb_smx_dv_sanity tb_smx_dv_ver02 tb_smx_dv_proto tb_smx_dv_latency tb_smx_dv_reg tb_smx_dv_random
+DV_TESTS ?= tb_smx_dv_sanity tb_smx_dv_ver02 tb_smx_dv_proto tb_smx_dv_latency tb_smx_dv_reg tb_smx_dv_random tb_smx_dv_corner
 
 vlib ?= vlib
 vmap ?= vmap
