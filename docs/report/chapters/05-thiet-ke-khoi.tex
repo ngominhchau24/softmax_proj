@@ -1,23 +1,23 @@
 \section{Thiết kế các khối}
 
-Lõi được chia thành mười khối, thiết kế theo thứ tự phụ thuộc. Mỗi khối sẽ có một tài liệu thiết kế riêng và phải được duyệt trước khi viết RTL. Trạng thái tại thời điểm viết báo cáo được tóm tắt trong Bảng \ref{tab:blocks}.
+Lõi được chia thành mười khối, thiết kế theo thứ tự phụ thuộc. Mỗi khối có một tài liệu thiết kế riêng, mô tả chức năng, bảng cổng, số học đối chiếu với golden model, sơ đồ cấu trúc, timing và kế hoạch kiểm thử. Trạng thái tại thời điểm viết báo cáo được tóm tắt trong Bảng \ref{tab:blocks}: cả mười khối đã có RTL và testbench tự kiểm, chín khối con đã được tích hợp vào \texttt{smx\_core}.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \begin{tabular}{clll}
 \toprule
 \# & Khối & Vai trò & Trạng thái \\
 \midrule
-1  & \texttt{smx\_exp2}    & $d \to E$, PWL và dịch & TODO \\
-2  & \texttt{smx\_scale}   & $u = q \cdot K$, $c = \lceil u \rceil$ & TODO \\
-3  & \texttt{smx\_maxtree} & $M_g$ và cập nhật $M$ & TODO \\
-4  & \texttt{smx\_sumacc}  & Cây cộng và tích luỹ có dịch & TODO \\
-5  & \texttt{smx\_divider} & $\lfloor 2^{40} / \mathit{sum} \rfloor$ tuần tự & TODO \\
-6  & \texttt{smx\_norm}    & $E \cdot \mathit{Rcp}$, làm tròn, bão hoà & TODO \\
-7  & \texttt{smx\_buf}     & Hai bank 32 bit, byte-enable & TODO \\
-8  & \texttt{smx\_csr}     & Thanh ghi, START/DONE/ERR & TODO \\
-9  & \texttt{smx\_ctrl}    & FSM hàng và lượt & TODO \\
-10 & \texttt{smx\_core}    & Nối các khối & TODO \\
+1  & \texttt{smx\_exp2}    & $d \to E$, PWL và dịch & Đã tích hợp \\
+2  & \texttt{smx\_scale}   & $u = q \cdot K$, $c = \lceil u \rceil$ & Đã tích hợp \\
+3  & \texttt{smx\_maxtree} & $M_g$ và cập nhật $M$ & Đã tích hợp \\
+4  & \texttt{smx\_sumacc}  & Cây cộng và tích luỹ có dịch & Đã tích hợp \\
+5  & \texttt{smx\_divider} & $\lfloor 2^{40} / \mathit{sum} \rfloor$ tuần tự & Đã tích hợp \\
+6  & \texttt{smx\_norm}    & $E \cdot \mathit{Rcp}$, làm tròn, bão hoà & Đã tích hợp \\
+7  & \texttt{smx\_buf}     & Bộ đệm nhiều bank, có byte-enable & Đã tích hợp \\
+8  & \texttt{smx\_csr}     & Thanh ghi, START/DONE/ERR & Đã tích hợp \\
+9  & \texttt{smx\_ctrl}    & FSM hàng và lượt & Đã tích hợp \\
+10 & \texttt{smx\_core}    & Nối các khối & Mô phỏng đạt \\
 \bottomrule
 \end{tabular}
 \caption{Danh sách khối và trạng thái thiết kế.}
@@ -26,12 +26,12 @@ Lõi được chia thành mười khối, thiết kế theo thứ tự phụ thu
 
 \subsection{Khối số học}
 
-Khối \texttt{smx\_exp2} là khối phức tạp nhất về số học, vì phải khớp bit-exact với bảng PWL và phép dịch. Khối \texttt{smx\_sumacc} nằm trên đường găng về timing vì có vòng phản hồi qua $M$ và $\mathit{sum}$. Khối \texttt{smx\_divider} là bộ chia tuần tự radix-2, ước lượng khoảng 28 chu kỳ mỗi hàng.
+Khối \texttt{smx\_exp2} là khối phức tạp nhất về số học, vì phải khớp bit-exact với bảng PWL và phép dịch. Khối \texttt{smx\_sumacc} chứa vòng phản hồi qua $\mathit{sum}$, là điểm được dự đoán sẽ găng về timing khi thiết kế kiến trúc; kết quả đo ở Chương 7 cho thấy với $P = 8$ và $P = 16$ đường găng nhất lại nằm ở tầng đầu của cây max trong \texttt{smx\_maxtree}. Khối \texttt{smx\_divider} là bộ chia tuần tự radix-2, mất 28 chu kỳ cho mỗi hàng.
 
 \subsection{Khối lưu trữ và điều khiển}
 
-Hai bộ đệm X và Y dùng chung một module \texttt{smx\_buf}, mỗi bộ gồm hai bank 32 bit $\times$ 1024. Khối \texttt{smx\_ctrl} điều khiển thứ tự hàng, lượt, địa chỉ và mặt nạ lane.
+Hai bộ đệm X và Y dùng chung một module \texttt{smx\_buf}. Số bank bằng $P/4$, mỗi bank rộng 32 bit; với $P = 8$, mỗi bộ đệm gồm hai bank 32 bit $\times$ 1024 word. Khối \texttt{smx\_ctrl} điều khiển thứ tự hàng, lượt, địa chỉ và mặt nạ lane cho nhóm cuối của mỗi hàng.
 
 \subsection{Kết quả thiết kế}
 
-Chưa có kết quả RTL và mô phỏng tại thời điểm viết báo cáo. Các số liệu tài nguyên và độ trễ sẽ được điền sau khi có báo cáo từ Quartus và mô phỏng thật.
+Mỗi khối có testbench tự kiểm, so kết quả bit-exact với vector sinh từ golden model, và đều đạt ở các giá trị $P$ và $N_{\text{SEG}}$ mà khối phụ thuộc. Lõi \texttt{smx\_core} sau tích hợp được kiểm qua cổng \texttt{acc\_*}; kết quả kiểm thử được trình bày ở Chương 6, tài nguyên và tần số sau Fitter ở Chương 7.

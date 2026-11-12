@@ -2,18 +2,18 @@
 
 \subsection{Sơ đồ tổng thể}
 
-Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi lộ ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*} với độ trễ đọc cố định 2 chu kỳ và không có stall.
+Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi đưa ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*}, có độ trễ đọc cố định 2 chu kỳ và không có tín hiệu chờ.
 
 Luồng dữ liệu của một hàng:
 \begin{enumerate}
-  \item Lượt 1 đọc $X$ theo nhóm 8 phần tử, qua nhân $K$, IntMax, $E(d)$ và cây cộng, để ra $\mathit{sum}$ và $M$.
+  \item Lượt 1 đọc $X$ theo nhóm $P$ phần tử, đưa qua phép nhân với $K$, IntMax, $E(d)$ và cây cộng để có $\mathit{sum}$ và $M$.
   \item Bộ chia tính $\mathit{Rcp}$ từ $\mathit{sum}$.
   \item Lượt 2 đọc lại $X$, tính lại $E$, nhân với $\mathit{Rcp}$, làm tròn, bão hoà và ghi vào $Y$.
 \end{enumerate}
 
 \subsection{Giao diện}
 
-IP là Avalon-MM slave dữ liệu 32 bit, địa chỉ theo word, không burst và không \texttt{waitrequest}. Độ trễ đọc là 2 chu kỳ. Phần mềm poll bit \texttt{DONE}, không dùng ngắt. Có conduit trạng thái gồm \texttt{status\_busy}, \texttt{status\_done} và \texttt{status\_err} để nối LED khi demo.
+IP là một Avalon-MM slave với dữ liệu 32 bit và địa chỉ theo word. Giao diện không dùng burst, không dùng \texttt{waitrequest}, và có độ trễ đọc 2 chu kỳ. Phần mềm thăm dò bit \texttt{DONE} để biết khi nào xong; IP không phát ngắt. Ba tín hiệu trạng thái \texttt{status\_busy}, \texttt{status\_done} và \texttt{status\_err} được đưa ra ngoài qua một conduit để nối LED khi demo.
 
 Hai kiểu hệ thống được hỗ trợ:
 \begin{itemize}
@@ -25,9 +25,10 @@ Hai kiểu hệ thống được hỗ trợ:
 
 Bảng \ref{tab:regmap} tóm tắt bản đồ thanh ghi, offset tính theo byte.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
-\begin{tabular}{llll}
+\small
+\begin{tabular}{lllp{7.2cm}}
 \toprule
 Offset & Tên & Truy cập & Nội dung \\
 \midrule
@@ -48,7 +49,7 @@ Offset & Tên & Truy cập & Nội dung \\
 
 \subsection{Trình tự phần mềm}
 
-Phần mềm thực hiện các bước sau: tính $K$ và ghi vào \texttt{SCALE\_K}; ghi $R$ hàng vào X\_BUF; ghi \texttt{LEN} và \texttt{ROWS}; ghi START; poll STATUS đến khi DONE; đọc Y\_BUF và có thể đọc CYCLE\_CNT để đo.
+Phần mềm thực hiện lần lượt các bước sau: tính $K$ và ghi vào \texttt{SCALE\_K}; ghi $R$ hàng vào X\_BUF; ghi \texttt{LEN} và \texttt{ROWS}; ghi START; đọc STATUS cho đến khi DONE bằng 1; đọc Y\_BUF, và đọc CYCLE\_CNT nếu cần đo thời gian.
 
 % Hình minh hoạ: đặt file PDF/SVG trong docs/figures/ rồi bỏ comment.
 % \begin{figure}[h]

@@ -2,30 +2,55 @@
 
 \subsection{Mục tiêu đánh giá}
 
-Đánh giá gồm bốn nhóm số liệu: tài nguyên (ALUT, DSP, M10K), tần số tối đa (Fmax), độ trễ mỗi hàng và số chu kỳ đo được qua \texttt{CYCLE\_CNT}. Ngoài ra có thể quét tham số $P$ và $N_{\text{SEG}}$.
+Đánh giá gồm ba nhóm số liệu: tài nguyên (ALUT, DSP, M10K), tần số tối đa (Fmax) và độ trễ mỗi hàng đo qua \texttt{CYCLE\_CNT}. Các số liệu được đo ở cấu hình mặc định $P = 8$, $N_{\text{SEG}} = 8$ và khi quét tham số $P$.
 
 \subsection{Tài nguyên và tần số}
 
-\begin{table}[h]
+Lõi \texttt{smx\_core} được tổng hợp riêng, không kèm hệ thống, bằng Quartus Prime Lite 18.1 cho linh kiện 5CSXFC6D6F31C6 với ràng buộc clock 100 MHz. Bảng \ref{tab:synth} so kết quả sau Fitter với mục tiêu. Fmax là giá trị nhỏ hơn giữa hai góc slow 85\,°C và 0\,°C, đo qua ba seed của Fitter.
+
+\begin{table}[htbp]
 \centering
 \begin{tabular}{lll}
 \toprule
 Chỉ số & Mục tiêu & Kết quả \\
 \midrule
-ALUT + DSP   & $> 1000$ & [Chưa đo] \\
-Số DSP       & 12--24   & [Chưa đo] \\
-Fmax         & $\ge 100$ MHz & [Chưa đo] \\
-Độ trễ mỗi hàng ($L = 512$, $P = 8$) & $\le 192$ chu kỳ & 182 chu kỳ (mô phỏng) \\
+ALUT + DSP   & $> 1000$ & 1\,681 ALUT + 24 DSP \\
+Số DSP       & 12--24   & 24 \\
+Fmax         & $\ge 100$ MHz & 122,09 đến 134,41 MHz (3 seed) \\
+Độ trễ mỗi hàng ($L = 512$) & $\le 192$ chu kỳ & 182 chu kỳ (mô phỏng) \\
 \bottomrule
 \end{tabular}
-\caption{Mục tiêu và kết quả tổng hợp (điền sau khi có báo cáo Quartus).}
+\caption{Mục tiêu và kết quả của lõi ở $P = 8$, $N_{\text{SEG}} = 8$.}
 \label{tab:synth}
 \end{table}
 
 \subsection{Quét tham số}
 
-Mục tiêu quét gồm $P \in \{4, 8, 16\}$ và $N_{\text{SEG}} \in \{4, 8, 16\}$, cùng độ dài $L$ thay đổi. Kết quả sẽ được trình bày bằng bảng và đồ thị lưu trong \texttt{docs/figures/}.
+Bảng \ref{tab:sweep} ghi kết quả khi đổi số lane $P$ với $N_{\text{SEG}} = 8$. Tài nguyên lấy ở seed 1. Độ trễ mỗi hàng theo công thức $2\lceil L/P \rceil + 54$ chu kỳ, đã được đối chiếu với \texttt{CYCLE\_CNT} trong mô phỏng (Chương 6).
 
-\subsection{Đánh giá ban đầu}
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{crrrrrlr}
+\toprule
+$P$ & ALM & ALUT & Thanh ghi & M10K & DSP & Fmax, seed 1 / 2 / 3 (MHz) & Chu kỳ/hàng \\
+\midrule
+4  &    645 &    991 &    860 & 18 & 12 & 148,81 / [Chưa đo] / [Chưa đo] & 310 \\
+8  & 1\,035 & 1\,681 & 1\,211 & 21 & 24 & 122,09 / 129,87 / 134,41 & 182 \\
+16 & 1\,821 & 2\,994 & 2\,011 & 33 & 48 & 108,57 / 112,94 / 107,83 & 118 \\
+\bottomrule
+\end{tabular}
+\caption{Tài nguyên, Fmax sau Fitter và độ trễ mỗi hàng với $L = 512$ khi quét $P$.}
+\label{tab:sweep}
+\end{table}
 
-Các số liệu về sai số đã có từ golden model, được nêu ở Chương 3. Các số liệu về tài nguyên, tần số và độ trễ chỉ là ước lượng thiết kế và sẽ được thay bằng số đo thật.
+Việc quét $N_{\text{SEG}} \in \{4, 16\}$ qua Fitter chưa được thực hiện; ở hai giá trị này lõi mới được kiểm bằng mô phỏng.
+
+\subsection{Nhận xét}
+
+Mục tiêu tần số 100 MHz đạt ở mọi lần chạy, sát nhất là 107,83 MHz ở $P = 16$. Mục tiêu tài nguyên của môn học, tổng ALUT và DSP trên 1000, đạt ở cả ba giá trị $P$; sát nhất là $P = 4$ với 991 ALUT và 12 DSP. Tăng $P$ gấp đôi làm số ALUT tăng khoảng 1,7 đến 1,8 lần và giảm gần một nửa số chu kỳ của hai lượt quét, nhưng phần cố định 54 chu kỳ mỗi hàng không đổi, nên lợi ích về độ trễ giảm dần với hàng ngắn.
+
+Kết quả có hai giới hạn. Thứ nhất, Fmax chỉ phản ánh các đường từ thanh ghi tới thanh ghi, vì tệp ràng buộc chỉ khai báo clock; các cổng \texttt{acc\_*} và \texttt{rst\_n} chưa được ràng buộc. Thứ hai, Fmax giữa các seed chênh nhau tới khoảng 10\% ở $P = 8$, nên mọi so sánh giữa hai phương án phải dựa trên nhiều seed; riêng $P = 4$ mới có một seed.
+
+Số liệu về sai số của thuật toán đo bằng golden model và đã nêu ở Chương 3. Số liệu trên board và của toàn hệ thống có wrapper Avalon chưa có tại thời điểm viết báo cáo.

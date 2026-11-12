@@ -2,36 +2,37 @@
 
 \subsection{Bối cảnh}
 
-Cơ chế attention là thành phần cốt lõi của Transformer. Trong mỗi lớp attention, điểm số giữa các vị trí được chuẩn hoá theo hàng bằng hàm softmax trước khi nhân với giá trị. Với độ dài chuỗi $L$, mỗi hàng cần $L$ phép tính $e^{x}$, $L-1$ phép cộng và một phép chia, và điều này lặp lại theo số hàng và số đầu attention. Khi mô hình được lượng tử hoá sang INT8, phần tính softmax trở thành nút nghẽn nếu vẫn dùng số thực dấu phẩy động.
+Cơ chế attention là thành phần cốt lõi của Transformer. Trong mỗi lớp attention, điểm số giữa các vị trí được chuẩn hoá theo hàng bằng hàm softmax trước khi nhân với giá trị. Với độ dài chuỗi $L$, mỗi hàng cần $L$ phép tính $e^{x}$, $L-1$ phép cộng và một phép chia, và điều này lặp lại theo số hàng và số đầu attention. Khi mô hình được lượng tử hoá sang INT8, phần tính softmax trở thành điểm nghẽn nếu vẫn dùng số thực dấu phẩy động.
 
 \subsection{Mục tiêu}
 
-Đề tài xây dựng một bộ tăng tốc softmax theo hàng, toàn bộ số học là số nguyên, nhận đầu vào INT8 có dấu và trả về đầu ra UINT8 với scale $1/256$. Bộ tăng tốc được hiện thực dưới dạng IP Avalon-MM slave trên kit DE10-Standard (Cyclone V 5CSXFC6D6F31C6), dùng Quartus Prime Lite 18.1.
+Đề tài xây dựng một bộ tăng tốc softmax theo hàng, trong đó toàn bộ phép tính dùng số nguyên, nhận đầu vào INT8 có dấu và trả về đầu ra UINT8 với scale $1/256$. Bộ tăng tốc được hiện thực dưới dạng IP Avalon-MM slave trên kit DE10-Standard (Cyclone V 5CSXFC6D6F31C6), dùng Quartus Prime Lite 18.1.
 
 Các mục tiêu cụ thể:
 \begin{itemize}
   \item Số học bit-exact so với một golden model viết bằng Python.
-  \item Tần số tối thiểu 100 MHz sau tổng hợp.
-  \item Số ALUT cộng DSP vượt 1000 theo yêu cầu môn học.
+  \item Tần số hoạt động từ 100 MHz trở lên sau Fitter.
+  \item Tổng số ALUT và DSP vượt 1000 theo yêu cầu môn học.
   \item Chạy được trên board qua JTAG và System Console, không cần Linux.
 \end{itemize}
 
 \subsection{Phạm vi}
 
-Báo cáo tập trung vào thiết kế lõi \texttt{smx\_core}, gồm thanh ghi điều khiển, bộ đệm X/Y, bộ điều khiển và datapath. Các phần wrapper Avalon, hệ thống Platform Designer và script demo thuộc nhóm hiện thực khác, được mô tả ở mức giao diện. Phần kiểm thử do nhóm verification đảm nhiệm, báo cáo này chỉ đề xuất kịch bản tối thiểu.
+Báo cáo tập trung vào thiết kế lõi \texttt{smx\_core}, gồm thanh ghi điều khiển, bộ đệm X/Y, bộ điều khiển và datapath. Wrapper Avalon, hệ thống Platform Designer và script demo do nhóm hiện thực đảm nhiệm và chỉ được mô tả ở mức giao diện. Phần kiểm thử lõi do nhóm kiểm thử thực hiện qua cổng \texttt{acc\_*}; kế hoạch và kết quả được trình bày ở Chương 6.
 
-Ngoài phạm vi: phép nhân ma trận, convolution, LayerNorm, GELU và masking. Hàm sigmoid và GELU chỉ được xem là mở rộng tuỳ chọn khi lõi đã hoàn thành.
+Đề tài không bao gồm phép nhân ma trận, convolution, LayerNorm, GELU và masking. Hàm sigmoid và GELU chỉ được xem là mở rộng tuỳ chọn sau khi lõi hoàn thành.
 
 \subsection{Đóng góp}
 
 Các đóng góp chính của đề tài gồm:
 \begin{enumerate}
-  \item Thuật toán softmax nguyên thuần, không dùng hàm log trong datapath, nhờ đưa hệ số $\log_2 e$ vào $K$ do phần mềm tính sẵn.
-  \item Kết hợp IntMax với online normalization để chỉ cần hai lượt quét, hiệu chỉnh tổng bằng phép dịch.
+  \item Thuật toán softmax thuần số nguyên, không dùng hàm log trong datapath, nhờ đưa hệ số $\log_2 e$ vào $K$ do phần mềm tính sẵn.
+  \item Kết hợp IntMax với chuẩn hoá trực tuyến để chỉ cần hai lượt quét và hiệu chỉnh tổng bằng phép dịch.
   \item Tính lại $E$ ở lượt thứ hai từ bộ đệm đầu vào, thay vì lưu kết quả trung gian.
-  \item Golden model bit-exact và bộ quy tắc đặc tả cho giao diện, làm cơ sở để nhóm khác tích hợp và kiểm thử.
+  \item Golden model bit-exact và đặc tả giao diện, làm cơ sở để các nhóm khác tích hợp và kiểm thử.
+  \item Lõi RTL đã kiểm thử bit-exact với golden model và đạt mục tiêu tần số, tài nguyên sau Fitter.
 \end{enumerate}
 
 \subsection{Cấu trúc báo cáo}
 
-Chương 2 khảo sát các hướng softmax phần cứng hiện có. Chương 3 đặc tả thuật toán và số học. Chương 4 mô tả kiến trúc hệ thống và giao diện. Chương 5 trình bày thiết kế từng khối. Chương 6 nêu kế hoạch kiểm thử. Chương 7 dành cho tổng hợp và đánh giá. Chương 8 kết luận.
+Chương 2 khảo sát các hướng softmax phần cứng hiện có. Chương 3 đặc tả thuật toán và số học. Chương 4 mô tả kiến trúc hệ thống và giao diện. Chương 5 trình bày thiết kế từng khối. Chương 6 trình bày kế hoạch và kết quả kiểm thử. Chương 7 trình bày kết quả tổng hợp và đánh giá. Chương 8 kết luận và nêu hướng phát triển.

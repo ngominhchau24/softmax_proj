@@ -1,34 +1,43 @@
-\section{Kế hoạch kiểm thử}
+\section{Kiểm thử}
 
-\subsection{Golden model làm scoreboard}
+Chương này trình bày kế hoạch kiểm thử lõi, môi trường và bộ testcase của nhóm kiểm thử, rồi đến kết quả mô phỏng.
 
-Golden model \texttt{softmax\_row} là chuẩn so sánh. Mọi kết quả RTL phải khớp bit-exact trên từng hàng. Vector kiểm thử được sinh từ golden model và lưu trong thư mục \texttt{tb/vectors/}.
+\subsection{Golden model làm chuẩn so sánh}
+
+Hàm \texttt{softmax\_row} của golden model là chuẩn so sánh: mọi kết quả của RTL phải khớp bit-exact trên từng phần tử của từng hàng. Vector kiểm thử, gồm đầu vào và đầu ra mong đợi, được sinh từ golden model vào thư mục \texttt{tb/vectors/}; testbench không tự tính lại softmax.
 
 \subsection{Kịch bản tối thiểu}
 
-Các kịch bản bắt buộc gồm:
+Tài liệu yêu cầu quy định các kịch bản bắt buộc sau:
 \begin{itemize}
   \item Độ dài $L = 1$, $L = P$, $L = P \pm 1$ và $L = L_{\max}$.
   \item Số hàng $R = 1$ và $R = R_{\max}$.
   \item Hệ số $K = 0$, $K = 1$ và $K = 65535$.
-  \item Hàng toàn $-128$, toàn $127$, đồng nhất, và one-hot ở cực trị.
-  \item Hàng có max nằm ở nhóm cuối, để kiểm tra phép dịch hiệu chỉnh.
-  \item Vector ngẫu nhiên.
+  \item Hàng toàn $-128$, hàng toàn $127$, hàng đồng nhất và hàng one-hot ở hai giá trị cực trị.
+  \item Hàng có giá trị lớn nhất nằm ở nhóm cuối, để kiểm tra phép dịch hiệu chỉnh tổng.
+  \item Hàng ngẫu nhiên.
 \end{itemize}
 
-\subsection{Khẳng định}
+\subsection{Khẳng định về giao thức}
 
-Các khẳng định đề xuất cho nhóm verification gồm: lệnh START khi BUSY bị bỏ qua; DONE chỉ lên sau khi BUSY xuống; LEN hoặc ROWS ngoài khoảng làm ERR lên; không có X hoặc Z trên đường đọc khi \texttt{readdatavalid}.
+Tài liệu yêu cầu đề xuất bốn khẳng định: lệnh START khi BUSY bị bỏ qua; DONE chỉ lên sau khi BUSY xuống; LEN hoặc ROWS ngoài khoảng cho phép làm ERR lên; không có X hoặc Z trên đường đọc khi \texttt{readdatavalid}.
 
 \subsection{Môi trường kiểm thử}
 
-Đối tượng kiểm thử là lõi \texttt{smx\_core}, chỉ được lái qua cổng \texttt{acc\_*} theo đúng trình tự mà phần mềm sẽ dùng: ghi X\_BUF, LEN, ROWS, SCALE\_K, ghi START, chờ DONE rồi đọc Y\_BUF. Môi trường đặt trong \texttt{tb/dv/}, tách khỏi các testbench tự kiểm của người thiết kế, và gồm bốn thành phần: mô hình bus cho cổng \texttt{acc\_*}, scoreboard đọc vector sinh từ golden model, bộ kiểm giao thức gắn vào lõi bằng \texttt{bind}, và phần môi trường chung chứa clock, reset và các trình tự dùng lại. Địa chỉ thanh ghi, các giới hạn và công thức độ trễ trong môi trường được chép từ tài liệu yêu cầu và đặc tả, không lấy từ mã RTL, để RTL lệch khỏi tài liệu thì test phải báo lỗi.
+Đối tượng kiểm thử là lõi \texttt{smx\_core}. Lõi chỉ được điều khiển qua cổng \texttt{acc\_*}, theo đúng trình tự mà phần mềm sẽ dùng: ghi X\_BUF, LEN, ROWS và SCALE\_K, ghi START, chờ DONE rồi đọc Y\_BUF. Môi trường kiểm thử đặt trong thư mục \texttt{tb/dv/}, tách khỏi các testbench tự kiểm của người thiết kế, và gồm bốn thành phần:
+\begin{itemize}
+  \item mô hình bus cho cổng \texttt{acc\_*};
+  \item scoreboard, đọc vector sinh từ golden model và so sánh kết quả;
+  \item bộ kiểm giao thức, gắn vào lõi bằng \texttt{bind};
+  \item phần môi trường chung, chứa clock, reset và các trình tự dùng lại.
+\end{itemize}
+Địa chỉ thanh ghi, các giới hạn và công thức độ trễ dùng trong môi trường được chép từ tài liệu yêu cầu và đặc tả, không lấy từ mã RTL. Nhờ vậy, nếu RTL lệch khỏi tài liệu thì test sẽ báo lỗi.
 
-Mô phỏng chạy trên ModelSim Intel FPGA Edition 10.5b. Bản này không hỗ trợ UVM, khẳng định đồng thời (SVA) và \texttt{covergroup}, nên bộ kiểm giao thức được viết bằng khối \texttt{always} thủ tục xét từng chu kỳ, còn độ phủ chức năng được đếm bằng biến và test tự báo lỗi khi còn tổ hợp chưa được chạy.
+Mô phỏng chạy trên ModelSim Intel FPGA Edition 10.5b. Phiên bản này không hỗ trợ UVM, khẳng định đồng thời (SVA) và \texttt{covergroup}. Vì vậy, bộ kiểm giao thức được viết bằng khối \texttt{always} xét từng chu kỳ; độ phủ chức năng được đếm bằng biến, và test tự báo lỗi nếu còn tổ hợp chưa được chạy.
 
 \subsection{Bộ testcase}
 
-Bộ kiểm thử gồm sáu testcase, liệt kê trong Bảng \ref{tab:dv-tests}. Ngoài phần so sánh riêng của từng test, mọi lần chạy đều được kiểm các điểm chung: trạng thái BUSY, DONE, ERR ngay sau START và khi kết thúc, giới hạn độ trễ, giá trị \texttt{CYCLE\_CNT} so với số chu kỳ BUSY quan sát trên chân trạng thái, và mọi phần tử $Y[r][i]$ với $i < L$ so bit-exact với golden model.
+Bộ kiểm thử gồm sáu testcase, liệt kê trong Bảng \ref{tab:dv-tests}. Ngoài phần kiểm riêng của từng test, mọi lần chạy đều được kiểm bốn điểm chung: trạng thái BUSY, DONE và ERR ngay sau START và khi kết thúc; giới hạn độ trễ; giá trị \texttt{CYCLE\_CNT} so với số chu kỳ BUSY quan sát trên chân trạng thái; và mọi phần tử $Y[r][i]$ với $i < L$ so bit-exact với golden model.
 
 \begin{table}[htbp]
 \centering
@@ -49,7 +58,17 @@ Bộ kiểm thử gồm sáu testcase, liệt kê trong Bảng \ref{tab:dv-tests
 \label{tab:dv-tests}
 \end{table}
 
-Bộ kiểm giao thức xét tám luật ở mọi chu kỳ của mọi test: không có X hoặc Z trên chân trạng thái; BUSY và DONE không cùng bằng 1; START hợp lệ làm BUSY lên ở chu kỳ kế tiếp; START với LEN hoặc ROWS ngoài khoảng làm DONE và ERR lên mà không chạy; START khi BUSY bị bỏ qua; lõi đang rảnh không tự chạy và DONE, ERR giữ nguyên giá trị; BUSY xuống và DONE lên trong cùng một chu kỳ; lệnh đọc thanh ghi không trả về X sau đúng hai chu kỳ.
+Bộ kiểm giao thức xét tám luật ở mọi chu kỳ của mọi test:
+\begin{enumerate}
+  \item không có X hoặc Z trên các chân trạng thái;
+  \item BUSY và DONE không cùng bằng 1, và ERR không bằng 1 khi BUSY;
+  \item START hợp lệ làm BUSY lên ở chu kỳ kế tiếp, đồng thời xoá DONE và ERR;
+  \item START khi LEN hoặc ROWS ngoài khoảng cho phép làm DONE và ERR lên, lõi không chạy;
+  \item START khi BUSY bị bỏ qua;
+  \item lõi đang rảnh không tự chạy, và DONE, ERR giữ nguyên giá trị;
+  \item khi kết thúc, BUSY xuống và DONE lên trong cùng một chu kỳ;
+  \item dữ liệu đọc từ thanh ghi, trả về sau đúng hai chu kỳ, không chứa X.
+\end{enumerate}
 
 \subsection{Kết quả mô phỏng}
 
@@ -76,7 +95,7 @@ Tổng             & 312\,910 & & Đạt \\
 \label{tab:dv-results}
 \end{table}
 
-Bộ test được chạy lại ở các giá trị tham số khác, kết quả ở Bảng \ref{tab:dv-sweep}. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng môi trường với 783 lần chạy và 354\,324 phần tử $Y$ được so.
+Bộ test được chạy lại ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
 
 \begin{table}[htbp]
 \centering
@@ -96,11 +115,11 @@ $P$ & $N_{\text{SEG}}$ & \texttt{sanity} & \texttt{ver02} & \texttt{proto} & \te
 \label{tab:dv-sweep}
 \end{table}
 
-Về độ trễ, \texttt{CYCLE\_CNT} khớp công thức $R \cdot (2\lceil L/P \rceil + 54) + 1$ ở mọi cặp $(L, R)$ đã chạy và không phụ thuộc dữ liệu hay hệ số $K$. Với $L = 512$, một hàng mất 310, 182 và 118 chu kỳ ở $P = 4$, 8 và 16, nằm trong giới hạn $2\lceil L/P \rceil + 64$ của yêu cầu, tức 320, 192 và 128 chu kỳ.
+Về độ trễ, \texttt{CYCLE\_CNT} khớp công thức $R \cdot (2\lceil L/P \rceil + 54) + 1$ ở mọi cặp $(L, R)$ đã chạy, và không phụ thuộc vào dữ liệu hay hệ số $K$. Với $L = 512$, một hàng mất 310, 182 và 118 chu kỳ lần lượt ở $P = 4$, 8 và 16. Các giá trị này nằm trong giới hạn $2\lceil L/P \rceil + 64$ của yêu cầu, tương ứng là 320, 192 và 128 chu kỳ.
 
 \subsection{Kiểm chứng khả năng bắt lỗi}
 
-Để chứng minh bộ test thật sự phát hiện được lỗi, mười hai lỗi được cố ý cài lần lượt vào bản sao của mã RTL, mỗi lần một lỗi, rồi chạy testcase phụ trách phần tương ứng. Cả mười hai lỗi đều bị phát hiện (Bảng \ref{tab:dv-mutation}). Phần này chạy bằng Verilator 5.020 ở $P = 8$, $N_{\text{SEG}} = 8$; mã RTL trong kho không bị thay đổi.
+Một bộ test chỉ có giá trị khi nó phát hiện được lỗi. Để kiểm chứng điều này, mười hai lỗi được cố ý cài vào bản sao của mã RTL, mỗi lần một lỗi, rồi testcase phụ trách phần tương ứng được chạy lại. Cả mười hai lỗi đều bị phát hiện (Bảng \ref{tab:dv-mutation}). Phần này chạy bằng Verilator 5.020 ở $P = 8$, $N_{\text{SEG}} = 8$; mã RTL trong kho mã không bị thay đổi.
 
 \begin{table}[htbp]
 \centering
@@ -129,7 +148,7 @@ Về độ trễ, \texttt{CYCLE\_CNT} khớp công thức $R \cdot (2\lceil L/P 
 
 \subsection{Truy vết yêu cầu}
 
-Bảng \ref{tab:dv-trace} nối từng yêu cầu kiểm thử được ở mức lõi với testcase tương ứng. Các yêu cầu về bus Avalon chưa kiểm được vì cần wrapper \texttt{smx\_avalon}.
+Bảng \ref{tab:dv-trace} liên kết từng yêu cầu kiểm được ở mức lõi với testcase tương ứng. Các yêu cầu về bus Avalon chưa được kiểm, vì cần có wrapper \texttt{smx\_avalon}.
 
 \begin{table}[htbp]
 \centering
@@ -160,4 +179,4 @@ IF-01, 02, 11 & Bus Avalon-MM, khai báo component & chờ \texttt{smx\_avalon} 
 
 \subsection{Giới hạn của kết quả}
 
-Kết quả trên có ba giới hạn. Thứ nhất, kiểm thử dừng ở ranh giới lõi; phần ``không có X hoặc Z khi \texttt{readdatavalid}'' của khẳng định giao thức mới được kiểm ở dạng tương đương trên \texttt{acc\_readdata}, chưa qua bus Avalon. Thứ hai, độ phủ được đo là độ phủ chức năng theo danh sách kịch bản; độ phủ mã (code coverage) chưa đo vì bản ModelSim đang dùng không hỗ trợ. Thứ ba, phần cài lỗi thử chạy trên Verilator, là trình mô phỏng hai trạng thái, nên không phản ánh các lỗi chỉ lộ ra qua giá trị X.
+Kết quả trên có ba giới hạn. Thứ nhất, kiểm thử dừng ở ranh giới của lõi: khẳng định ``không có X hoặc Z khi \texttt{readdatavalid}'' mới được kiểm ở dạng tương đương trên \texttt{acc\_readdata}, chưa qua bus Avalon. Thứ hai, độ phủ đã đo là độ phủ chức năng theo danh sách kịch bản; độ phủ mã chưa được đo, vì phiên bản ModelSim đang dùng không hỗ trợ. Thứ ba, phần cài lỗi chạy trên Verilator, một trình mô phỏng hai trạng thái, nên không phản ánh các lỗi chỉ lộ ra qua giá trị X.

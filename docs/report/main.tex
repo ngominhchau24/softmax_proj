@@ -37,10 +37,25 @@
 \usepackage{titlesec}
 \usepackage{hyperref}
 
+% ---------- Ngôn ngữ của các nhãn tự sinh ----------
+% Báo cáo tiếng Việt: giữ \reportvitrue (Bảng, Hình, Mục lục, Tài liệu tham khảo, Chương).
+% Bản tiếng Anh: đổi thành \reportvifalse (Table, Figure, Contents, References, Chapter).
+\newif\ifreportvi
+\reportvitrue
+\ifreportvi
+  \renewcommand{\tablename}{Bảng}
+  \renewcommand{\figurename}{Hình}
+  \renewcommand{\contentsname}{Mục lục}
+  \renewcommand{\refname}{Tài liệu tham khảo}
+  \newcommand{\smxchaptername}{Chương}
+\else
+  \newcommand{\smxchaptername}{Chapter}
+\fi
+
 % Tiêu đề chương (\section) và mục (\subsection)
 \titleformat{\section}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont\centering}
-  {Chương \thesection.}{0.5em}{\MakeUppercase}
+  {\smxchaptername{} \thesection.}{0.5em}{\MakeUppercase}
 \titleformat{\subsection}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont}
   {\thesubsection}{0.5em}{}
