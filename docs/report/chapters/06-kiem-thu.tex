@@ -123,7 +123,7 @@ Về độ trễ, \texttt{CYCLE\_CNT} khớp công thức $R \cdot (2\lceil L/P 
 
 Mỗi testcase in ba dòng vào nhật ký: cấu hình của lần chạy, thống kê của bộ kiểm giao thức, và dòng kết luận bắt đầu bằng \texttt{TB\_RESULT} kèm số phép so và khối lượng đã chạy. Lệnh \texttt{make dv} chạy cả bộ rồi gom các dòng kết luận lại. Các nhật ký dưới đây lấy từ lần chạy trên ModelSim ở cấu hình mặc định và là nguồn của các số trong Bảng \ref{tab:dv-results}; dấu \texttt{\#} ở đầu dòng do ModelSim thêm vào.
 
-\noindent\textit{Tổng kết của \texttt{make dv}, chạy trước khi testcase \texttt{corner} được bổ sung:}
+\noindent\textit{Tổng kết của \texttt{make dv}:}
 \lstinputlisting{logs/dv_suite_p8_n8.txt}
 
 Với từng testcase, phần trích gồm ba dòng nói trên, thời điểm kết thúc mô phỏng và dòng tổng kết của ModelSim. Trong dòng thống kê của bộ kiểm giao thức, bốn số lần lượt là số lệnh START đã thấy, số lệnh START khi BUSY, số lệnh START với LEN hoặc ROWS sai, và số lệnh đọc đã được kiểm không chứa X. Riêng \texttt{proto} có 5 lệnh START khi BUSY và 7 lệnh START với cấu hình sai, đúng bằng số tình huống mà test tạo ra.
