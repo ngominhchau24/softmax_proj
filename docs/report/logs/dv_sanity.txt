@@ -1,0 +1,5 @@
+# tb_smx_dv_sanity: P=8 N_SEG=8 SEED=1 VECDIR=../tb/vectors/smx_dv_sanity/p8_n8
+# tb_smx_dv_sanity: checker saw 9 START, 0 while BUSY, 0 with bad LEN/ROWS, 28 reads checked for X
+# TB_RESULT: PASS tb_smx_dv_sanity P=8 N_SEG=8: 2337 checks, 9 runs, 617 writes, 606 reads
+#    Time: 36230 ns  Iteration: 1  Instance: /tb_smx_dv_sanity
+# Errors: 0, Warnings: 0

@@ -1,0 +1,5 @@
+# tb_smx_dv_random: P=8 N_SEG=8 SEED=1 VECDIR=../tb/vectors/smx_dv_random/p8_n8
+# tb_smx_dv_random: checker saw 140 START, 0 while BUSY, 0 with bad LEN/ROWS, 340 reads checked for X
+# TB_RESULT: PASS tb_smx_dv_random P=8 N_SEG=8: 167267 checks, 120 runs in two passes, 20 resets in mid-run, seed 1
+#    Time: 2113850 ns  Iteration: 1  Instance: /tb_smx_dv_random
+# Errors: 0, Warnings: 0

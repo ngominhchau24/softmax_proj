@@ -1,0 +1,5 @@
+# tb_smx_dv_proto: P=8 N_SEG=8 SEED=1 VECDIR=../tb/vectors/smx_dv_proto/p8_n8
+# tb_smx_dv_proto: checker saw 23 START, 5 while BUSY, 7 with bad LEN/ROWS, 32 reads checked for X
+# TB_RESULT: PASS tb_smx_dv_proto P=8 N_SEG=8: 3287 checks, 7 bad STARTs, 5 STARTs while BUSY, 3 vector runs
+#    Time: 37390 ns  Iteration: 1  Instance: /tb_smx_dv_proto
+# Errors: 0, Warnings: 0
