@@ -188,6 +188,7 @@ Ký hiệu loại nguồn: **[TL]** tài liệu đã công bố (số trong ngo�
 
 - 2026-11-05: Chau duyệt kiểu sơ đồ. Chuyển toàn bộ sơ đồ cấu trúc và FSM trong `docs/spec/` sang `docs/spec/fig/` (14 hình). Thêm rule ghi độ rộng dạng `addr[15:0]` trên dây, tính ở P = 8, N_SEG = 8.
 - 2026-11-06: Chau duyệt A3: sửa câu cận `sum` trong REQ-ARI-05 từ `≤ 512·2¹⁶` thành `≤ 512·2¹⁵ = 2²⁴` (cận cũ 2²⁵ cần 26 bit, mâu thuẫn với "≥ 25 bit" cùng câu). Chỉ sửa câu chữ: golden model, RTL, `SUM_W = 25`, bản đồ thanh ghi và VERSION (0x10) không đổi. Đổi tên file trong `docs/spec/` thành 01–09 theo thứ tự đọc.
+- 2026-11-12: Nhóm verify (tiendangphuoc) thêm môi trường DV cho `smx_core` trong `tb/dv/`: BFM cổng `acc_*`, scoreboard, checker giao thức REQ-VER-03 gắn bằng `bind`, và 6 test `tb_smx_dv_*` (sanity, ver02, proto, latency, reg, random); vector từ `model/vec_dv_*.py`. `make dv` PASS trên ModelSim Intel 10.5b ở P = 4/8/16 và N_SEG = 4/8/16; chưa tìm thấy lỗi RTL. `sim/Makefile` thêm `make dv`, `make dvview`, `SEED`, `VCD` và bước ghi `modelsim.ini` khi chạy ModelSim Windows từ WSL; thêm `sim/setup.sh`. RTL lõi, golden model và bản đồ thanh ghi không đổi. Báo cáo `docs/report/` được cập nhật theo hiện trạng, chương 6 có kết quả kiểm thử. Theo yêu cầu của tiendangphuoc, các thay đổi này được đưa thẳng vào `main`.
 
 ## 11. Tài liệu tham khảo chính
 
