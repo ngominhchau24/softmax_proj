@@ -56,7 +56,7 @@ Test đạt khi log có `TB_RESULT: PASS`; `make dv` kết thúc bằng `DV ALL 
 
 ## Đã kiểm đến đâu
 
-- ModelSim Intel 10.5b: `tb_smx_dv_sanity` PASS ở P = N_SEG = 8 (2026-11-12). Năm test còn lại và checker chưa chạy trên ModelSim.
+- ModelSim Intel 10.5b: cả 6 test PASS ở P = N_SEG = 8, SEED = 1 (`make dv`, 2026-11-12), số phép so trùng với Verilator; `bind` và checker chạy được trên bản này. Các tổ hợp P, N_SEG khác chưa chạy trên ModelSim.
 - Verilator 5.020 (2 trạng thái, không thấy X/Z): cả 6 test PASS ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8.
 - Cài lỗi thử trên bản sao RTL, P = N_SEG = 8, Verilator: 12/12 bị bắt (làm tròn `smx_norm`, đếm `CYCLE_CNT`, ghi LEN khi BUSY, ghi X_BUF khi BUSY, `cfg_ok` luôn đúng, mask lane đuôi, phép dịch `sum`, cờ `first` của `sum`, START khi BUSY, byteenable LEN, alias địa chỉ CSR, thiếu reset LEN).
 

@@ -49,7 +49,7 @@ Câu hỏi khác đang chờ Chau:
 ## Đang chờ nhóm khác
 
 - **Nhóm implement:** `smx_avalon`, `ip/smx_hw.tcl`, hệ thống Platform Designer, script System Console, đo băng thông JTAG. Câu hỏi còn mở: họ dùng JTAG to Avalon Master Bridge không.
-- **Nhóm verify (tiendangphuoc):** bắt đầu từ 2026-11-11, dùng ModelSim Intel FPGA Edition 10.5b gọi từ WSL (`source sim/setup.sh`), không UVM. Môi trường ở `tb/dv/`, 6 test và checker REQ-VER-03 đã viết xong; chi tiết và trạng thái ở `tb/dv/README.md`, chạy cả bộ bằng `make dv`. Trên ModelSim mới có `tb_smx_dv_sanity` PASS; cả bộ đã PASS dưới Verilator (2-state) và bắt 12/12 lỗi cài thử. Còn chờ: chạy `make dv` trên ModelSim, và phần mức bus Avalon khi wrapper được merge. Lỗi họ báo sẽ quay về RTL.
+- **Nhóm verify (tiendangphuoc):** bắt đầu từ 2026-11-11, dùng ModelSim Intel FPGA Edition 10.5b gọi từ WSL (`source sim/setup.sh`), không UVM. Môi trường ở `tb/dv/`, 6 test và checker REQ-VER-03 đã viết xong; chi tiết và trạng thái ở `tb/dv/README.md`, chạy cả bộ bằng `make dv`. `make dv` PASS trên ModelSim ở P = N_SEG = 8 (2026-11-12); cả bộ cũng PASS dưới Verilator (2-state) ở 5 tổ hợp tham số và bắt 12/12 lỗi cài thử. Còn chờ: quét P = 4/16 và N_SEG = 4/16 trên ModelSim, và phần mức bus Avalon khi wrapper được merge. Lỗi họ báo sẽ quay về RTL.
 
 ## Việc tiếp theo
 
