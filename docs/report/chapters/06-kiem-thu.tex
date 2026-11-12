@@ -97,20 +97,20 @@ Tổng             & 458\,837 & & Đạt \\
 \label{tab:dv-results}
 \end{table}
 
-Sáu testcase đầu được chạy lại trên ModelSim ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Testcase \texttt{corner} được bổ sung sau, mới chạy trên ModelSim ở cấu hình mặc định; ở bốn tổ hợp tham số còn lại nó đạt khi mô phỏng bằng Verilator. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
+Bộ test được chạy lại trên ModelSim ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Testcase \texttt{corner} so 146\,339 phần tử ở $P = 4$ và 145\,863 phần tử ở $P = 16$, và đủ 512/512 độ dài hàng ở mọi tổ hợp. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
 
 \begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{cccccccc}
+\begin{tabular}{ccccccccc}
 \toprule
-$P$ & $N_{\text{SEG}}$ & \texttt{sanity} & \texttt{ver02} & \texttt{proto} & \texttt{latency} & \texttt{reg} & \texttt{random} \\
+$P$ & $N_{\text{SEG}}$ & \texttt{sanity} & \texttt{ver02} & \texttt{proto} & \texttt{latency} & \texttt{reg} & \texttt{random} & \texttt{corner} \\
 \midrule
-4  & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
-8  & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
-16 & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
-8  & 4  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
-8  & 16 & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+4  & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+8  & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+16 & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+8  & 4  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+8  & 16 & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
 \bottomrule
 \end{tabular}
 \caption{Kết quả trên ModelSim khi quét tham số $P$ và $N_{\text{SEG}}$.}
