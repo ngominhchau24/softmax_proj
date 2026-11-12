@@ -134,7 +134,7 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
 
-Hình \ref{fig:dv-sanity} và \ref{fig:dv-ver02} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
+Các Hình \ref{fig:dv-sanity}, \ref{fig:dv-ver02} và \ref{fig:dv-proto-err} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
 
 \begin{figure}[htbp]
   \centering
@@ -152,8 +152,8 @@ Hình \ref{fig:dv-sanity} và \ref{fig:dv-ver02} là ảnh chụp cửa sổ Wav
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_proto_err.pdf}
-  \caption{\texttt{proto}: START với cấu hình sai. (1) START được ghi khi $\text{LEN} = 0$. (2) DONE và ERR cùng lên ở chu kỳ kế tiếp, BUSY giữ nguyên ở 0.}
+  \includegraphics[width=\textwidth]{dv_proto_err_modelsim.png}
+  \caption{\texttt{proto} trên ModelSim: START với cấu hình sai. Testbench ghi $\text{LEN} = 0$ (địa chỉ 0002h), $\text{ROWS} = 1$ (0003h), rồi ghi START (0000h). Ở chu kỳ kế tiếp \texttt{status\_done} và \texttt{status\_err} cùng lên, còn \texttt{status\_busy} giữ ở 0 và \texttt{busy\_cnt} không tăng: lõi không chạy. Bộ kiểm giao thức ghi nhận một lệnh START với cấu hình sai (\texttt{n\_start\_bad} = 1). Lệnh đọc sau đó ở địa chỉ 0001h lấy STATUS.}
   \label{fig:dv-proto-err}
 \end{figure}
 
