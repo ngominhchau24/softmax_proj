@@ -134,7 +134,7 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
 
-Các Hình \ref{fig:dv-sanity}, \ref{fig:dv-ver02} và \ref{fig:dv-proto-err} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-proto-busy} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
 
 \begin{figure}[htbp]
   \centering
@@ -159,8 +159,8 @@ Các Hình \ref{fig:dv-sanity}, \ref{fig:dv-ver02} và \ref{fig:dv-proto-err} l�
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_proto_start_busy.pdf}
-  \caption{\texttt{proto}: START khi đang BUSY. (1) START được ghi đúng vào chu kỳ BUSY cuối cùng. (2) BUSY xuống và DONE lên như một lần chạy bình thường; không có lần chạy mới nào bắt đầu.}
+  \includegraphics[width=\textwidth]{dv_proto_start_busy_modelsim.png}
+  \caption{\texttt{proto} trên ModelSim: START khi đang BUSY. Lệnh START (ghi 00000001h vào địa chỉ 0000h) được đưa vào đúng chu kỳ BUSY cuối cùng của một lần chạy dài 189 chu kỳ. Lệnh bị bỏ qua: \texttt{status\_busy} xuống và \texttt{status\_done} lên như bình thường, \texttt{busy\_cnt} dừng ở 189 và không có lần chạy mới. Bộ kiểm giao thức đếm đây là lệnh START khi BUSY thứ năm (\texttt{n\_start\_busy} = 5). Lệnh đọc sau đó ở địa chỉ 0005h trả về $\texttt{CYCLE\_CNT} = \text{BDh} = 189$, bằng lần chạy không bị quấy rầy; hai lệnh đọc tiếp theo lấy Y\_BUF.}
   \label{fig:dv-proto-busy}
 \end{figure}
 
