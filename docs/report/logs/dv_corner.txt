@@ -1,0 +1,5 @@
+# tb_smx_dv_corner: P=8 N_SEG=8 SEED=1 VECDIR=../tb/vectors/smx_dv_corner/p8_n8
+# tb_smx_dv_corner: checker saw 526 START, 0 while BUSY, 0 with bad LEN/ROWS, 1052 reads checked for X
+# TB_RESULT: PASS tb_smx_dv_corner P=8 N_SEG=8: 145927 checks, 526 runs, 512/512 row lengths, 8 sum_min, 1 sum_max, dm_max in the first and last group
+#    Time: 1427390 ns  Iteration: 1  Instance: /tb_smx_dv_corner
+# Errors: 0, Warnings: 0

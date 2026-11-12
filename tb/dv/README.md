@@ -62,7 +62,7 @@ Test đạt khi log có `TB_RESULT: PASS`; `make dv` kết thúc bằng `DV ALL 
 
 - ModelSim Intel 10.5b (`make dv`, 2026-11-12, do tiendangphuoc chạy và báo lại): cả 6 test PASS ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8; `tb_smx_dv_random` PASS thêm ở SEED = 2 và 3. Ở P = N_SEG = 8 số phép so trùng với Verilator. `bind` và checker chạy được trên bản này.
 - Verilator 5.020 (2 trạng thái, không thấy X/Z): cả 6 test PASS ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8.
-- `tb_smx_dv_corner` (thêm 2026-11-12): PASS dưới Verilator ở P = 4/8/16 với N_SEG = 8 và N_SEG = 4/16 với P = 8; chưa chạy trên ModelSim. Ba lỗi cài thử bị nó bắt: bỏ phép dịch `sum`, mask lane đuôi, và mất bit cao nhất của Rcp trong `smx_divider`. Lỗi thứ ba **lọt qua `tb_smx_dv_ver02`** và chỉ bị test này bắt, vì chỉ lộ ra khi `sum` = 2¹⁴.
+- `tb_smx_dv_corner` (thêm 2026-11-12): PASS trên ModelSim ở P = N_SEG = 8 (145 927 phép so, 526 lần chạy, đủ 512/512 độ dài) và dưới Verilator ở P = 4/8/16 với N_SEG = 8, N_SEG = 4/16 với P = 8. Ba lỗi cài thử bị nó bắt: bỏ phép dịch `sum`, mask lane đuôi, và mất bit cao nhất của Rcp trong `smx_divider`. Lỗi thứ ba **lọt qua `tb_smx_dv_ver02`** và chỉ bị test này bắt, vì chỉ lộ ra khi `sum` = 2¹⁴.
 - Cài lỗi thử trên bản sao RTL, P = N_SEG = 8, Verilator: 12/12 bị bắt (làm tròn `smx_norm`, đếm `CYCLE_CNT`, ghi LEN khi BUSY, ghi X_BUF khi BUSY, `cfg_ok` luôn đúng, mask lane đuôi, phép dịch `sum`, cờ `first` của `sum`, START khi BUSY, byteenable LEN, alias địa chỉ CSR, thiếu reset LEN).
 
 ## Lỗi tìm được

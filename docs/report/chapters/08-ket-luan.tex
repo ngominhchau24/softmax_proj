@@ -4,7 +4,7 @@
 
 Đề tài đã xây dựng thuật toán softmax thuần số nguyên cho attention, với đặc tả số học bit-exact, golden model làm chuẩn so sánh và giao diện đóng băng ở phiên bản 1.0. Việc chọn cơ số 2, IntMax, PWL 8 đoạn và tính lại $E$ ở lượt hai giúp datapath không cần hàm log và chỉ có một phép chia mỗi hàng.
 
-Lõi \texttt{smx\_core} đã được hiện thực bằng SystemVerilog và tích hợp đủ mười khối. Trong mô phỏng, lõi khớp bit-exact với golden model trên toàn bộ sáu testcase của nhóm kiểm thử ở $P \in \{4, 8, 16\}$ và $N_{\text{SEG}} \in \{4, 8, 16\}$. Sau Fitter ở $P = 8$, lõi dùng 1\,681 ALUT, 24 DSP và 21 khối M10K, đạt từ 122 MHz trở lên qua ba seed, và xử lý một hàng 512 phần tử trong 182 chu kỳ.
+Lõi \texttt{smx\_core} đã được hiện thực bằng SystemVerilog và tích hợp đủ mười khối. Trong mô phỏng, lõi khớp bit-exact với golden model trên toàn bộ bảy testcase của nhóm kiểm thử, với $P \in \{4, 8, 16\}$ và $N_{\text{SEG}} \in \{4, 8, 16\}$. Sau Fitter ở $P = 8$, lõi dùng 1\,681 ALUT, 24 DSP và 21 khối M10K, đạt từ 122 MHz trở lên qua ba seed, và xử lý một hàng 512 phần tử trong 182 chu kỳ.
 
 \subsection{Hướng phát triển}
 

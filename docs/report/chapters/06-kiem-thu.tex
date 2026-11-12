@@ -37,7 +37,7 @@ Mô phỏng chạy trên ModelSim Intel FPGA Edition 10.5b. Phiên bản này kh
 
 \subsection{Bộ testcase}
 
-Bộ kiểm thử gồm sáu testcase, liệt kê trong Bảng \ref{tab:dv-tests}. Ngoài phần kiểm riêng của từng test, mọi lần chạy đều được kiểm bốn điểm chung: trạng thái BUSY, DONE và ERR ngay sau START và khi kết thúc; giới hạn độ trễ; giá trị \texttt{CYCLE\_CNT} so với số chu kỳ BUSY quan sát trên chân trạng thái; và mọi phần tử $Y[r][i]$ với $i < L$ so bit-exact với golden model.
+Bộ kiểm thử gồm bảy testcase, liệt kê trong Bảng \ref{tab:dv-tests}. Ngoài phần kiểm riêng của từng test, mọi lần chạy đều được kiểm bốn điểm chung: trạng thái BUSY, DONE và ERR ngay sau START và khi kết thúc; giới hạn độ trễ; giá trị \texttt{CYCLE\_CNT} so với số chu kỳ BUSY quan sát trên chân trạng thái; và mọi phần tử $Y[r][i]$ với $i < L$ so bit-exact với golden model.
 
 \begin{table}[htbp]
 \centering
@@ -52,6 +52,7 @@ Bộ kiểm thử gồm sáu testcase, liệt kê trong Bảng \ref{tab:dv-tests
 4 & \texttt{latency} & VER-04, PRF-03 & \texttt{CYCLE\_CNT} so với công thức độ trễ, với ba kiểu dữ liệu cho mỗi cặp $(L, R)$ \\
 5 & \texttt{reg}     & IF-03, IF-07, IF-08 & 16 mẫu \texttt{byteenable} trên thanh ghi và X\_BUF; địa chỉ không định nghĩa; ghi X\_BUF từng phần tử \\
 6 & \texttt{random}  & VER-01, FUN-05 & 60 lần chạy ngẫu nhiên, lặp lại hai lượt; reset bất đồng bộ giữa lần chạy \\
+7 & \texttt{corner}  & VER-01, ARI-05, ARI-06, FUN-02 & Tổng của hàng ở cận dưới $2^{14}$ và cận trên $2^{24}$; giá trị lớn nhất nhảy 254 đơn vị; mọi độ dài hàng từ 1 đến 512 \\
 \bottomrule
 \end{tabular}
 \caption{Bộ testcase của nhóm kiểm thử. Tên đầy đủ có tiền tố \texttt{tb\_smx\_dv\_}.}
@@ -72,7 +73,7 @@ Bộ kiểm giao thức xét tám luật ở mọi chu kỳ của mọi test:
 
 \subsection{Kết quả mô phỏng}
 
-Bảng \ref{tab:dv-results} ghi kết quả trên ModelSim ở cấu hình mặc định $P = 8$, $N_{\text{SEG}} = 8$. Cả sáu test đạt, với tổng cộng 312\,910 phép so và không có sai khác nào.
+Bảng \ref{tab:dv-results} ghi kết quả trên ModelSim ở cấu hình mặc định $P = 8$, $N_{\text{SEG}} = 8$. Cả bảy test đạt, với tổng cộng 458\,837 phép so và không có sai khác nào.
 
 \begin{table}[htbp]
 \centering
@@ -87,15 +88,16 @@ Testcase & Số phép so & Khối lượng & Kết quả \\
 \texttt{latency} &  68\,604 & 168 lần chạy trên 56 cặp $(L, R)$ & Đạt \\
 \texttt{reg}     &   2\,003 & 1\,533 lệnh ghi, 809 lệnh đọc & Đạt \\
 \texttt{random}  & 167\,267 & 120 lần chạy, 20 lần reset giữa chừng & Đạt \\
+\texttt{corner}  & 145\,927 & 526 lần chạy, đủ 512/512 độ dài hàng & Đạt \\
 \midrule
-Tổng             & 312\,910 & & Đạt \\
+Tổng             & 458\,837 & & Đạt \\
 \bottomrule
 \end{tabular}
 \caption{Kết quả bộ testcase trên ModelSim, $P = 8$, $N_{\text{SEG}} = 8$, seed 1.}
 \label{tab:dv-results}
 \end{table}
 
-Bộ test được chạy lại ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
+Sáu testcase đầu được chạy lại trên ModelSim ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Testcase \texttt{corner} được bổ sung sau, mới chạy trên ModelSim ở cấu hình mặc định; ở bốn tổ hợp tham số còn lại nó đạt khi mô phỏng bằng Verilator. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
 
 \begin{table}[htbp]
 \centering
@@ -121,7 +123,7 @@ Về độ trễ, \texttt{CYCLE\_CNT} khớp công thức $R \cdot (2\lceil L/P 
 
 Mỗi testcase in ba dòng vào nhật ký: cấu hình của lần chạy, thống kê của bộ kiểm giao thức, và dòng kết luận bắt đầu bằng \texttt{TB\_RESULT} kèm số phép so và khối lượng đã chạy. Lệnh \texttt{make dv} chạy cả bộ rồi gom các dòng kết luận lại. Các nhật ký dưới đây lấy từ lần chạy trên ModelSim ở cấu hình mặc định và là nguồn của các số trong Bảng \ref{tab:dv-results}; dấu \texttt{\#} ở đầu dòng do ModelSim thêm vào.
 
-\noindent\textit{Tổng kết của \texttt{make dv}:}
+\noindent\textit{Tổng kết của \texttt{make dv}, chạy trước khi testcase \texttt{corner} được bổ sung:}
 \lstinputlisting{logs/dv_suite_p8_n8.txt}
 
 Với từng testcase, phần trích gồm ba dòng nói trên, thời điểm kết thúc mô phỏng và dòng tổng kết của ModelSim. Trong dòng thống kê của bộ kiểm giao thức, bốn số lần lượt là số lệnh START đã thấy, số lệnh START khi BUSY, số lệnh START với LEN hoặc ROWS sai, và số lệnh đọc đã được kiểm không chứa X. Riêng \texttt{proto} có 5 lệnh START khi BUSY và 7 lệnh START với cấu hình sai, đúng bằng số tình huống mà test tạo ra.
@@ -132,6 +134,7 @@ Với từng testcase, phần trích gồm ba dòng nói trên, thời điểm k
 \smxlog{dv_latency.txt}{Nhật ký của \texttt{tb\_smx\_dv\_latency}:}
 \smxlog{dv_reg.txt}{Nhật ký của \texttt{tb\_smx\_dv\_reg}:}
 \smxlog{dv_random.txt}{Nhật ký của \texttt{tb\_smx\_dv\_random}:}
+\smxlog{dv_corner.txt}{Nhật ký của \texttt{tb\_smx\_dv\_corner}:}
 
 \subsection{Dạng sóng minh hoạ}
 
@@ -188,7 +191,7 @@ Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} là ảnh chụp cửa
 
 \subsection{Kiểm chứng khả năng bắt lỗi}
 
-Một bộ test chỉ có giá trị khi nó phát hiện được lỗi. Để kiểm chứng điều này, mười hai lỗi được cố ý cài vào bản sao của mã RTL, mỗi lần một lỗi, rồi testcase phụ trách phần tương ứng được chạy lại. Cả mười hai lỗi đều bị phát hiện (Bảng \ref{tab:dv-mutation}). Phần này chạy bằng Verilator 5.020 ở $P = 8$, $N_{\text{SEG}} = 8$; mã RTL trong kho mã không bị thay đổi.
+Một bộ test chỉ có giá trị khi nó phát hiện được lỗi. Để kiểm chứng điều này, mười ba lỗi được cố ý cài vào bản sao của mã RTL, mỗi lần một lỗi, rồi testcase phụ trách phần tương ứng được chạy lại. Cả mười ba lỗi đều bị phát hiện (Bảng \ref{tab:dv-mutation}). Lỗi thứ 13, làm mất bit cao nhất của $\mathit{Rcp}$, chỉ lộ ra khi tổng của hàng bằng đúng $2^{14}$: nó lọt qua \texttt{ver02} và chỉ bị \texttt{corner} phát hiện, đây là lý do testcase này được bổ sung. Phần này chạy bằng Verilator 5.020 ở $P = 8$, $N_{\text{SEG}} = 8$; mã RTL trong kho mã không bị thay đổi.
 
 \begin{table}[htbp]
 \centering
@@ -209,6 +212,7 @@ Một bộ test chỉ có giá trị khi nó phát hiện được lỗi. Để 
 10 & Bỏ qua \texttt{byteenable} của byte cao LEN & \texttt{smx\_csr}    & \texttt{reg} \\
 11 & Giải mã địa chỉ thanh ghi thiếu một bit (alias) & \texttt{smx\_csr}    & \texttt{reg} \\
 12 & LEN không được xoá khi reset & \texttt{smx\_csr}    & \texttt{random} \\
+13 & Mất bit cao nhất của $\mathit{Rcp}$ & \texttt{smx\_divider} & \texttt{corner} \\
 \bottomrule
 \end{tabular}
 \caption{Các lỗi cố ý cài vào bản sao RTL và testcase phát hiện.}
@@ -226,7 +230,7 @@ Bảng \ref{tab:dv-trace} liên kết từng yêu cầu kiểm được ở mứ
 \toprule
 Yêu cầu & Nội dung & Testcase & Trạng thái \\
 \midrule
-VER-01 & Khớp bit-exact với golden model & cả sáu test & Đạt \\
+VER-01 & Khớp bit-exact với golden model & cả bảy test & Đạt \\
 VER-02 & Danh sách kịch bản tối thiểu & \texttt{ver02} & Đạt \\
 VER-03 & Khẳng định giao thức & \texttt{proto}, bộ kiểm giao thức & Đạt ở mức lõi \\
 VER-04 & \texttt{CYCLE\_CNT} theo công thức độ trễ & \texttt{latency} & Đạt \\
@@ -239,6 +243,7 @@ IF-07 & Đóng gói little-endian, 4 phần tử mỗi word & \texttt{reg} & Đ�
 IF-08 & Địa chỉ không định nghĩa đọc 0, ghi bị bỏ qua & \texttt{reg} & Đạt \\
 IF-09 & Truy cập khi BUSY & \texttt{proto} & Đạt \\
 PRF-03 & Độ trễ mỗi hàng $\le 2\lceil L/P \rceil + 64$ & \texttt{latency} & Đạt \\
+ARI-05, 06 & Cận của tổng, độ rộng của $\mathit{Rcp}$ & \texttt{corner} & Đạt \\
 IF-01, 02, 11 & Bus Avalon-MM, khai báo component & chưa có test mức bus & [Chưa đo] \\
 \bottomrule
 \end{tabular}
