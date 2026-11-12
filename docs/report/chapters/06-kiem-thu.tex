@@ -214,7 +214,7 @@ Một bộ test chỉ có giá trị khi nó phát hiện được lỗi. Để 
 
 \subsection{Truy vết yêu cầu}
 
-Bảng \ref{tab:dv-trace} liên kết từng yêu cầu kiểm được ở mức lõi với testcase tương ứng. Các yêu cầu về bus Avalon chưa được kiểm, vì cần có wrapper \texttt{smx\_avalon}.
+Bảng \ref{tab:dv-trace} liên kết từng yêu cầu kiểm được ở mức lõi với testcase tương ứng. Các yêu cầu về bus Avalon chưa được kiểm: lớp bao \texttt{smx\_avalon} đã có, nhưng testbench ở mức bus chưa được viết.
 
 \begin{table}[htbp]
 \centering
@@ -236,7 +236,7 @@ IF-07 & Đóng gói little-endian, 4 phần tử mỗi word & \texttt{reg} & Đ�
 IF-08 & Địa chỉ không định nghĩa đọc 0, ghi bị bỏ qua & \texttt{reg} & Đạt \\
 IF-09 & Truy cập khi BUSY & \texttt{proto} & Đạt \\
 PRF-03 & Độ trễ mỗi hàng $\le 2\lceil L/P \rceil + 64$ & \texttt{latency} & Đạt \\
-IF-01, 02, 11 & Bus Avalon-MM, khai báo component & chờ \texttt{smx\_avalon} & [Chưa đo] \\
+IF-01, 02, 11 & Bus Avalon-MM, khai báo component & chưa có test mức bus & [Chưa đo] \\
 \bottomrule
 \end{tabular}
 \caption{Truy vết yêu cầu sang testcase.}

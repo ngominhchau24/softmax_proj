@@ -8,6 +8,7 @@
 #   make dv                                 compile, run the whole DV suite (tb/dv/README.md)
 #   make run testname=tb_smx_dv_random SEED=7   another seed: new vectors, +SEED=7 to the bench
 #   make run testname=tb_smx_dv_proto VCD=1     DV tests only: dump the DUT ports to wave/<run>.vcd
+#   make dvview testname=tb_smx_dv_proto        DV tests only: run, then open the wave in the GUI
 #   make run WAVE=1                         run without recompiling, log wave/<run>.wlf
 #   make dump                               compile, open the GUI with main_wave.do
 #   make view                               compile, run with wave logging, open the .wlf
@@ -60,7 +61,7 @@ ifeq ($(WAVE),1)
   LOG_CMD := log -r /*;
 endif
 
-.PHONY: all build vectors run regress dv dump view clean
+.PHONY: all build vectors run regress dv dvview dump view clean
 
 all: clean build run
 
@@ -108,6 +109,13 @@ dv: build
 	  grep -h "TB_RESULT" log/$${t}_p$(P)_n$(N_SEG)$(SEEDTAG).log || echo "TB_RESULT: MISSING $$t"; \
 	done; \
 	if [ $$fail = 0 ]; then echo "DV ALL PASS"; else echo "DV SOME FAILED, see sim/log/"; exit 1; fi
+
+# Wave of one DV test: log only the DUT ports and the checker (small .wlf), open it with wave_dv.do.
+# Compile first (make build). The GUI stays open until you close it.
+dvview:
+	$(MAKE) --no-print-directory run ACC='-voptargs="+acc"' \
+	  LOG_CMD='log /$(TESTNAME)/env/*; log /$(TESTNAME)/env/dut/u_dv_chk/*;'
+	$(vsim) -view wave/$(RUN).wlf -do "do wave_dv.do"
 
 dump: build vectors
 	$(vsim) -gui -voptargs="+acc" $(SIMARGS) -do "do main_wave.do"

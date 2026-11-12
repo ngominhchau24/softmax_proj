@@ -53,4 +53,4 @@ Mục tiêu tần số 100 MHz đạt ở mọi lần chạy, sát nhất là 10
 
 Kết quả có hai giới hạn. Thứ nhất, Fmax chỉ phản ánh các đường từ thanh ghi tới thanh ghi, vì tệp ràng buộc chỉ khai báo clock; các cổng \texttt{acc\_*} và \texttt{rst\_n} chưa được ràng buộc. Thứ hai, Fmax giữa các seed chênh nhau tới khoảng 10\% ở $P = 8$, nên mọi so sánh giữa hai phương án phải dựa trên nhiều seed; riêng $P = 4$ mới có một seed.
 
-Số liệu về sai số của thuật toán đo bằng golden model và đã nêu ở Chương 3. Số liệu trên board và của toàn hệ thống có wrapper Avalon chưa có tại thời điểm viết báo cáo.
+Số liệu về sai số của thuật toán đo bằng golden model và đã nêu ở Chương 3. Hệ thống demo gồm JTAG to Avalon Master Bridge và \texttt{smx} đã biên dịch thành công cho DE10-Standard với clock 50 MHz. Tài nguyên và timing của toàn hệ thống chưa được ghi lại, và thiết kế chưa chạy trên board, nên các số liệu đó để là [Chưa đo].

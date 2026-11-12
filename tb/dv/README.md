@@ -40,6 +40,7 @@ make dv P=4                                # tham số khác: P = 4, 8, 16 và N
 make build                                 # chỉ compile
 make run testname=tb_smx_dv_proto          # chỉ chạy một test, không compile lại
 make run testname=tb_smx_dv_random SEED=7  # seed khác: vector mới, log riêng
+make dvview testname=tb_smx_dv_proto      # chạy rồi mở dạng sóng trong ModelSim GUI (wave_dv.do)
 make run testname=tb_smx_dv_proto WAVE=1   # ghi wave/<run>.wlf
 make run testname=tb_smx_dv_proto VCD=1    # xuất cổng DUT ra wave/<run>.vcd, để vẽ hình bằng docs/report/tools/dv_waves.py
 ```

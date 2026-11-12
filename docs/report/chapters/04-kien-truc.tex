@@ -21,6 +21,14 @@ Hai kiểu hệ thống được hỗ trợ:
   \item Đường tuỳ chọn: GHRD Terasic, master là cầu HPS-to-FPGA.
 \end{itemize}
 
+\subsection{Lớp bao Avalon và hệ thống demo}
+
+Lớp bao \texttt{smx\_avalon} chỉ đổi tên tín hiệu giữa Avalon-MM slave \texttt{s0} và cổng \texttt{acc\_*} của lõi, không thêm logic nào. Thành phần Platform Designer được khai báo trong \texttt{ip/smx\_hw.tcl} với các giao diện: clock, reset mức thấp, slave \texttt{s0} (địa chỉ theo word, độ trễ đọc 2, không \texttt{waitrequest}, không burst, \texttt{byteenable} 4 bit) và conduit trạng thái. Hai tham số $P$ và $N_{\text{SEG}}$ chọn được khi tạo thành phần.
+
+Hệ thống demo trên DE10-Standard không dùng HPS và gồm ba khối: nguồn clock 50 MHz từ \texttt{CLOCK\_50}, JTAG to Avalon Master Bridge, và \texttt{smx} đặt ở địa chỉ gốc 0, nên offset dùng trong System Console trùng với offset của bản đồ thanh ghi. Ở mức top, nút \texttt{KEY[0]} là reset mức thấp, đi qua một bộ đồng bộ hai tầng để được thả đồng bộ với clock, vì lõi không có bộ đồng bộ reset riêng; ba đèn \texttt{LEDR[2:0]} hiển thị BUSY, DONE và ERR.
+
+Tại thời điểm viết báo cáo, lớp bao, thành phần và hệ thống demo đã được nhóm hiện thực viết và biên dịch thành công bằng Quartus, tạo được tệp \texttt{.sof}. Thiết kế chưa được nạp lên board, và phần gán chân chưa được đối chiếu với tài liệu của Terasic.
+
 \subsection{Bản đồ thanh ghi}
 
 Bảng \ref{tab:regmap} tóm tắt bản đồ thanh ghi, offset tính theo byte.
