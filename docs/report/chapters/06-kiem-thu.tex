@@ -132,12 +132,14 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 \subsection{Dạng sóng minh hoạ}
 
-Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Trục ngang tính theo chu kỳ clock; các giá trị bus ghi ở hệ thập lục phân; dấu tròn đánh số được giải thích trong chú thích của từng hình. Dạng sóng được vẽ từ tệp VCD do chính môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL như lần chạy trên ModelSim.
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
+
+Hình \ref{fig:dv-sanity} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Các hình còn lại được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở các hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_sanity_run.pdf}
-  \caption{\texttt{sanity}: lần chạy đầu tiên, $L = 8$, $R = 1$. (1) Lệnh START; BUSY lên ở chu kỳ kế tiếp và kéo dài 57 chu kỳ. (2) STATUS đọc về bằng 2, tức DONE, đúng hai chu kỳ sau lệnh đọc.}
+  \includegraphics[width=\textwidth]{dv_sanity_run_modelsim.png}
+  \caption{\texttt{sanity} trên ModelSim: lần chạy đầu tiên, $L = 8$, $R = 1$. Lệnh START là lệnh ghi 00000001h vào địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp và kéo dài 57 chu kỳ, \texttt{busy\_cnt} dừng ở 57. Khi BUSY xuống, \texttt{status\_done} lên. Sau đó testbench đọc STATUS, \texttt{CYCLE\_CNT} và Y\_BUF, rồi nạp lần chạy thứ hai.}
   \label{fig:dv-sanity}
 \end{figure}
 
