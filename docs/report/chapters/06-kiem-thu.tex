@@ -132,9 +132,7 @@ Mỗi testcase in đúng một dòng kết luận bắt đầu bằng \texttt{TB
 
 \subsection{Dạng sóng minh hoạ}
 
-Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới. Các giá trị bus ghi ở hệ thập lục phân.
-
-Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-reg} là ảnh chụp cửa sổ Wave của ModelSim. Trong ảnh, nhóm \texttt{DV} ở dưới cùng gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi, số lệnh START, số lệnh START khi BUSY và số lệnh START với cấu hình sai. Hình \ref{fig:dv-random} được vẽ từ tệp VCD do môi trường kiểm thử xuất ra khi mô phỏng bằng Verilator, với cùng testbench, cùng vector và cùng mã RTL; ở hình này trục ngang tính theo chu kỳ clock và dấu tròn đánh số được giải thích trong chú thích.
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} là ảnh chụp cửa sổ Wave của ModelSim, trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới, ở cấu hình $P = 8$, $N_{\text{SEG}} = 8$. Các giá trị bus ghi ở hệ thập lục phân, riêng \texttt{acc\_byteenable} ở hệ nhị phân. Nhóm \texttt{DV} ở dưới cùng của mỗi ảnh gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi (\texttt{n\_err}), số lệnh START (\texttt{n\_start}), số lệnh START khi BUSY (\texttt{n\_start\_busy}) và số lệnh START với cấu hình sai (\texttt{n\_start\_bad}). Ở mọi ảnh, \texttt{n\_err} bằng 0.
 
 \begin{figure}[htbp]
   \centering
@@ -180,8 +178,8 @@ Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-reg} là ảnh chụp cửa s�
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{dv_random_reset.pdf}
-  \caption{\texttt{random}: reset bất đồng bộ giữa lần chạy. (1) \texttt{rst\_n} xuống ở giữa hai cạnh clock khi lõi đang BUSY. (2) BUSY về 0 ngay lập tức, không chờ cạnh clock. (3) Sau khi thả reset, các thanh ghi đọc về 0.}
+  \includegraphics[width=\textwidth]{dv_random_reset_modelsim.png}
+  \caption{\texttt{random} trên ModelSim: reset bất đồng bộ giữa lần chạy. \texttt{rst\_n} xuống ở giữa hai cạnh clock khi lõi đang BUSY, lúc \texttt{busy\_cnt} bằng 63; \texttt{status\_busy} về 0 ngay lập tức, không chờ cạnh clock, và \texttt{busy\_cnt} dừng lại. Sau khi reset được thả, năm lệnh đọc ở các địa chỉ 0001h đến 0005h lấy STATUS, LEN, ROWS, SCALE\_K và \texttt{CYCLE\_CNT}; \texttt{acc\_readdata} giữ nguyên 00000000h, tức mọi thanh ghi đã về 0. Lõi không tự chạy lại sau reset.}
   \label{fig:dv-random}
 \end{figure}
 
