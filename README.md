@@ -12,7 +12,7 @@ BTL môn Cấu trúc phần cứng cho giải thuật học máy (nhóm 6), hạ
 | Tài liệu thiết kế | Xong nhưng **DRAFT**: người thiết kế chưa duyệt (`docs/spec/07-open-decisions.md` mục A). Chỉ `smx_exp2` là `APPROVED`. |
 | Wrapper Avalon, Platform Designer, System Console | **Chưa làm** (`rtl/avalon/`, `ip/`, `sw/` còn trống). Đây là việc của phần board. |
 | Verification chính thức | **Xong ở mức lõi.** 6 test DV và checker giao thức trong `tb/dv/`, chạy bằng `make dv`; PASS trên ModelSim ở P và N_SEG = 4/8/16. Mức bus Avalon chưa có test. Chi tiết: `tb/dv/README.md`. |
-| Báo cáo | Bản LaTeX trong `docs/report/` đã có nội dung các chương; chương 6 (kiểm thử) có kết quả, nhật ký và dạng sóng. Còn thiếu số liệu trên board và tên trên trang bìa. |
+| Báo cáo | Bản LaTeX trong `docs/report/` đã có nội dung các chương; chương 6 (kiểm thử) có kết quả, nhật ký và dạng sóng. Chương 6 dùng log và ảnh dạng sóng chụp từ ModelSim. Còn thiếu số liệu trên board và logo trường trên trang bìa (`docs/figures/logo_bk.png`). |
 
 Trạng thái chi tiết, việc đang chờ và việc kế tiếp: **`docs/PROGRESS.md`** (đọc file này đầu tiên).
 
