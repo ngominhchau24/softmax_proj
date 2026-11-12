@@ -73,13 +73,26 @@
 % ---------- Trang bìa ----------
 \begin{titlepage}
 \begin{center}
+ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\\[0.2em]
+\textbf{TRƯỜNG ĐẠI HỌC BÁCH KHOA}\\[2em]
+% Logo trường: đặt file docs/figures/logo_bk.png; chưa có file thì trang bìa vẫn biên dịch được
+\IfFileExists{../figures/logo_bk.png}{\includegraphics[height=4.2cm]{logo_bk.png}\\[2em]}{\vspace*{3em}}
 \textbf{BÁO CÁO BÀI TẬP LỚN}\\[0.3em]
-Môn: Cấu trúc phần cứng cho giải thuật học máy\\[0.3em]
-Nhóm 6\\[3em]
-\textbf{THIẾT KẾ VÀ HIỆN THỰC FPGA BỘ TĂNG TỐC SOFTMAX NGUYÊN THUẦN\\CHO ATTENTION TRANSFORMER}\\[0.3em]
-\textit{Design and FPGA Implementation of an Integer-Only Softmax Accelerator for Transformer Attention}\\[4em]
-Sinh viên thực hiện: [Họ và tên]\\[1em]
-Giảng viên hướng dẫn: [Họ và tên]\\[4em]
+Môn: Cấu trúc phần cứng cho giải thuật học máy\\[2.5em]
+\textbf{THIẾT KẾ VÀ HIỆN THỰC FPGA\\BỘ TĂNG TỐC SOFTMAX NGUYÊN THUẦN\\CHO ATTENTION TRANSFORMER}\\[0.3em]
+\textit{Design and FPGA Implementation of an\\Integer-Only Softmax Accelerator for Transformer Attention}\\[3em]
+Nhóm 6\\[0.6em]
+\begin{tabular}{ll}
+\toprule
+Họ và tên & MSSV \\
+\midrule
+Ngô Minh Châu     & 2470212 \\
+Trần Gia Tuấn     & 2470214 \\
+Đặng Phước Tiến   & 2470455 \\
+\bottomrule
+\end{tabular}\\[2em]
+Giảng viên hướng dẫn: [Họ và tên]\\
+\vfill
 Thành phố Hồ Chí Minh, 2026
 \end{center}
 \end{titlepage}
