@@ -37,4 +37,6 @@ add wave -radix unsigned /$TOP/env/dut/u_dv_chk/n_err
 add wave -radix unsigned /$TOP/env/dut/u_dv_chk/n_start
 add wave -radix unsigned /$TOP/env/dut/u_dv_chk/n_start_busy
 add wave -radix unsigned /$TOP/env/dut/u_dv_chk/n_start_bad
+# show only the last part of each name (acc_addr, not /tb_smx_dv_x/env/acc_addr)
+configure wave -signalnamewidth 1
 wave zoom full
