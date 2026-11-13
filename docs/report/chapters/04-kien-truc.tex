@@ -2,14 +2,50 @@
 
 \subsection{Sơ đồ tổng thể}
 
-Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi đưa ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*}, có độ trễ đọc cố định 2 chu kỳ và không có tín hiệu chờ.
+Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi đưa ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*}, có độ trễ đọc cố định 2 chu kỳ và không có tín hiệu chờ. Hình \ref{fig:smx-system} cho thấy ranh giới này trong hệ thống demo: máy tính điều khiển qua USB-Blaster, cầu JTAG to Avalon Master, lớp bao rồi tới lõi.
 
-Luồng dữ liệu của một hàng:
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_system.pdf}
+  \caption{Ranh giới hệ thống: PC, cầu JTAG to Avalon Master, lớp bao \texttt{smx\_avalon} và lõi \texttt{smx\_core}. Phần trong khung nét đứt nằm trên FPGA.}
+  \label{fig:smx-system}
+\end{figure}
+
+Hình \ref{fig:softmax-flow} tóm tắt đường đi của dữ liệu qua các phép tính của Chương 3. Luồng dữ liệu của một hàng:
 \begin{enumerate}
   \item Lượt 1 đọc $X$ theo nhóm $P$ phần tử, đưa qua phép nhân với $K$, IntMax, $E(d)$ và cây cộng để có $\mathit{sum}$ và $M$.
   \item Bộ chia tính $\mathit{Rcp}$ từ $\mathit{sum}$.
   \item Lượt 2 đọc lại $X$, tính lại $E$, nhân với $\mathit{Rcp}$, làm tròn, bão hoà và ghi vào $Y$.
 \end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{softmax_flow.pdf}
+  \caption{Luồng số học của một hàng. Lượt 1 đi qua nhánh $M$, $dM$ và bộ tích luỹ $\mathit{sum}$ để có $\mathit{Rcp}$; lượt 2 dùng lại nhánh $E$ rồi nhân với $\mathit{Rcp}$ để ra $y$.}
+  \label{fig:softmax-flow}
+\end{figure}
+
+\subsection{Cấu trúc bên trong lõi}
+
+Hình \ref{fig:smx-core} là sơ đồ khối của \texttt{smx\_core}, vẽ ở $P = 8$ và $N_{\text{SEG}} = 8$. Khối \texttt{smx\_csr} giải mã cổng \texttt{acc\_*}, giữ các thanh ghi và ghi vào X\_BUF. Khi chạy, \texttt{smx\_ctrl} phát địa chỉ từng nhóm; dữ liệu đọc từ X\_BUF đi qua \texttt{smx\_scale}, \texttt{smx\_maxtree} và \texttt{smx\_exp2}, rồi rẽ sang \texttt{smx\_sumacc} và \texttt{smx\_divider} ở lượt 1, hoặc sang \texttt{smx\_norm} và Y\_BUF ở lượt 2. Một chuỗi thanh ghi dịch mang các nhãn của nhóm (lượt, nhóm đầu, nhóm cuối, mặt nạ lane) đi song song với dữ liệu, nên mỗi khối biết nhóm nó đang xử lý mà không cần tự đếm.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[angle=90,height=0.9\textheight]{smx_core.pdf}
+  \caption{Sơ đồ khối bên trong \texttt{smx\_core} (xoay ngang), vẽ ở $P = 8$, $N_{\text{SEG}} = 8$; clock và reset không vẽ.}
+  \label{fig:smx-core}
+\end{figure}
+
+\subsection{Điều khiển}
+
+Khối \texttt{smx\_ctrl} đi theo máy trạng thái ở Hình \ref{fig:smx-fsm}, gồm tám trạng thái. Từ \texttt{IDLE}, lệnh START đưa lõi vào \texttt{P1\_RUN}, nơi mỗi chu kỳ phát một nhóm của lượt 1; \texttt{P1\_DRAIN} chờ tổng của nhóm cuối ra khỏi pipeline. \texttt{DIV} khởi động bộ chia và \texttt{DIV\_WAIT} chờ nó xong. \texttt{P2\_RUN} và \texttt{P2\_DRAIN} làm tương tự cho lượt 2, tới khi phần tử $y$ cuối cùng được ghi. \texttt{NEXT\_ROW} hoặc quay lại \texttt{P1\_RUN} cho hàng kế tiếp, hoặc báo xong và về \texttt{IDLE}. Việc chuyển pha dựa trên sự kiện từ datapath, không dựa trên bộ đếm độ trễ.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_fsm.pdf}
+  \caption{Máy trạng thái của \texttt{smx\_ctrl}. Nhãn trên mỗi cung là điều kiện chuyển; $r$ là chỉ số hàng, $R$ là số hàng.}
+  \label{fig:smx-fsm}
+\end{figure}
 
 \subsection{Giao diện}
 
@@ -58,11 +94,3 @@ Offset & Tên & Truy cập & Nội dung \\
 \subsection{Trình tự phần mềm}
 
 Phần mềm thực hiện lần lượt các bước sau: tính $K$ và ghi vào \texttt{SCALE\_K}; ghi $R$ hàng vào X\_BUF; ghi \texttt{LEN} và \texttt{ROWS}; ghi START; đọc STATUS cho đến khi DONE bằng 1; đọc Y\_BUF, và đọc CYCLE\_CNT nếu cần đo thời gian.
-
-% Hình minh hoạ: đặt file PDF/SVG trong docs/figures/ rồi bỏ comment.
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=0.9\textwidth]{arch_top.pdf}
-%   \caption{Sơ đồ khối tổng thể của smx.}
-%   \label{fig:arch}
-% \end{figure}
