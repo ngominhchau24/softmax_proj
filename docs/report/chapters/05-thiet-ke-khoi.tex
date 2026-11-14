@@ -57,6 +57,32 @@ Khối \texttt{smx\_divider} là bộ chia phục hồi radix-2, mỗi chu kỳ 
 
 Hai bộ đệm X và Y dùng chung một module \texttt{smx\_buf}, là bộ nhớ hai cổng đơn có cổng đọc qua thanh ghi. Số bank bằng $P/4$, mỗi bank rộng 32 bit; với $P = 8$, mỗi bộ đệm gồm hai bank 32 bit $\times$ 1024 word, và mỗi byte của mỗi bank là một RAM riêng để ghi theo \texttt{byteenable}. Khối \texttt{smx\_csr} giải mã cổng \texttt{acc\_*}, giữ các thanh ghi điều khiển và trạng thái, và ghép đường đọc có độ trễ 2 chu kỳ. Khối \texttt{smx\_ctrl} điều khiển thứ tự hàng, lượt, địa chỉ và mặt nạ lane cho nhóm cuối của mỗi hàng; máy trạng thái của nó đã được mô tả ở Chương 4.
 
+\subsection{Độ trễ và tài nguyên từng khối}
+
+Bảng \ref{tab:blk-res} ghi độ trễ của từng khối và tài nguyên khi tổng hợp riêng khối đó. Các số tài nguyên lấy từ bước Analysis \& Synthesis của Quartus, chưa qua Fitter, nên chỉ dùng để so sánh tương đối giữa các khối; tài nguyên của cả lõi sau Fitter nằm ở Chương 7. Tổng độ trễ của đường từ địa chỉ đọc X\_BUF tới $E$ là $1 + 3 + 2 + 3 = 9$ chu kỳ, và mỗi lượt quét cộng thêm 3 chu kỳ của \texttt{smx\_sumacc} hoặc \texttt{smx\_norm}.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{llrrrl}
+\toprule
+Khối & Tổng hợp ở & Độ trễ & ALUT & Thanh ghi & Khác \\
+\midrule
+\texttt{smx\_scale}   & 1 lane  & 3  & 13  & 85  & 1 DSP \\
+\texttt{smx\_maxtree} & $P = 8$ & 2  & 202 & 38  & \\
+\texttt{smx\_exp2}    & 1 lane  & 3  & [Chưa đo] & [Chưa đo] & 1 DSP \\
+\texttt{smx\_sumacc}  & $P = 8$ & 3  & 180 & 101 & \\
+\texttt{smx\_divider} &         & 28 & 60  & 109 & \\
+\texttt{smx\_norm}    & 1 lane  & 3  & 20  & 66  & 1 DSP \\
+\texttt{smx\_buf}     & $P = 8$ & 1  &     & 0   & 65\,536 bit bộ nhớ khối \\
+\texttt{smx\_csr}     & $P = 8$ & 2  & 192 & 136 & độ trễ của đường đọc \\
+\texttt{smx\_ctrl}    & $P = 8$ &    & 72  & 24  & ngõ ra tổ hợp \\
+\bottomrule
+\end{tabular}
+\caption{Độ trễ (chu kỳ) và tài nguyên của từng khối sau Analysis \& Synthesis. Ô trống: không áp dụng.}
+\label{tab:blk-res}
+\end{table}
+
 \subsection{Kết quả thiết kế}
 
 Mỗi khối có testbench tự kiểm, so kết quả bit-exact với vector sinh từ golden model, và đều đạt ở các giá trị $P$ và $N_{\text{SEG}}$ mà khối phụ thuộc. Lõi \texttt{smx\_core} sau tích hợp được kiểm qua cổng \texttt{acc\_*}; kết quả kiểm thử được trình bày ở Chương 6, tài nguyên và tần số sau Fitter ở Chương 7.

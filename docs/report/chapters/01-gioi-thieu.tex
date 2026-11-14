@@ -18,7 +18,14 @@ Các mục tiêu cụ thể:
 
 \subsection{Phạm vi}
 
-Báo cáo tập trung vào thiết kế lõi \texttt{smx\_core}, gồm thanh ghi điều khiển, bộ đệm X/Y, bộ điều khiển và datapath. Wrapper Avalon, hệ thống Platform Designer và script demo do nhóm hiện thực đảm nhiệm; báo cáo mô tả các phần này ở mức giao diện và cấu trúc hệ thống (Chương 4). Phần kiểm thử lõi do nhóm kiểm thử thực hiện qua cổng \texttt{acc\_*}; kế hoạch và kết quả được trình bày ở Chương 6.
+Báo cáo tập trung vào thiết kế lõi \texttt{smx\_core}, gồm thanh ghi điều khiển, bộ đệm X/Y, bộ điều khiển và datapath. Wrapper Avalon, hệ thống Platform Designer và script demo do nhóm hiện thực đảm nhiệm; báo cáo mô tả các phần này ở mức giao diện và cấu trúc hệ thống (Chương 4). Phần kiểm thử lõi do nhóm kiểm thử thực hiện qua cổng \texttt{acc\_*}; kế hoạch và kết quả được trình bày ở Chương 6. Hình \ref{fig:smx-system} cho thấy vị trí của lõi trong hệ thống demo và ranh giới giữa các phần việc.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_system.pdf}
+  \caption{Ranh giới hệ thống: PC, cầu JTAG to Avalon Master, lớp bao \texttt{smx\_avalon} và lõi \texttt{smx\_core}. Phần trong khung nét đứt nằm trên FPGA.}
+  \label{fig:smx-system}
+\end{figure}
 
 Đề tài không bao gồm phép nhân ma trận, convolution, LayerNorm, GELU và masking. Hàm sigmoid và GELU chỉ được xem là mở rộng tuỳ chọn sau khi lõi hoàn thành.
 
@@ -32,6 +39,30 @@ Các đóng góp chính của đề tài gồm:
   \item Golden model bit-exact và đặc tả giao diện, làm cơ sở để các nhóm khác tích hợp và kiểm thử.
   \item Lõi RTL đã kiểm thử bit-exact với golden model và đạt mục tiêu tần số, tài nguyên sau Fitter.
 \end{enumerate}
+
+\subsection{Tóm tắt kết quả}
+
+Bảng \ref{tab:summary} tóm tắt các kết quả chính của đề tài ở cấu hình mặc định; chi tiết và điều kiện đo nằm ở các chương được dẫn trong bảng.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+Hạng mục & Kết quả & Chương \\
+\midrule
+Cấu hình mặc định & $P = 8$ lane, $N_{\text{SEG}} = 8$, $L_{\max} = 512$, $R_{\max} = 16$ & 3, 4 \\
+Sai số so với softmax float64 & khoảng 0,002, bằng nửa LSB của đầu ra & 3 \\
+Tài nguyên sau Fitter & 1\,681 ALUT, 24 DSP, 21 khối M10K & 7 \\
+Tần số tối đa & 122 đến 134 MHz qua ba seed & 7 \\
+Độ trễ một hàng, $L = 512$ & 182 chu kỳ & 6, 7 \\
+Kiểm thử lõi & 7 testcase, 458\,837 phép so, khớp bit-exact & 6 \\
+Chạy trên board & [Chưa đo] & 7 \\
+\bottomrule
+\end{tabular}
+\caption{Tóm tắt kết quả chính ở cấu hình mặc định.}
+\label{tab:summary}
+\end{table}
 
 \subsection{Cấu trúc báo cáo}
 

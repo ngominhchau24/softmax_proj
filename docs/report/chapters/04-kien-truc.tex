@@ -2,14 +2,7 @@
 
 \subsection{Sơ đồ tổng thể}
 
-Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi đưa ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*}, có độ trễ đọc cố định 2 chu kỳ và không có tín hiệu chờ. Hình \ref{fig:smx-system} cho thấy ranh giới này trong hệ thống demo: máy tính điều khiển qua USB-Blaster, cầu JTAG to Avalon Master, lớp bao rồi tới lõi.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_system.pdf}
-  \caption{Ranh giới hệ thống: PC, cầu JTAG to Avalon Master, lớp bao \texttt{smx\_avalon} và lõi \texttt{smx\_core}. Phần trong khung nét đứt nằm trên FPGA.}
-  \label{fig:smx-system}
-\end{figure}
+Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi đưa ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*}, có độ trễ đọc cố định 2 chu kỳ và không có tín hiệu chờ. Ranh giới này trong hệ thống demo đã được vẽ ở Hình \ref{fig:smx-system} của Chương 1: máy tính điều khiển qua USB-Blaster, cầu JTAG to Avalon Master, lớp bao rồi tới lõi.
 
 Hình \ref{fig:softmax-flow} tóm tắt đường đi của dữ liệu qua các phép tính của Chương 3. Luồng dữ liệu của một hàng:
 \begin{enumerate}

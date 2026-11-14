@@ -45,6 +45,15 @@ $P$ & ALM & ALUT & Thanh ghi & M10K & DSP & Fmax, seed 1 / 2 / 3 (MHz) & Chu k�
 \label{tab:sweep}
 \end{table}
 
+Hình \ref{fig:sweep-p} vẽ lại các số của Bảng \ref{tab:sweep}: tài nguyên logic tăng gần tuyến tính theo $P$, Fmax giảm dần nhưng vẫn trên mục tiêu, và số chu kỳ mỗi hàng giảm chậm dần vì phần cố định 54 chu kỳ.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{sweep_p.pdf}
+  \caption{Tài nguyên logic, Fmax theo từng seed của Fitter và số chu kỳ mỗi hàng với $L = 512$ khi đổi số lane $P$, $N_{\text{SEG}} = 8$.}
+  \label{fig:sweep-p}
+\end{figure}
+
 Việc quét $N_{\text{SEG}} \in \{4, 16\}$ qua Fitter chưa được thực hiện; ở hai giá trị này lõi mới được kiểm bằng mô phỏng.
 
 \subsection{Nhận xét}

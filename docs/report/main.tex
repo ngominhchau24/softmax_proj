@@ -84,11 +84,8 @@
 \titleformat{\subsection}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont}
   {\thesubsection}{0.5em}{}
-% Chương mới sang trang mới, trừ khi trang hiện tại còn trống hơn nửa: khi đó chương đi tiếp trên
-% cùng trang sau một khoảng trống lớn, để không bỏ trắng phần lớn trang. \penalty0 cho TeX ngắt trang
-% đang dở trước khi đo, nên \pagetotal và \pagegoal là của trang thật sự đang đứng.
-\newcommand{\sectionbreak}{\par\penalty0\relax
-  \ifdim\dimexpr\pagegoal-\pagetotal\relax<0.5\textheight\clearpage\else\vspace{3.2\baselineskip}\fi}
+% Mỗi chương bắt đầu ở một trang mới
+\newcommand{\sectionbreak}{\clearpage}
 \titlespacing*{\section}{0pt}{0pt}{14pt}
 \titlespacing*{\subsection}{0pt}{6pt}{0pt}
 
