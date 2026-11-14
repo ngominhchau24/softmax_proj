@@ -42,6 +42,7 @@
 \newcommand{\smxlog}[2]{\IfFileExists{logs/#1}{\noindent\textit{#2}\lstinputlisting{logs/#1}}{}}
 \usepackage{titlesec}
 \usepackage{hyperref}
+\hypersetup{hidelinks}   % liên kết vẫn bấm được, không có khung màu quanh chữ
 
 % ---------- Ngôn ngữ của các nhãn tự sinh ----------
 % Báo cáo tiếng Việt: giữ \reportvitrue (Bảng, Hình, Mục lục, Tài liệu tham khảo, Chương).
@@ -65,7 +66,9 @@
 \titleformat{\subsection}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont}
   {\thesubsection}{0.5em}{}
-\titlespacing*{\section}{0pt}{12pt}{6pt}
+% Mỗi chương bắt đầu ở một trang mới
+\newcommand{\sectionbreak}{\clearpage}
+\titlespacing*{\section}{0pt}{0pt}{14pt}
 \titlespacing*{\subsection}{0pt}{6pt}{0pt}
 
 \begin{document}
@@ -97,8 +100,8 @@ Thành phố Hồ Chí Minh, 2026
 \end{center}
 \end{titlepage}
 
-\tableofcontents
-\newpage
+% Mục lục: giãn dòng đơn và không cách đoạn, để không tràn trang
+{\setlength{\parskip}{0pt}\singlespacing\tableofcontents}
 
 \input{chapters/01-gioi-thieu}
 \input{chapters/02-co-so-khao-sat}
