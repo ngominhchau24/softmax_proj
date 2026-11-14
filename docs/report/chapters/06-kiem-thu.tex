@@ -97,7 +97,7 @@ Tổng             & 458\,837 & & Đạt \\
 \label{tab:dv-results}
 \end{table}
 
-Bộ test được chạy lại trên ModelSim ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Testcase \texttt{corner} so 146\,339 phần tử ở $P = 4$ và 145\,863 phần tử ở $P = 16$, và đủ 512/512 độ dài hàng ở mọi tổ hợp. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
+Bộ test được chạy lại trên ModelSim ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Testcase \texttt{corner} thực hiện 146\,339 phép so ở $P = 4$ và 145\,863 phép so ở $P = 16$, và chạy đủ 512/512 độ dài hàng ở mọi tổ hợp. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
 
 \begin{table}[htbp]
 \centering
@@ -135,59 +135,6 @@ Với từng testcase, phần trích gồm ba dòng nói trên, thời điểm k
 \smxlog{dv_reg.txt}{Nhật ký của \texttt{tb\_smx\_dv\_reg}:}
 \smxlog{dv_random.txt}{Nhật ký của \texttt{tb\_smx\_dv\_random}:}
 \smxlog{dv_corner.txt}{Nhật ký của \texttt{tb\_smx\_dv\_corner}:}
-
-\subsection{Dạng sóng minh hoạ}
-
-Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} là ảnh chụp cửa sổ Wave của ModelSim, trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới, ở cấu hình $P = 8$, $N_{\text{SEG}} = 8$. Các giá trị bus ghi ở hệ thập lục phân, riêng \texttt{acc\_byteenable} ở hệ nhị phân. Nhóm \texttt{DV} ở dưới cùng của mỗi ảnh gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi (\texttt{n\_err}), số lệnh START (\texttt{n\_start}), số lệnh START khi BUSY (\texttt{n\_start\_busy}) và số lệnh START với cấu hình sai (\texttt{n\_start\_bad}). Ở mọi ảnh, \texttt{n\_err} bằng 0.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_sanity_run_modelsim.png}
-  \caption{\texttt{sanity} trên ModelSim: lần chạy đầu tiên, $L = 8$, $R = 1$. Lệnh START là lệnh ghi 00000001h vào địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp và kéo dài 57 chu kỳ, \texttt{busy\_cnt} dừng ở 57. Khi BUSY xuống, \texttt{status\_done} lên. Sau đó testbench đọc STATUS, \texttt{CYCLE\_CNT} và Y\_BUF, rồi nạp lần chạy thứ hai.}
-  \label{fig:dv-sanity}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_ver02_tail_modelsim.png}
-  \caption{\texttt{ver02} trên ModelSim: nạp một lần chạy có phần đuôi chứa giá trị rác, $L = 1$, $R = 2$. Word đầu của hàng 0 được ghi vào địa chỉ 0800h với giá trị 59807F80h: byte thấp 80h là phần tử duy nhất của hàng, ba byte còn lại (7Fh, 80h và 59h) nằm ngoài độ dài $L$. Tiếp theo là word thứ hai của hàng 0, hai word của hàng 1 (0880h, 0881h), rồi $\text{LEN} = 1$, $\text{ROWS} = 2$, $\text{SCALE\_K} = 0$ và lệnh START ở địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp. Kết quả $Y$ vẫn phải khớp golden model.}
-  \label{fig:dv-ver02}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_proto_err_modelsim.png}
-  \caption{\texttt{proto} trên ModelSim: START với cấu hình sai. Testbench ghi $\text{LEN} = 0$ (địa chỉ 0002h), $\text{ROWS} = 1$ (0003h), rồi ghi START (0000h). Ở chu kỳ kế tiếp \texttt{status\_done} và \texttt{status\_err} cùng lên, còn \texttt{status\_busy} giữ ở 0 và \texttt{busy\_cnt} không tăng: lõi không chạy. Bộ kiểm giao thức ghi nhận một lệnh START với cấu hình sai (\texttt{n\_start\_bad} = 1). Lệnh đọc sau đó ở địa chỉ 0001h lấy STATUS.}
-  \label{fig:dv-proto-err}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_proto_start_busy_modelsim.png}
-  \caption{\texttt{proto} trên ModelSim: START khi đang BUSY. Lệnh START (ghi 00000001h vào địa chỉ 0000h) được đưa vào đúng chu kỳ BUSY cuối cùng của một lần chạy dài 189 chu kỳ. Lệnh bị bỏ qua: \texttt{status\_busy} xuống và \texttt{status\_done} lên như bình thường, \texttt{busy\_cnt} dừng ở 189 và không có lần chạy mới. Bộ kiểm giao thức đếm đây là lệnh START khi BUSY thứ năm (\texttt{n\_start\_busy} = 5). Lệnh đọc sau đó ở địa chỉ 0005h trả về $\texttt{CYCLE\_CNT} = \text{BDh} = 189$, bằng lần chạy không bị quấy rầy; hai lệnh đọc tiếp theo lấy Y\_BUF.}
-  \label{fig:dv-proto-busy}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_latency_cycle_cnt_modelsim.png}
-  \caption{\texttt{latency} trên ModelSim: lần chạy ngắn nhất, $L = 1$, $R = 1$. Sau lệnh START, \texttt{status\_busy} kéo dài đúng $2 \cdot 1 + 54 + 1 = 57$ chu kỳ, thể hiện ở \texttt{busy\_cnt} đếm từ 1 đến 57. Khi BUSY xuống, \texttt{status\_done} lên. Bốn lệnh đọc sau đó lần lượt lấy STATUS (0001h), \texttt{CYCLE\_CNT} (0005h), Y\_BUF (1000h) và \texttt{CYCLE\_CNT} lần nữa; test so cả hai lần đọc \texttt{CYCLE\_CNT} với công thức.}
-  \label{fig:dv-latency}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_reg_byteenable_modelsim.png}
-  \caption{\texttt{reg} trên ModelSim: \texttt{byteenable} trên thanh ghi LEN (địa chỉ 0002h). Giá trị F0F0F0F0h được ghi với \texttt{byteenable} = 1111, rồi 0F0F0F0Fh được ghi với \texttt{byteenable} = 0101, tức chỉ byte 0 và byte 2. Lệnh đọc ngay sau đó trả về 0000000Fh sau hai chu kỳ: byte 0 nhận giá trị mới 0Fh, còn hai bit 9 và 8 của LEN, thuộc byte 1, giữ giá trị cũ; các bit ngoài trường $[9{:}0]$ đọc về 0. Phía sau là mẫu \texttt{byteenable} kế tiếp, 0110.}
-  \label{fig:dv-reg}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{dv_random_reset_modelsim.png}
-  \caption{\texttt{random} trên ModelSim: reset bất đồng bộ giữa lần chạy. \texttt{rst\_n} xuống ở giữa hai cạnh clock khi lõi đang BUSY, lúc \texttt{busy\_cnt} bằng 63; \texttt{status\_busy} về 0 ngay lập tức, không chờ cạnh clock, và \texttt{busy\_cnt} dừng lại. Sau khi reset được thả, năm lệnh đọc ở các địa chỉ 0001h đến 0005h lấy STATUS, LEN, ROWS, SCALE\_K và \texttt{CYCLE\_CNT}; \texttt{acc\_readdata} giữ nguyên 00000000h, tức mọi thanh ghi đã về 0. Lõi không tự chạy lại sau reset.}
-  \label{fig:dv-random}
-\end{figure}
 
 \subsection{Kiểm chứng khả năng bắt lỗi}
 
@@ -251,6 +198,60 @@ IF-01, 02, 11 & Bus Avalon-MM, khai báo component & chưa có test mức bus & 
 \label{tab:dv-trace}
 \end{table}
 
+\subsection{Dạng sóng minh hoạ}
+
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} là ảnh chụp cửa sổ Wave của ModelSim, trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới, ở cấu hình $P = 8$, $N_{\text{SEG}} = 8$. Các giá trị bus ghi ở hệ thập lục phân, riêng \texttt{acc\_byteenable} ở hệ nhị phân. Nhóm \texttt{DV} ở dưới cùng của mỗi ảnh gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi (\texttt{n\_err}), số lệnh START (\texttt{n\_start}), số lệnh START khi BUSY (\texttt{n\_start\_busy}) và số lệnh START với cấu hình sai (\texttt{n\_start\_bad}). Ở mọi ảnh, \texttt{n\_err} bằng 0.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_sanity_run_modelsim.png}
+  \caption{\texttt{sanity} trên ModelSim: lần chạy đầu tiên, $L = 8$, $R = 1$. Lệnh START là lệnh ghi 00000001h vào địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp và kéo dài 57 chu kỳ, \texttt{busy\_cnt} dừng ở 57. Khi BUSY xuống, \texttt{status\_done} lên. Sau đó testbench đọc STATUS, \texttt{CYCLE\_CNT} và Y\_BUF, rồi nạp lần chạy thứ hai.}
+  \label{fig:dv-sanity}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_ver02_tail_modelsim.png}
+  \caption{\texttt{ver02} trên ModelSim: nạp một lần chạy có phần đuôi chứa giá trị rác, $L = 1$, $R = 2$. Word đầu của hàng 0 được ghi vào địa chỉ 0800h với giá trị 59807F80h: byte thấp 80h là phần tử duy nhất của hàng, ba byte còn lại (7Fh, 80h và 59h) nằm ngoài độ dài $L$. Tiếp theo là word thứ hai của hàng 0, hai word của hàng 1 (0880h, 0881h), rồi $\text{LEN} = 1$, $\text{ROWS} = 2$, $\text{SCALE\_K} = 0$ và lệnh START ở địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp. Kết quả $Y$ vẫn phải khớp golden model.}
+  \label{fig:dv-ver02}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_proto_err_modelsim.png}
+  \caption{\texttt{proto} trên ModelSim: START với cấu hình sai. Testbench ghi $\text{LEN} = 0$ (địa chỉ 0002h), $\text{ROWS} = 1$ (0003h), rồi ghi START (0000h). Ở chu kỳ kế tiếp \texttt{status\_done} và \texttt{status\_err} cùng lên, còn \texttt{status\_busy} giữ ở 0 và \texttt{busy\_cnt} không tăng: lõi không chạy. Bộ kiểm giao thức ghi nhận một lệnh START với cấu hình sai (\texttt{n\_start\_bad} = 1). Lệnh đọc sau đó ở địa chỉ 0001h lấy STATUS.}
+  \label{fig:dv-proto-err}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_proto_start_busy_modelsim.png}
+  \caption{\texttt{proto} trên ModelSim: START khi đang BUSY. Lệnh START (ghi 00000001h vào địa chỉ 0000h) được đưa vào đúng chu kỳ BUSY cuối cùng của một lần chạy dài 189 chu kỳ. Lệnh bị bỏ qua: \texttt{status\_busy} xuống và \texttt{status\_done} lên như bình thường, \texttt{busy\_cnt} dừng ở 189 và không có lần chạy mới. Bộ kiểm giao thức đếm đây là lệnh START khi BUSY thứ năm (\texttt{n\_start\_busy} = 5). Lệnh đọc sau đó ở địa chỉ 0005h trả về $\texttt{CYCLE\_CNT} = \text{BDh} = 189$, bằng lần chạy không bị quấy rầy; hai lệnh đọc tiếp theo lấy Y\_BUF.}
+  \label{fig:dv-proto-busy}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_latency_cycle_cnt_modelsim.png}
+  \caption{\texttt{latency} trên ModelSim: lần chạy ngắn nhất, $L = 1$, $R = 1$. Sau lệnh START, \texttt{status\_busy} kéo dài đúng $2 \cdot 1 + 54 + 1 = 57$ chu kỳ, thể hiện ở \texttt{busy\_cnt} đếm từ 1 đến 57. Khi BUSY xuống, \texttt{status\_done} lên. Bốn lệnh đọc sau đó lần lượt lấy STATUS (0001h), \texttt{CYCLE\_CNT} (0005h), Y\_BUF (1000h) và \texttt{CYCLE\_CNT} lần nữa; test so cả hai lần đọc \texttt{CYCLE\_CNT} với công thức.}
+  \label{fig:dv-latency}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_reg_byteenable_modelsim.png}
+  \caption{\texttt{reg} trên ModelSim: \texttt{byteenable} trên thanh ghi LEN (địa chỉ 0002h). Giá trị F0F0F0F0h được ghi với \texttt{byteenable} = 1111, rồi 0F0F0F0Fh được ghi với \texttt{byteenable} = 0101, tức chỉ byte 0 và byte 2. Lệnh đọc ngay sau đó trả về 0000000Fh sau hai chu kỳ: byte 0 nhận giá trị mới 0Fh, còn hai bit 9 và 8 của LEN, thuộc byte 1, giữ giá trị cũ; các bit ngoài trường $[9{:}0]$ đọc về 0. Phía sau là mẫu \texttt{byteenable} kế tiếp, 0110.}
+  \label{fig:dv-reg}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_random_reset_modelsim.png}
+  \caption{\texttt{random} trên ModelSim: reset bất đồng bộ giữa lần chạy. \texttt{rst\_n} xuống ở giữa hai cạnh clock khi lõi đang BUSY, lúc \texttt{busy\_cnt} bằng 63; \texttt{status\_busy} về 0 ngay lập tức, không chờ cạnh clock, và \texttt{busy\_cnt} dừng lại. Sau khi reset được thả, năm lệnh đọc ở các địa chỉ 0001h đến 0005h lấy STATUS, LEN, ROWS, SCALE\_K và \texttt{CYCLE\_CNT}; \texttt{acc\_readdata} giữ nguyên 00000000h, tức mọi thanh ghi đã về 0. Lõi không tự chạy lại sau reset.}
+  \label{fig:dv-random}
+\end{figure}
+
+\FloatBarrier
 \subsection{Giới hạn của kết quả}
 
 Kết quả trên có ba giới hạn. Thứ nhất, kiểm thử dừng ở ranh giới của lõi: khẳng định ``không có X hoặc Z khi \texttt{readdatavalid}'' mới được kiểm ở dạng tương đương trên \texttt{acc\_readdata}, chưa qua bus Avalon. Thứ hai, độ phủ đã đo là độ phủ chức năng theo danh sách kịch bản; độ phủ mã chưa được đo, vì phiên bản ModelSim đang dùng không hỗ trợ. Thứ ba, phần cài lỗi chạy trên Verilator, một trình mô phỏng hai trạng thái, nên không phản ánh các lỗi chỉ lộ ra qua giá trị X.
