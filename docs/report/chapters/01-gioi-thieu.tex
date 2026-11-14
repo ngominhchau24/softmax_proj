@@ -18,11 +18,11 @@ Các mục tiêu cụ thể:
 
 \subsection{Phạm vi}
 
-Báo cáo tập trung vào thiết kế lõi \texttt{smx\_core}, gồm thanh ghi điều khiển, bộ đệm X/Y, bộ điều khiển và datapath. Lớp bao Avalon, hệ thống Platform Designer và script demo do nhóm hiện thực đảm nhiệm; báo cáo mô tả các phần này ở mức giao diện và cấu trúc hệ thống (Chương 4). Phần kiểm thử lõi do nhóm kiểm thử thực hiện qua cổng \texttt{acc\_*}; kế hoạch và kết quả được trình bày ở Chương 6. Hình \ref{fig:smx-system} cho thấy vị trí của lõi trong hệ thống demo và ranh giới giữa các phần việc.
+Đây là báo cáo tiến độ ở mốc 50\% của đề tài: lõi đã được thiết kế, kiểm thử bằng mô phỏng và tổng hợp riêng. Tích hợp hệ thống, chạy trên board và đánh giá trên mô hình mục tiêu thuộc giai đoạn còn lại; các ô ghi [Chưa đo] sẽ được bổ sung khi đó. Báo cáo tập trung vào thiết kế lõi \texttt{smx\_core}, gồm thanh ghi điều khiển, bộ đệm X/Y, bộ điều khiển và datapath. Lớp bao Avalon, hệ thống Platform Designer và script demo do nhóm hiện thực đảm nhiệm; báo cáo mô tả các phần này ở mức giao diện và cấu trúc hệ thống (Chương 4). Phần kiểm thử lõi do nhóm kiểm thử thực hiện qua cổng \texttt{acc\_*}; kế hoạch và kết quả được trình bày ở Chương 6. Hình \ref{fig:smx-system} cho thấy vị trí của lõi trong hệ thống demo và ranh giới giữa các phần việc.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{smx_system.pdf}
+  \includegraphics[width=0.84\textwidth]{smx_system.pdf}
   \caption{Ranh giới hệ thống: PC, cầu JTAG to Avalon Master, lớp bao \texttt{smx\_avalon} và lõi \texttt{smx\_core}. Phần trong khung nét đứt nằm trên FPGA.}
   \label{fig:smx-system}
 \end{figure}
@@ -66,4 +66,4 @@ Chạy trên board & [Chưa đo] & 7 \\
 
 \subsection{Cấu trúc báo cáo}
 
-Chương 2 khảo sát các hướng softmax phần cứng hiện có. Chương 3 đặc tả thuật toán và số học. Chương 4 mô tả kiến trúc hệ thống và giao diện. Chương 5 trình bày thiết kế từng khối. Chương 6 trình bày kế hoạch và kết quả kiểm thử. Chương 7 trình bày kết quả tổng hợp và đánh giá. Chương 8 kết luận và nêu hướng phát triển.
+Chương 2 khảo sát các hướng softmax phần cứng, Chương 3 đặc tả số học, Chương 4 và 5 trình bày kiến trúc và các khối, Chương 6 đến 8 là kiểm thử, tổng hợp và kết luận.
