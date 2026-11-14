@@ -1,4 +1,10 @@
+% Danh mục ngắn nên đi tiếp ngay sau chương cuối, không ngắt trang; giãn dòng đơn
+\begingroup
+\renewcommand{\sectionbreak}{\vspace{1.2em}}
+\singlespacing\small
+\setlength{\parskip}{0pt}
 \begin{thebibliography}{99}
+\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
 \addcontentsline{toc}{section}{\refname}
 
 \bibitem{milakov2018}
@@ -23,3 +29,4 @@ M.~Wang, S.~Lu, D.~Zhu, J.~Lin, and Z.~Wang. A high-speed and low-complexity arc
 W.~Wang, S.~Zhou, W.~Sun, P.~Sun, and Y.~Liu. SOLE: Hardware-software co-design of softmax and LayerNorm for efficient transformer inference. arXiv:2510.17189, 2025.
 
 \end{thebibliography}
+\endgroup

@@ -41,6 +41,24 @@
 % Nhật ký của một testcase: chỉ chèn khi file có trong docs/report/logs/
 \newcommand{\smxlog}[2]{\IfFileExists{logs/#1}{\noindent\textit{#2}\lstinputlisting{logs/#1}}{}}
 \usepackage{titlesec}
+\usepackage{enumitem}
+\setlist{itemsep=1pt, parsep=0pt, topsep=3pt, partopsep=0pt}   % danh sách gọn, không cách dòng thừa
+
+% ---------- Hình và bảng trôi ----------
+% Cho phép hình, bảng chiếm phần lớn một trang có chữ, để không bị đẩy sang trang riêng gần trống;
+% trên trang chỉ có hình thì xếp từ đầu trang xuống, không giãn đều ra cả trang.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{14pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
 \usepackage{hyperref}
 \hypersetup{hidelinks}   % liên kết vẫn bấm được, không có khung màu quanh chữ
 
@@ -66,8 +84,11 @@
 \titleformat{\subsection}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont}
   {\thesubsection}{0.5em}{}
-% Mỗi chương bắt đầu ở một trang mới
-\newcommand{\sectionbreak}{\clearpage}
+% Chương mới sang trang mới, trừ khi trang hiện tại còn trống hơn nửa: khi đó chương đi tiếp trên
+% cùng trang sau một khoảng trống lớn, để không bỏ trắng phần lớn trang. \penalty0 cho TeX ngắt trang
+% đang dở trước khi đo, nên \pagetotal và \pagegoal là của trang thật sự đang đứng.
+\newcommand{\sectionbreak}{\par\penalty0\relax
+  \ifdim\dimexpr\pagegoal-\pagetotal\relax<0.5\textheight\clearpage\else\vspace{3.2\baselineskip}\fi}
 \titlespacing*{\section}{0pt}{0pt}{14pt}
 \titlespacing*{\subsection}{0pt}{6pt}{0pt}
 
@@ -102,6 +123,7 @@ Thành phố Hồ Chí Minh, 2026
 
 % Mục lục: giãn dòng đơn và không cách đoạn, để không tràn trang
 {\setlength{\parskip}{0pt}\singlespacing\tableofcontents}
+\clearpage
 
 \input{chapters/01-gioi-thieu}
 \input{chapters/02-co-so-khao-sat}
