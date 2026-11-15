@@ -1,0 +1,4 @@
+# de10 - Quartus Prime Lite 18.1 project for the smx demo on DE10-Standard.
+# Build: syn/de10/build.sh   (generates the Platform Designer system, then compiles to .sof)
+QUARTUS_VERSION = "18.1"
+PROJECT_REVISION = "de10"

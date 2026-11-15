@@ -22,7 +22,7 @@ RTL `smx_core` đã tích hợp và qua Fitter. Tài liệu vẫn là DRAFT, nê
 | Sơ đồ | Xong: mọi sơ đồ cấu trúc và FSM đã chuyển, Chau đã duyệt kiểu vẽ | `docs/spec/09-diagram-rules.md`, `docs/spec/fig/` (14 hình), hình mẫu https://claude.ai/artifact/KdXrpjvPAcWa2vqQCf61E3 |
 | Tài liệu lý thuyết softmax | Xong, Chau đang đọc trước khi duyệt các mục A | `docs/spec/01-softmax-theory.md`, bản web https://claude.ai/artifact/ScwHoNtA1WWJKCqLboefGu |
 
-Chưa có gì trong `rtl/avalon/`, `ip/`, `sw/`: wrapper và hệ thống thuộc nhóm implement, không tự viết (`CLAUDE.md`).
+2026-11-07, theo yêu cầu của Chau, đã viết sẵn phần của nhóm implement để chạy thử trên DE10: `rtl/avalon/smx_avalon.sv`, `ip/smx_hw.tcl`, `syn/de10/` (hệ thống JTAG master + smx, top DE10, `build.sh`) và project `syn/smx.qpf`. Cả hai biên dịch Quartus thành công, file `.sof` ở `syn/release/`. Chưa nạp lên board; gán chân chưa đối chiếu với manual Terasic (xem `syn/de10/de10.qsf`). Nhóm implement dùng làm điểm xuất phát, chưa phải bản đã kiểm trên board. `sw/` vẫn trống.
 
 ## Đang chờ Chau
 
