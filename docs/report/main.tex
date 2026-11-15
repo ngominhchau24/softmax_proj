@@ -74,7 +74,7 @@
   \renewcommand{\figurename}{Hình}
   \renewcommand{\contentsname}{Mục lục}
   \renewcommand{\refname}{Tài liệu tham khảo}
-  \newcommand{\smxchaptername}{Chương}
+  \newcommand{\smxchaptername}{Phần}
 \else
   \newcommand{\smxchaptername}{Chapter}
 \fi
@@ -89,7 +89,12 @@
 % Mỗi chương bắt đầu ở một trang mới
 \newcommand{\sectionbreak}{\clearpage}
 \titlespacing*{\section}{0pt}{0pt}{14pt}
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\itshape\fontsize{13pt}{16pt}\selectfont}
+  {\thesubsubsection}{0.5em}{}
 \titlespacing*{\subsection}{0pt}{6pt}{0pt}
+\titlespacing*{\subsubsection}{0pt}{6pt}{0pt}
+\setcounter{tocdepth}{2}   % mục lục chỉ tới mục cấp hai (2.1, 2.2, ...)
 
 \begin{document}
 
@@ -124,14 +129,10 @@ Thành phố Hồ Chí Minh, 2026
 {\setlength{\parskip}{0pt}\singlespacing\tableofcontents}
 \clearpage
 
-\input{chapters/01-gioi-thieu}
-\input{chapters/02-co-so-khao-sat}
-\input{chapters/03-dac-ta-so-hoc}
-\input{chapters/04-kien-truc}
-\input{chapters/05-thiet-ke-khoi}
-\input{chapters/06-kiem-thu}
-\input{chapters/07-tong-hop-danh-gia}
-\input{chapters/08-tinh-hinh-ke-hoach}
+\input{chapters/01-yeu-cau}
+\input{chapters/02-mo-ta-thiet-ke}
+\input{chapters/03-mo-phong}
+\input{chapters/04-tinh-hinh-ke-hoach}
 
 \input{chapters/99-tai-lieu-tham-khao}
 

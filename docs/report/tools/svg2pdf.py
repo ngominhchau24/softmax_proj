@@ -13,7 +13,9 @@ import sys
 import cairosvg
 
 # the diagrams the report includes; add a name here when a chapter starts using another one
-USED = ["smx_system", "softmax_flow", "smx_core", "smx_fsm", "smx_maxtree", "smx_exp2", "smx_sumacc"]
+USED = ["smx_system", "softmax_flow", "smx_core", "smx_fsm",
+        "smx_scale", "smx_maxtree", "smx_exp2", "smx_sumacc", "smx_divider", "smx_divider_fsm",
+        "smx_norm", "smx_buf", "smx_csr", "smx_ctrl"]
 
 
 def main():

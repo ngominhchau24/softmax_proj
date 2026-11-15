@@ -1,0 +1,522 @@
+\section{Mô tả thiết kế}
+
+Phần này mô tả thiết kế theo hai lớp: mục \ref{sec:principle} giải thích nguyên lý hoạt động, từ thuật toán và số học tới luồng dữ liệu, điều khiển và giao diện; mục \ref{sec:rtl} trình bày sơ đồ RTL của lõi \texttt{smx\_core} và của từng khối.
+
+\subsection{Nguyên lý hoạt động}
+\label{sec:principle}
+
+\subsubsection{Softmax theo hàng và chuẩn hoá trực tuyến}
+\label{sec:softmax}
+
+Với một hàng $x = (x_0, \dots, x_{L-1})$, softmax cho
+\begin{equation}
+  y_i = \frac{e^{x_i}}{\sum_{k=0}^{L-1} e^{x_k}}, \qquad i = 0, \dots, L-1.
+\end{equation}
+Để ổn định số học, người ta thường trừ đi giá trị lớn nhất của hàng trước khi lấy mũ. Trên phần cứng, hai khó khăn chính là hàm mũ và phép chia.
+
+Milakov và Gimelshein \cite{milakov2018} đề xuất tính max và tổng mũ trong cùng một lượt quét, cập nhật tổng khi max thay đổi bằng hệ số $e^{M_{\text{cũ}}-M_{\text{mới}}}$. Thuật toán này giảm số lượt quét từ ba xuống hai, với điều kiện có cách hiệu chỉnh hệ số đó.
+
+\subsubsection{Các hướng tiếp cận và lựa chọn của đề tài}
+\label{sec:choice}
+
+I-BERT \cite{kim2021ibert} đưa toàn bộ suy luận Transformer về số nguyên, dùng đa thức xấp xỉ cho hàm mũ. Softermax \cite{stevens2021softermax} dùng cơ số 2, max nguyên và PWL cho $2^{F}$. I-ViT và Shiftmax \cite{li2023ivit} dùng dịch bit để hiệu chỉnh hệ số. SoftGen \cite{wei2020softgen} là bộ sinh softmax tham số hoá, cho thấy việc đọc lại dữ liệu từ bộ nhớ thay vì lưu trong thanh ghi giữ diện tích không đổi theo độ dài vector. SOLE \cite{wang2025sole} và kiến trúc log-sum-exp \cite{wang2018lse} khảo sát thêm các dạng xấp xỉ khác.
+
+Từ khảo sát, đề tài chọn:
+\begin{itemize}
+  \item Cơ số 2 với hệ số $K = S \cdot \log_2 e$ do phần mềm tính sẵn, nên phần cứng không cần biết $S$ và không cần hàm log.
+  \item IntMax để max lấy trên $\lceil u \rceil$, khiến hiệu chỉnh tổng chỉ là phép dịch.
+  \item PWL 8 đoạn cho $2^{F}$, đủ để sai số xấp xỉ nằm dưới sai số lượng tử hoá đầu ra.
+  \item Một bộ chia tuần tự cho mỗi hàng, mỗi phần tử chỉ một phép nhân.
+  \item Tính lại $E$ ở lượt hai từ bộ đệm đầu vào, thay vì lưu trung gian.
+\end{itemize}
+
+Chi tiết từng lựa chọn và nguồn gốc số liệu được ghi trong bảng nguồn của tài liệu thiết kế, trong đó số liệu đo bằng golden model được đánh dấu tách biệt với số liệu ước lượng.
+
+\subsubsection{Đầu vào và hệ số $K$}
+\label{sec:arith}
+
+Các công thức dưới đây khớp với golden model \texttt{model/softmax\_ref.py}. Khi có mâu thuẫn, golden model là nguồn chân lý.
+
+Đầu vào $q$ là INT8 có dấu. Giá trị thực là $x = S \cdot q$, với $S$ là scale lượng tử hoá của điểm attention. Hệ số
+\begin{equation}
+  K = \operatorname{round}(S \cdot \log_2 e \cdot 2^{16}),
+\end{equation}
+là số nguyên không dấu 16 bit (UQ0.16), được phần mềm tính và ghi vào thanh ghi \texttt{SCALE\_K}. Ràng buộc $0 < S < 0{,}693$ để $K$ vừa 16 bit.
+
+\subsubsection{Số mũ cơ số 2}
+\label{sec:exp}
+
+Với $u_k = q_k \cdot K$ (25 bit, Q8.16) và $c_k = \lceil u_k / 2^{16} \rceil$ (9 bit có dấu), hàm $E(d)$ với $d \le 0$ được tính như sau. Đặt $I = d \gg 16$, $F = d \,\&\, \text{0xFFFF}$, chỉ số đoạn $\mathit{idx} = F \gg 13$ và phần dư $r = F \,\&\, \text{0x1FFF}$ với $N_{\text{SEG}} = 8$. Khi đó
+\begin{align}
+  E_0 &= C[\mathit{idx}] + \left((\tilde{M}[\mathit{idx}] \cdot r) \gg 13\right), \\
+  E   &= \begin{cases} 0, & -I > 15, \\ E_0 \gg (-I), & \text{ngược lại,} \end{cases}
+\end{align}
+trong đó $E_0$ là số UQ1.15 rộng 16 bit. Hai bảng hệ số của xấp xỉ tuyến tính từng đoạn được định nghĩa bởi
+\begin{align}
+  C[i] &= \operatorname{round}\left(2^{i/N} \cdot 2^{15}\right), \\
+  \tilde{M}[i] &= \operatorname{round}\left(\left(2^{(i+1)/N} - 2^{i/N}\right) \cdot 2^{15}\right),
+\end{align}
+với $N = N_{\text{SEG}}$ và $i = 0, \dots, N-1$. Hai bảng này được sinh bằng lệnh \texttt{python3 model/softmax\_ref.py --gen-pwl 8}, không sửa tay.
+
+\subsubsection{Lượt 1: chuẩn hoá trực tuyến với IntMax}
+\label{sec:pass1}
+
+Hàng được duyệt theo các nhóm $g = 0, 1, \dots$, mỗi nhóm gồm $P$ phần tử liên tiếp ($P = 8$ ở cấu hình mặc định), theo thứ tự chỉ số tăng dần. Với nhóm $g$, đặt $M_g = \max_{k \in g} c_k$. Các đại lượng được cập nhật như sau:
+\begin{align}
+  M_{\text{mới}} &= \begin{cases} M_g, & g = 0, \\ \max(M, M_g), & g > 0, \end{cases} \\
+  \mathit{sum} &\leftarrow \left(\mathit{sum} \gg (M_{\text{mới}} - M)\right) + \sum_{k \in g} E(u_k - M_{\text{mới}} \cdot 2^{16}), \\
+  M &\leftarrow M_{\text{mới}}.
+\end{align}
+Thứ tự nhóm và phép dịch cắt bỏ là một phần của đặc tả, vì chúng ảnh hưởng đến kết quả bit-exact.
+
+\subsubsection{Nghịch đảo}
+\label{sec:rcp}
+
+Sau lượt 1, $\mathit{sum} \ge 2^{14}$ và
+\begin{equation}
+  \mathit{Rcp} = \left\lfloor \frac{2^{40}}{\mathit{sum}} \right\rfloor,
+\end{equation}
+là số không dấu 27 bit. Phép chia này được thực hiện bằng bộ chia radix-2 tuần tự.
+
+\subsubsection{Lượt 2: chuẩn hoá đầu ra}
+\label{sec:pass2}
+
+Với mỗi $k < L$, tính lại $e = E(u_k - M \cdot 2^{16})$, trong đó $M$ là giá trị cuối của lượt 1, rồi
+\begin{equation}
+  y_k = \min\left(255, \; \left\lfloor \frac{e \cdot \mathit{Rcp} + 2^{31}}{2^{32}} \right\rfloor\right),
+\end{equation}
+trong đó phép chia lấy phần nguyên được thực hiện bằng dịch phải 32 bit, còn số hạng $2^{31}$ làm tròn về số gần nhất. Giá trị thực của đầu ra là $y_k / 256$. Xác suất bằng 1 không biểu diễn được trong 8 bit nên được bão hoà về 255.
+
+\subsubsection{Sai số và giới hạn}
+\label{sec:err}
+
+Golden model được kiểm trên hàng ngẫu nhiên $L = 128$ với $S \in \{0{,}02;\, 0{,}0625;\, 0{,}2\}$. Sai số tuyệt đối tối đa so với softmax float64 khoảng $0{,}00195$ đến $0{,}0020$ với $N_{\text{SEG}} = 8$, tức bằng nửa LSB đầu ra. Sai số của xấp xỉ PWL theo số đoạn là $0{,}376\%$, $0{,}094\%$ và $0{,}025\%$ với 4, 8 và 16 đoạn. Với 8 đoạn, sai số xấp xỉ đã nằm dưới sàn lượng tử hoá UINT8, nên lượng tử hoá là yếu tố chi phối.
+
+Độ dài hàng tối đa là $L_{\max} = 512$ và số hàng tối đa là $R_{\max} = 16$. Hai giá trị này được ghi trong thanh ghi \texttt{HW\_PARAM} để phần mềm đọc và kiểm tra.
+
+\subsubsection{Luồng dữ liệu và điều khiển}
+\label{sec:flow}
+
+Bộ tăng tốc gồm một lõi \texttt{smx\_core} và một lớp bao Avalon-MM mỏng. Lõi chứa toàn bộ thanh ghi điều khiển, bộ đệm đầu vào X, bộ đệm đầu ra Y, bộ điều khiển và datapath. Lõi đưa ra một cổng truy cập bộ nhớ đơn giản \texttt{acc\_*}, có độ trễ đọc cố định 2 chu kỳ và không có tín hiệu chờ. Ranh giới này trong hệ thống demo đã được vẽ ở Hình \ref{fig:smx-system}: máy tính điều khiển qua USB-Blaster, cầu JTAG to Avalon Master, lớp bao rồi tới lõi.
+
+Hình \ref{fig:softmax-flow} tóm tắt đường đi của dữ liệu qua các phép tính ở mục \ref{sec:arith} đến \ref{sec:err}. Luồng dữ liệu của một hàng:
+\begin{enumerate}
+  \item Lượt 1 đọc $X$ theo nhóm $P$ phần tử, đưa qua phép nhân với $K$, IntMax, $E(d)$ và cây cộng để có $\mathit{sum}$ và $M$.
+  \item Bộ chia tính $\mathit{Rcp}$ từ $\mathit{sum}$.
+  \item Lượt 2 đọc lại $X$, tính lại $E$, nhân với $\mathit{Rcp}$, làm tròn, bão hoà và ghi vào $Y$.
+\end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{softmax_flow.pdf}
+  \caption{Luồng số học của một hàng. Lượt 1 đi qua nhánh $M$, $dM$ và bộ tích luỹ $\mathit{sum}$ để có $\mathit{Rcp}$; lượt 2 dùng lại nhánh $E$ rồi nhân với $\mathit{Rcp}$ để ra $y$.}
+  \label{fig:softmax-flow}
+\end{figure}
+
+Khối \texttt{smx\_ctrl} đi theo máy trạng thái ở Hình \ref{fig:smx-fsm}, gồm tám trạng thái. Từ \texttt{IDLE}, lệnh START đưa lõi vào \texttt{P1\_RUN}, nơi mỗi chu kỳ phát một nhóm của lượt 1; \texttt{P1\_DRAIN} chờ tổng của nhóm cuối ra khỏi pipeline. \texttt{DIV} khởi động bộ chia và \texttt{DIV\_WAIT} chờ nó xong. \texttt{P2\_RUN} và \texttt{P2\_DRAIN} làm tương tự cho lượt 2, tới khi phần tử $y$ cuối cùng được ghi. \texttt{NEXT\_ROW} hoặc quay lại \texttt{P1\_RUN} cho hàng kế tiếp, hoặc báo xong và về \texttt{IDLE}. Việc chuyển pha dựa trên sự kiện từ datapath, không dựa trên bộ đếm độ trễ.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_fsm.pdf}
+  \caption{Máy trạng thái của \texttt{smx\_ctrl}. Nhãn trên mỗi cung là điều kiện chuyển; $r$ là chỉ số hàng, $R$ là số hàng.}
+  \label{fig:smx-fsm}
+\end{figure}
+
+\subsubsection{Giao diện, bản đồ thanh ghi và hệ thống demo}
+\label{sec:iface}
+
+IP là một Avalon-MM slave với dữ liệu 32 bit và địa chỉ theo word. Giao diện không dùng burst, không dùng \texttt{waitrequest}, và có độ trễ đọc 2 chu kỳ. Phần mềm thăm dò bit \texttt{DONE} để biết khi nào xong; IP không phát ngắt. Ba tín hiệu trạng thái \texttt{status\_busy}, \texttt{status\_done} và \texttt{status\_err} được đưa ra ngoài qua một conduit để nối LED khi demo.
+
+Hai kiểu hệ thống được hỗ trợ:
+\begin{itemize}
+  \item Đường demo chính: không dùng HPS, master là JTAG to Avalon Master Bridge, điều khiển từ PC bằng System Console.
+  \item Đường tuỳ chọn: GHRD Terasic, master là cầu HPS-to-FPGA.
+\end{itemize}
+
+Lớp bao \texttt{smx\_avalon} chỉ đổi tên tín hiệu giữa Avalon-MM slave \texttt{s0} và cổng \texttt{acc\_*} của lõi, không thêm logic nào. Thành phần Platform Designer được khai báo trong \texttt{ip/smx\_hw.tcl} với các giao diện: clock, reset mức thấp, slave \texttt{s0} (địa chỉ theo word, độ trễ đọc 2, không \texttt{waitrequest}, không burst, \texttt{byteenable} 4 bit) và conduit trạng thái. Hai tham số $P$ và $N_{\text{SEG}}$ chọn được khi tạo thành phần.
+
+Hệ thống demo trên DE10-Standard không dùng HPS và gồm ba khối: nguồn clock 50 MHz từ \texttt{CLOCK\_50}, JTAG to Avalon Master Bridge, và \texttt{smx} đặt ở địa chỉ gốc 0, nên offset dùng trong System Console trùng với offset của bản đồ thanh ghi. Ở mức top, nút \texttt{KEY[0]} là reset mức thấp, đi qua một bộ đồng bộ hai tầng để được thả đồng bộ với clock, vì lõi không có bộ đồng bộ reset riêng; ba đèn \texttt{LEDR[2:0]} hiển thị BUSY, DONE và ERR.
+
+Tại thời điểm viết báo cáo, lớp bao, thành phần và hệ thống demo đã được nhóm hiện thực viết và biên dịch thành công bằng Quartus, tạo được tệp \texttt{.sof}. Thiết kế chưa được nạp lên board, và phần gán chân chưa được đối chiếu với tài liệu của Terasic.
+
+Bảng \ref{tab:regmap} tóm tắt bản đồ thanh ghi, offset tính theo byte.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lllp{7.2cm}}
+\toprule
+Offset & Tên & Truy cập & Nội dung \\
+\midrule
+0x0000 & CTRL      & W   & Bit 0: START (tự xoá) \\
+0x0004 & STATUS    & R   & BUSY, DONE, ERR \\
+0x0008 & LEN       & R/W & Độ dài hàng $L$, 1..512 \\
+0x000C & ROWS      & R/W & Số hàng $R$, 1..16 \\
+0x0010 & SCALE\_K  & R/W & Hệ số $K$ (UQ0.16) \\
+0x0014 & CYCLE\_CNT & R  & Số chu kỳ từ START đến DONE \\
+0x0018 & HW\_PARAM & R   & $P$, $\log_2 L_{\max}$, $R_{\max}$, $\log_2 N_{\text{SEG}}$, VERSION \\
+0x2000--0x3FFF & X\_BUF & R/W & INT8, hàng $r$ phần tử $i$ tại byte $r \cdot 512 + i$ \\
+0x4000--0x5FFF & Y\_BUF & R   & UINT8, cùng bố trí \\
+\bottomrule
+\end{tabular}
+\caption{Bản đồ thanh ghi của IP (rút gọn từ đặc tả).}
+\label{tab:regmap}
+\end{table}
+
+Phần mềm thực hiện lần lượt các bước sau: tính $K$ và ghi vào \texttt{SCALE\_K}; ghi $R$ hàng vào X\_BUF; ghi \texttt{LEN} và \texttt{ROWS}; ghi START; đọc STATUS cho đến khi DONE bằng 1; đọc Y\_BUF, và đọc CYCLE\_CNT nếu cần đo thời gian.
+
+\subsection{Sơ đồ RTL}
+\label{sec:rtl}
+
+Lõi \texttt{smx\_core} gồm mười khối, thiết kế theo thứ tự phụ thuộc. Mỗi khối có một tài liệu thiết kế riêng, mô tả chức năng, bảng cổng, số học đối chiếu với golden model, sơ đồ cấu trúc, timing và kế hoạch kiểm thử. Bảng \ref{tab:blocks} liệt kê các khối và trạng thái; cả mười khối đã có RTL và testbench tự kiểm, chín khối con đã được tích hợp vào \texttt{smx\_core}. Các sơ đồ dưới đây là sơ đồ cấu trúc của RTL, vẽ từ tài liệu thiết kế của từng khối (\texttt{docs/spec}): mỗi hình ghi các thanh ghi với hậu tố \texttt{\_q}, độ rộng tín hiệu và độ trễ của khối.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{clll}
+\toprule
+\# & Khối & Vai trò & Trạng thái \\
+\midrule
+1  & \texttt{smx\_exp2}    & $d \to E$, PWL và dịch & Đã tích hợp \\
+2  & \texttt{smx\_scale}   & $u = q \cdot K$, $c = \lceil u \rceil$ & Đã tích hợp \\
+3  & \texttt{smx\_maxtree} & $M_g$ và cập nhật $M$ & Đã tích hợp \\
+4  & \texttt{smx\_sumacc}  & Cây cộng và tích luỹ có dịch & Đã tích hợp \\
+5  & \texttt{smx\_divider} & $\lfloor 2^{40} / \mathit{sum} \rfloor$ tuần tự & Đã tích hợp \\
+6  & \texttt{smx\_norm}    & $E \cdot \mathit{Rcp}$, làm tròn, bão hoà & Đã tích hợp \\
+7  & \texttt{smx\_buf}     & Bộ đệm nhiều bank, có byte-enable & Đã tích hợp \\
+8  & \texttt{smx\_csr}     & Thanh ghi, START/DONE/ERR & Đã tích hợp \\
+9  & \texttt{smx\_ctrl}    & FSM hàng và lượt & Đã tích hợp \\
+10 & \texttt{smx\_core}    & Nối các khối & Mô phỏng đạt \\
+\bottomrule
+\end{tabular}
+\caption{Danh sách khối và trạng thái thiết kế.}
+\label{tab:blocks}
+\end{table}
+
+\subsubsection{Sơ đồ khối của \texttt{smx\_core}}
+\label{sec:core}
+
+Hình \ref{fig:smx-core} là sơ đồ khối của \texttt{smx\_core}, vẽ ở $P = 8$ và $N_{\text{SEG}} = 8$. Khối \texttt{smx\_csr} giải mã cổng \texttt{acc\_*}, giữ các thanh ghi và ghi vào X\_BUF. Khi chạy, \texttt{smx\_ctrl} phát địa chỉ từng nhóm; dữ liệu đọc từ X\_BUF đi qua \texttt{smx\_scale}, \texttt{smx\_maxtree} và \texttt{smx\_exp2}, rồi rẽ sang \texttt{smx\_sumacc} và \texttt{smx\_divider} ở lượt 1, hoặc sang \texttt{smx\_norm} và Y\_BUF ở lượt 2. Một chuỗi thanh ghi dịch mang các nhãn của nhóm (lượt, nhóm đầu, nhóm cuối, mặt nạ lane) đi song song với dữ liệu, nên mỗi khối biết nhóm nó đang xử lý mà không cần tự đếm.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[angle=90,height=0.9\textheight]{smx_core.pdf}
+  \caption{Sơ đồ khối bên trong \texttt{smx\_core} (xoay ngang), vẽ ở $P = 8$, $N_{\text{SEG}} = 8$; clock và reset không vẽ.}
+  \label{fig:smx-core}
+\end{figure}
+
+Mười khối được trình bày lần lượt theo đường đi của dữ liệu: các khối số học (\texttt{smx\_scale}, \texttt{smx\_maxtree}, \texttt{smx\_exp2}, \texttt{smx\_sumacc}, \texttt{smx\_divider}, \texttt{smx\_norm}), rồi bộ đệm, thanh ghi và bộ điều khiển. Mỗi khối có sơ đồ cấu trúc và bảng cổng.
+
+\subsubsection{\texttt{smx\_scale}}
+
+Khối \texttt{smx\_scale} nhân điểm đầu vào $q$ với hệ số $K$ bằng một bộ nhân $8 \times 17$ có dấu để có $u = q \cdot K$, rồi làm tròn lên để có $c = \lceil u / 2^{16} \rceil$. Khối xử lý một phần tử mỗi chu kỳ và được nhân bản $P$ lần; độ trễ 3 chu kỳ, với thanh ghi ở hai phía bộ nhân để Quartus đưa vào khối DSP.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_scale.pdf}
+  \caption{\texttt{smx\_scale}: nhân $q$ với $K$ để có $u$, và làm tròn lên để có $c$. Độ trễ 3 chu kỳ; bộ nhân $8 \times 17$ có dấu có thanh ghi ở hai phía.}
+  \label{fig:blk-scale}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{in\_valid} & vào & 1 & có phần tử ở chu kỳ này \\
+\texttt{q\_in} & vào & 8 & điểm attention đã lượng tử hoá, INT8 có dấu \\
+\texttt{k\_in} & vào & 16 & hệ số $K$ (UQ0.16), ổn định suốt lần chạy \\
+\texttt{out\_valid} & ra & 1 & \texttt{in\_valid} trễ đúng 3 chu kỳ \\
+\texttt{u\_out} & ra & 25 & $u = q \cdot K$, Q8.16 có dấu \\
+\texttt{c\_out} & ra & 9 & $c = \lceil u / 2^{16} \rceil$, có dấu, cùng chu kỳ với \texttt{u\_out} \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_scale} (không kể clock và reset).}
+\label{tab:p-scale}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_maxtree}}
+
+Khối \texttt{smx\_maxtree} thực hiện IntMax. Nó che các lane nằm ngoài độ dài hàng, tìm giá trị lớn nhất $M_g$ của nhóm bằng cây so sánh hai tầng, rồi cập nhật giá trị lớn nhất hiện hành $M$ và bước nhảy $dM$ của nhóm. Chỉ lượt 1 đi qua khối này; độ trễ 2 chu kỳ. Đây là khối có đường găng nhất về timing ở $P = 8$ và $P = 16$.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_maxtree.pdf}
+  \caption{\texttt{smx\_maxtree}: che các lane ngoài độ dài hàng, tìm giá trị lớn nhất của nhóm bằng cây so sánh, rồi cập nhật $M$ và bước nhảy $dM$. Độ trễ 2 chu kỳ; vẽ ở $P = 8$.}
+  \label{fig:blk-maxtree}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{in\_valid} & vào & 1 & có nhóm ở chu kỳ này, chỉ lên ở lượt 1 \\
+\texttt{in\_first} & vào & 1 & nhóm đầu của hàng \\
+\texttt{in\_en} & vào & $P$ & lane hợp lệ ($k < L$) \\
+\texttt{c\_in} & vào & $P \times 9$ & giá trị $c$ của các lane \\
+\texttt{out\_valid} & ra & 1 & \texttt{in\_valid} trễ đúng 2 chu kỳ \\
+\texttt{m\_out} & ra & 9 & $M_{\text{mới}}$ của nhóm \\
+\texttt{dm\_out} & ra & 8 & $M_{\text{mới}} - M$; bằng 0 ở nhóm đầu \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_maxtree}.}
+\label{tab:p-maxtree}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_exp2}}
+
+Khối \texttt{smx\_exp2} tính $E = 2^{d}$ với $d = u - M \cdot 2^{16} \le 0$. Phần lẻ của $d$ chọn đoạn trong bảng PWL, phần dư đi qua bộ nhân $13 \times 13$, còn phần nguyên thành lượng dịch phải; nếu lượng dịch vượt 15 thì $E = 0$. Đây là khối phức tạp nhất về số học vì phải khớp bit-exact với bảng PWL và phép dịch. Khối được nhân bản $P$ lần và dùng ở cả hai lượt; độ trễ 3 chu kỳ.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_exp2.pdf}
+  \caption{\texttt{smx\_exp2}: tính $E = 2^{d}$ với $d = u - M \cdot 2^{16}$. Phần lẻ chọn hệ số trong bảng PWL và qua bộ nhân $13 \times 13$; phần nguyên thành lượng dịch phải, hoặc ép kết quả về 0. Độ trễ 3 chu kỳ; vẽ ở $N_{\text{SEG}} = 8$.}
+  \label{fig:blk-exp2}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{in\_valid} & vào & 1 & có phần tử ở chu kỳ này \\
+\texttt{in\_en} & vào & 1 & lane hợp lệ; bằng 0 thì $E = 0$ \\
+\texttt{u\_in} & vào & 25 & $u$ từ \texttt{smx\_scale} \\
+\texttt{m\_in} & vào & 9 & $M$ (lượt 1: của nhóm; lượt 2: cuối hàng) \\
+\texttt{out\_valid} & ra & 1 & \texttt{in\_valid} trễ đúng 3 chu kỳ \\
+\texttt{e\_out} & ra & 16 & $E$, UQ1.15 \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_exp2}.}
+\label{tab:p-exp2}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_sumacc}}
+
+Khối \texttt{smx\_sumacc} cộng $E$ của $P$ lane bằng cây cộng hai tầng, rồi tích luỹ vào $\mathit{sum}$ sau khi dịch tổng cũ sang phải $dM$ bit; nhóm đầu của hàng bỏ qua tổng cũ. Vòng phản hồi qua $\mathit{sum}$ là điểm được dự đoán sẽ găng về timing khi thiết kế kiến trúc, nhưng kết quả đo ở mục \ref{sec:synth} cho thấy với $P = 8$ và $P = 16$ đường găng nhất nằm ở tầng đầu của cây max trong \texttt{smx\_maxtree}. Độ trễ 3 chu kỳ.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_sumacc.pdf}
+  \caption{\texttt{smx\_sumacc}: cộng $E$ của $P$ lane bằng cây cộng hai tầng, rồi tích luỹ vào $\mathit{sum}$ sau khi dịch tổng cũ sang phải $dM$ bit; nhóm đầu của hàng bỏ qua tổng cũ. Độ trễ 3 chu kỳ; vẽ ở $P = 8$.}
+  \label{fig:blk-sumacc}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{in\_valid} & vào & 1 & có nhóm, chỉ lên ở lượt 1 \\
+\texttt{in\_first} & vào & 1 & nhóm đầu của hàng \\
+\texttt{e\_in} & vào & $P \times 16$ & $E$ của các lane; lane bị che đã bằng 0 \\
+\texttt{dm\_in} & vào & 8 & $dM$ từ \texttt{smx\_maxtree}, từ 0 đến 254 \\
+\texttt{out\_valid} & ra & 1 & \texttt{in\_valid} trễ đúng 3 chu kỳ \\
+\texttt{sum\_out} & ra & 25 & $\mathit{sum}$ tích luỹ, giữ đến nhóm kế tiếp \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_sumacc}.}
+\label{tab:p-sumacc}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_divider}}
+
+Khối \texttt{smx\_divider} là bộ chia phục hồi radix-2 tính $\mathit{Rcp} = \lfloor 2^{40} / \mathit{sum} \rfloor$, mỗi chu kỳ quyết định một bit thương. Mỗi hàng chỉ cần một phép chia nên chỉ có một bản. Độ trễ từ \texttt{start} tới \texttt{done} là 28 chu kỳ, gồm 27 bước lặp (Hình \ref{fig:blk-divider-fsm}).
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_divider.pdf}
+  \caption{\texttt{smx\_divider}: bộ chia phục hồi tính $\mathit{Rcp} = \lfloor 2^{40} / \mathit{sum} \rfloor$, mỗi chu kỳ quyết định một bit thương. Độ trễ 28 chu kỳ từ \texttt{start} tới \texttt{done}.}
+  \label{fig:blk-divider}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_divider_fsm.pdf}
+  \caption{Máy trạng thái của \texttt{smx\_divider}: nạp $\mathit{sum}$ khi có \texttt{start}, lặp 27 bước, rồi nạp $\mathit{Rcp}$ và phát \texttt{done} trong một chu kỳ.}
+  \label{fig:blk-divider-fsm}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{start} & vào & 1 & xung một chu kỳ; \texttt{sum\_in} được lấy mẫu ở chu kỳ này \\
+\texttt{sum\_in} & vào & 25 & $\mathit{sum}$, hợp lệ khi $2^{14} \le \mathit{sum} \le 2^{24}$ \\
+\texttt{done} & ra & 1 & xung một chu kỳ, 28 chu kỳ sau \texttt{start} \\
+\texttt{rcp\_out} & ra & 27 & $\mathit{Rcp}$, giữ nguyên đến lần \texttt{done} kế tiếp \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_divider}.}
+\label{tab:p-divider}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_norm}}
+
+Khối \texttt{smx\_norm} nhân $E$ với $\mathit{Rcp}$ bằng bộ nhân $16 \times 27$, làm tròn ở bit 31 và bão hoà về 255 để có $y$. Khối được nhân bản $P$ lần và chỉ chạy ở lượt 2; độ trễ 3 chu kỳ.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_norm.pdf}
+  \caption{\texttt{smx\_norm}: nhân $E$ với $\mathit{Rcp}$ bằng bộ nhân $16 \times 27$, làm tròn ở bit 31 và bão hoà về 255 để có $y$. Độ trễ 3 chu kỳ.}
+  \label{fig:blk-norm}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{in\_valid} & vào & 1 & có phần tử ở chu kỳ này, chỉ lên ở lượt 2 \\
+\texttt{e\_in} & vào & 16 & $E$ từ \texttt{smx\_exp2} \\
+\texttt{rcp\_in} & vào & 27 & $\mathit{Rcp}$, ổn định suốt lượt 2 \\
+\texttt{out\_valid} & ra & 1 & \texttt{in\_valid} trễ đúng 3 chu kỳ \\
+\texttt{y\_out} & ra & 8 & $y$, UINT8 \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_norm}.}
+\label{tab:p-norm}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_buf}}
+
+Hai bộ đệm X và Y dùng chung một module \texttt{smx\_buf}, là bộ nhớ hai cổng đơn có cổng đọc qua thanh ghi (độ trễ 1 chu kỳ). Số bank bằng $P/4$, mỗi bank rộng 32 bit; với $P = 8$, mỗi bộ đệm gồm hai bank 32 bit $\times$ 1024 word, và mỗi byte của mỗi bank là một RAM riêng để ghi theo \texttt{byteenable}. Khối không có reset.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_buf.pdf}
+  \caption{\texttt{smx\_buf}: bộ đệm hai cổng đơn, một cổng ghi có \texttt{byteenable} và một cổng đọc có thanh ghi (độ trễ 1 chu kỳ). Vẽ ở $P = 8$: 8 RAM, mỗi bank và mỗi byte một RAM.}
+  \label{fig:blk-buf}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{wr\_en} & vào & $P/4$ & cho phép ghi, mỗi bit một bank \\
+\texttt{wr\_be} & vào & 4 & \texttt{byteenable} \\
+\texttt{wr\_addr} & vào & 10 & địa chỉ từ trong bank \\
+\texttt{wr\_data} & vào & $P/4 \times 32$ & dữ liệu ghi, bank 0 ở bit thấp \\
+\texttt{rd\_addr} & vào & 10 & địa chỉ đọc \\
+\texttt{rd\_data} & ra & $P/4 \times 32$ & dữ liệu đọc, trễ 1 chu kỳ; lane 0 ở bit $[7{:}0]$ \\
+\bottomrule
+\end{tabular}
+\caption{Cổng của \texttt{smx\_buf} ở $P = 8$, độ rộng địa chỉ là 10 bit.}
+\label{tab:p-buf}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_csr}}
+
+Khối \texttt{smx\_csr} giải mã cổng \texttt{acc\_*}, giữ các thanh ghi LEN, ROWS, SCALE\_K và các bit trạng thái BUSY, DONE, ERR, đếm \texttt{CYCLE\_CNT}, ghi vào X\_BUF và ghép đường đọc hai tầng để dữ liệu trả về đúng 2 chu kỳ sau lệnh đọc. Khi BUSY, mọi lệnh ghi vào LEN, ROWS, SCALE\_K và X\_BUF bị bỏ qua để bảo vệ lần chạy đang diễn ra.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_csr.pdf}
+  \caption{\texttt{smx\_csr}: giải mã cổng \texttt{acc\_*}, các thanh ghi LEN, ROWS, SCALE\_K, trạng thái BUSY, DONE, ERR, cổng ghi X\_BUF, và đường đọc hai tầng trả dữ liệu sau 2 chu kỳ.}
+  \label{fig:blk-csr}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{acc\_*} & vào/ra & 13, 1, 1, 32, 4, 32 & cổng truy cập của lõi: địa chỉ, ghi, đọc, dữ liệu ghi, \texttt{byteenable}, dữ liệu đọc \\
+\texttt{status\_*} & ra & 1 mỗi bit & BUSY, DONE, ERR \\
+\texttt{len, rows, k} & ra & 10, 5, 16 & giá trị các thanh ghi cấu hình \\
+\texttt{start} & ra & 1 & xung một chu kỳ ở đầu lần chạy, chỉ khi cấu hình hợp lệ \\
+\texttt{run\_done} & vào & 1 & từ \texttt{smx\_ctrl}, báo hết hàng cuối \\
+\texttt{x\_wr\_*} & ra & $P/4$, 4, 10, $P/4 \times 32$ & cổng ghi X\_BUF; bị chặn khi BUSY \\
+\texttt{buf\_rd\_addr} & ra & 10 & địa chỉ đọc cho cả hai bộ đệm \\
+\bottomrule
+\end{tabular}
+\caption{Cổng chính của \texttt{smx\_csr}.}
+\label{tab:p-csr}
+\end{table}
+
+
+\subsubsection{\texttt{smx\_ctrl}}
+
+Khối \texttt{smx\_ctrl} chứa máy trạng thái ở mục \ref{sec:flow}, bộ đếm nhóm và hàng, phần tính hình học của nhóm từ LEN, và phần giải mã ra các nhãn của nhóm (hợp lệ, lượt, nhóm đầu, nhóm cuối, mặt nạ lane) cùng địa chỉ đọc, ghi của hai bộ đệm. Mọi ngõ ra là tổ hợp của trạng thái và các thanh ghi.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{smx_ctrl.pdf}
+  \caption{\texttt{smx\_ctrl}: thanh ghi trạng thái, bộ đếm nhóm và hàng, phần tính hình học của nhóm từ LEN, và phần giải mã ra các nhãn của nhóm cùng địa chỉ đọc, ghi của hai bộ đệm.}
+  \label{fig:blk-ctrl}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{2.7cm}p{1.2cm}p{1.9cm}p{7.2cm}}
+\toprule
+Cổng & Hướng & Độ rộng & Ý nghĩa \\
+\midrule
+\texttt{start} & vào & 1 & xung từ \texttt{smx\_csr}, chỉ có nghĩa ở IDLE \\
+\texttt{len, rows} & vào & 10, 5 & $L$ và $R$, ổn định khi BUSY \\
+\texttt{grp\_valid, grp\_pass2, grp\_first, grp\_last} & ra & 1 mỗi bit & nhãn của nhóm đang phát \\
+\texttt{grp\_en} & ra & $P$ & lane hợp lệ của nhóm \\
+\texttt{grp\_addr} & ra & 10 & địa chỉ đọc X\_BUF, ghép từ chỉ số hàng và nhóm \\
+\texttt{sum\_last, div\_done} & vào & 1 & sự kiện từ datapath \\
+\texttt{div\_start} & ra & 1 & khởi động bộ chia \\
+\texttt{y\_valid, y\_last} & vào & 1 & sự kiện ghi $y$ \\
+\texttt{y\_wr\_addr} & ra & 10 & địa chỉ ghi Y\_BUF \\
+\texttt{run\_done} & ra & 1 & xong hàng cuối \\
+\bottomrule
+\end{tabular}
+\caption{Cổng chính của \texttt{smx\_ctrl}.}
+\label{tab:p-ctrl}
+\end{table}
+
+
+\subsubsection{Độ trễ và tài nguyên từng khối}
+
+Bảng \ref{tab:blk-res} ghi độ trễ của từng khối và tài nguyên khi tổng hợp riêng khối đó. Các số tài nguyên lấy từ bước Analysis \& Synthesis của Quartus, chưa qua Fitter, nên chỉ dùng để so sánh tương đối giữa các khối; tài nguyên của cả lõi sau Fitter nằm ở mục \ref{sec:synth}. Tổng độ trễ của đường từ địa chỉ đọc X\_BUF tới $E$ là $1 + 3 + 2 + 3 = 9$ chu kỳ, và mỗi lượt quét cộng thêm 3 chu kỳ của \texttt{smx\_sumacc} hoặc \texttt{smx\_norm}.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{llrrrl}
+\toprule
+Khối & Tổng hợp ở & Độ trễ & ALUT & Thanh ghi & Khác \\
+\midrule
+\texttt{smx\_scale}   & 1 lane  & 3  & 13  & 85  & 1 DSP \\
+\texttt{smx\_maxtree} & $P = 8$ & 2  & 202 & 38  & \\
+\texttt{smx\_exp2}    & 1 lane  & 3  & [Chưa đo] & [Chưa đo] & 1 DSP \\
+\texttt{smx\_sumacc}  & $P = 8$ & 3  & 180 & 101 & \\
+\texttt{smx\_divider} &         & 28 & 60  & 109 & \\
+\texttt{smx\_norm}    & 1 lane  & 3  & 20  & 66  & 1 DSP \\
+\texttt{smx\_buf}     & $P = 8$ & 1  &     & 0   & 65\,536 bit bộ nhớ khối \\
+\texttt{smx\_csr}     & $P = 8$ & 2  & 192 & 136 & độ trễ của đường đọc \\
+\texttt{smx\_ctrl}    & $P = 8$ &    & 72  & 24  & ngõ ra tổ hợp \\
+\bottomrule
+\end{tabular}
+\caption{Độ trễ (chu kỳ) và tài nguyên của từng khối sau Analysis \& Synthesis. Ô trống: không áp dụng.}
+\label{tab:blk-res}
+\end{table}
