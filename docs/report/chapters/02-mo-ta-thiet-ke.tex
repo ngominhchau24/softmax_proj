@@ -204,18 +204,11 @@ Hình \ref{fig:smx-core} là sơ đồ khối của \texttt{smx\_core}, vẽ ở
   \label{fig:smx-core}
 \end{figure}
 
-Mười khối được trình bày lần lượt theo đường đi của dữ liệu: các khối số học (\texttt{smx\_scale}, \texttt{smx\_maxtree}, \texttt{smx\_exp2}, \texttt{smx\_sumacc}, \texttt{smx\_divider}, \texttt{smx\_norm}), rồi bộ đệm, thanh ghi và bộ điều khiển. Mỗi khối có sơ đồ cấu trúc và bảng cổng.
+Mười khối được trình bày lần lượt theo đường đi của dữ liệu: các khối số học (\texttt{smx\_scale}, \texttt{smx\_maxtree}, \texttt{smx\_exp2}, \texttt{smx\_sumacc}, \texttt{smx\_divider}, \texttt{smx\_norm}), rồi bộ đệm, thanh ghi và bộ điều khiển. Ba khối mang ý tưởng chính của thuật toán có sơ đồ cấu trúc, mọi khối đều có bảng cổng; sơ đồ các khối còn lại nằm trong thư mục \texttt{docs/spec/fig}.
 
 \subsubsection{\texttt{smx\_scale}}
 
 Khối \texttt{smx\_scale} nhân điểm đầu vào $q$ với hệ số $K$ bằng một bộ nhân $8 \times 17$ có dấu để có $u = q \cdot K$, rồi làm tròn lên để có $c = \lceil u / 2^{16} \rceil$. Khối xử lý một phần tử mỗi chu kỳ và được nhân bản $P$ lần; độ trễ 3 chu kỳ, với thanh ghi ở hai phía bộ nhân để Quartus đưa vào khối DSP.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_scale.pdf}
-  \caption{\texttt{smx\_scale}: nhân $q$ với $K$ để có $u$, và làm tròn lên để có $c$. Độ trễ 3 chu kỳ; bộ nhân $8 \times 17$ có dấu có thanh ghi ở hai phía.}
-  \label{fig:blk-scale}
-\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -333,21 +326,7 @@ Cổng & Hướng & Độ rộng & Ý nghĩa \\
 
 \subsubsection{\texttt{smx\_divider}}
 
-Khối \texttt{smx\_divider} là bộ chia phục hồi radix-2 tính $\mathit{Rcp} = \lfloor 2^{40} / \mathit{sum} \rfloor$, mỗi chu kỳ quyết định một bit thương. Mỗi hàng chỉ cần một phép chia nên chỉ có một bản. Độ trễ từ \texttt{start} tới \texttt{done} là 28 chu kỳ, gồm 27 bước lặp (Hình \ref{fig:blk-divider-fsm}).
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_divider.pdf}
-  \caption{\texttt{smx\_divider}: bộ chia phục hồi tính $\mathit{Rcp} = \lfloor 2^{40} / \mathit{sum} \rfloor$, mỗi chu kỳ quyết định một bit thương. Độ trễ 28 chu kỳ từ \texttt{start} tới \texttt{done}.}
-  \label{fig:blk-divider}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_divider_fsm.pdf}
-  \caption{Máy trạng thái của \texttt{smx\_divider}: nạp $\mathit{sum}$ khi có \texttt{start}, lặp 27 bước, rồi nạp $\mathit{Rcp}$ và phát \texttt{done} trong một chu kỳ.}
-  \label{fig:blk-divider-fsm}
-\end{figure}
+Khối \texttt{smx\_divider} là bộ chia phục hồi radix-2 tính $\mathit{Rcp} = \lfloor 2^{40} / \mathit{sum} \rfloor$, mỗi chu kỳ quyết định một bit thương. Mỗi hàng chỉ cần một phép chia nên chỉ có một bản. Độ trễ từ \texttt{start} tới \texttt{done} là 28 chu kỳ, gồm 27 bước lặp.
 
 \begin{table}[htbp]
 \centering
@@ -371,13 +350,6 @@ Cổng & Hướng & Độ rộng & Ý nghĩa \\
 
 Khối \texttt{smx\_norm} nhân $E$ với $\mathit{Rcp}$ bằng bộ nhân $16 \times 27$, làm tròn ở bit 31 và bão hoà về 255 để có $y$. Khối được nhân bản $P$ lần và chỉ chạy ở lượt 2; độ trễ 3 chu kỳ.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_norm.pdf}
-  \caption{\texttt{smx\_norm}: nhân $E$ với $\mathit{Rcp}$ bằng bộ nhân $16 \times 27$, làm tròn ở bit 31 và bão hoà về 255 để có $y$. Độ trễ 3 chu kỳ.}
-  \label{fig:blk-norm}
-\end{figure}
-
 \begin{table}[htbp]
 \centering
 \small
@@ -400,13 +372,6 @@ Cổng & Hướng & Độ rộng & Ý nghĩa \\
 \subsubsection{\texttt{smx\_buf}}
 
 Hai bộ đệm X và Y dùng chung một module \texttt{smx\_buf}, là bộ nhớ hai cổng đơn có cổng đọc qua thanh ghi (độ trễ 1 chu kỳ). Số bank bằng $P/4$, mỗi bank rộng 32 bit; với $P = 8$, mỗi bộ đệm gồm hai bank 32 bit $\times$ 1024 word, và mỗi byte của mỗi bank là một RAM riêng để ghi theo \texttt{byteenable}. Khối không có reset.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_buf.pdf}
-  \caption{\texttt{smx\_buf}: bộ đệm hai cổng đơn, một cổng ghi có \texttt{byteenable} và một cổng đọc có thanh ghi (độ trễ 1 chu kỳ). Vẽ ở $P = 8$: 8 RAM, mỗi bank và mỗi byte một RAM.}
-  \label{fig:blk-buf}
-\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -432,13 +397,6 @@ Cổng & Hướng & Độ rộng & Ý nghĩa \\
 
 Khối \texttt{smx\_csr} giải mã cổng \texttt{acc\_*}, giữ các thanh ghi LEN, ROWS, SCALE\_K và các bit trạng thái BUSY, DONE, ERR, đếm \texttt{CYCLE\_CNT}, ghi vào X\_BUF và ghép đường đọc hai tầng để dữ liệu trả về đúng 2 chu kỳ sau lệnh đọc. Khi BUSY, mọi lệnh ghi vào LEN, ROWS, SCALE\_K và X\_BUF bị bỏ qua để bảo vệ lần chạy đang diễn ra.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_csr.pdf}
-  \caption{\texttt{smx\_csr}: giải mã cổng \texttt{acc\_*}, các thanh ghi LEN, ROWS, SCALE\_K, trạng thái BUSY, DONE, ERR, cổng ghi X\_BUF, và đường đọc hai tầng trả dữ liệu sau 2 chu kỳ.}
-  \label{fig:blk-csr}
-\end{figure}
-
 \begin{table}[htbp]
 \centering
 \small
@@ -463,13 +421,6 @@ Cổng & Hướng & Độ rộng & Ý nghĩa \\
 \subsubsection{\texttt{smx\_ctrl}}
 
 Khối \texttt{smx\_ctrl} chứa máy trạng thái ở mục \ref{sec:flow}, bộ đếm nhóm và hàng, phần tính hình học của nhóm từ LEN, và phần giải mã ra các nhãn của nhóm (hợp lệ, lượt, nhóm đầu, nhóm cuối, mặt nạ lane) cùng địa chỉ đọc, ghi của hai bộ đệm. Mọi ngõ ra là tổ hợp của trạng thái và các thanh ghi.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{smx_ctrl.pdf}
-  \caption{\texttt{smx\_ctrl}: thanh ghi trạng thái, bộ đếm nhóm và hàng, phần tính hình học của nhóm từ LEN, và phần giải mã ra các nhãn của nhóm cùng địa chỉ đọc, ghi của hai bộ đệm.}
-  \label{fig:blk-ctrl}
-\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -519,4 +470,29 @@ Khối & Tổng hợp ở & Độ trễ & ALUT & Thanh ghi & Khác \\
 \end{tabular}
 \caption{Độ trễ (chu kỳ) và tài nguyên của từng khối sau Analysis \& Synthesis. Ô trống: không áp dụng.}
 \label{tab:blk-res}
+\end{table}
+\subsubsection{Độ trễ của một hàng}
+
+Với $G = \lceil L/P \rceil$ nhóm và độ trễ từ địa chỉ đọc X\_BUF tới $E$ là $\mathit{PIPE} = 1 + 3 + 2 + 3 = 9$ chu kỳ, một hàng đi qua các đoạn ở Bảng \ref{tab:trow}. Các đoạn cộng lại thành $T_{\text{row}} = 2G + 54$ chu kỳ; phần cố định 54 chu kỳ gồm hai lần đổ đầy pipeline, độ trễ của \texttt{smx\_sumacc} và \texttt{smx\_norm}, và 28 chu kỳ của bộ chia. Cả lần chạy mất $\texttt{CYCLE\_CNT} = R \cdot T_{\text{row}} + 1$ chu kỳ, trong đó 1 chu kỳ là do BUSY lên một chu kỳ trước khi nhóm đầu được phát. Công thức này được đối chiếu với \texttt{CYCLE\_CNT} thật trong mô phỏng (mục \ref{sec:sim-res}), và nằm trong giới hạn $2G + 64$ của yêu cầu.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lc}
+\toprule
+Đoạn & Số chu kỳ \\
+\midrule
+Phát nhóm đầu của lượt 1 tới khi tổng nhóm cuối vào $\mathit{sum}$ & $G - 1 + \mathit{PIPE} + 3$ \\
+Tổng nhóm cuối tới chu kỳ khởi động bộ chia & 1 \\
+Khởi động bộ chia tới \texttt{div\_done} & 28 \\
+\texttt{div\_done} tới nhóm đầu của lượt 2 & 1 \\
+Nhóm đầu của lượt 2 tới phần tử $y$ cuối cùng & $G - 1 + \mathit{PIPE} + 3$ \\
+$y$ cuối cùng tới \texttt{NEXT\_ROW} & 1 \\
+\texttt{NEXT\_ROW} tới nhóm đầu của hàng sau & 1 \\
+\midrule
+Tổng, $T_{\text{row}}$ & $2G + 54$ \\
+\bottomrule
+\end{tabular}
+\caption{Các đoạn của độ trễ một hàng, $\mathit{PIPE} = 9$.}
+\label{tab:trow}
 \end{table}
