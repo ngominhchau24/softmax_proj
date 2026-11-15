@@ -30,20 +30,65 @@
 \setlength{\parindent}{1.25cm}
 
 % ---------- Tiện ích ----------
+\usepackage{amsmath}
 \usepackage{graphicx}
 \graphicspath{{../figures/}}
 \usepackage{booktabs}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\scriptsize, breaklines=true, breakatwhitespace=true,
+        columns=fullflexible, keepspaces=true, frame=single, framesep=4pt,
+        xleftmargin=4pt, xrightmargin=4pt, aboveskip=8pt, belowskip=4pt}
+% Nhật ký của một testcase: chỉ chèn khi file có trong docs/report/logs/
+\newcommand{\smxlog}[2]{\IfFileExists{logs/#1}{\noindent\textit{#2}\lstinputlisting{logs/#1}}{}}
 \usepackage{titlesec}
+\usepackage{enumitem}
+\newcommand{\wavew}{\textwidth}   % bề rộng của các ảnh dạng sóng ở chương 6
+\usepackage{placeins}   % \FloatBarrier: hình của một mục không trôi sang mục sau
+\setlist{itemsep=1pt, parsep=0pt, topsep=3pt, partopsep=0pt}   % danh sách gọn, không cách dòng thừa
+
+% ---------- Hình và bảng trôi ----------
+% Cho phép hình, bảng chiếm phần lớn một trang có chữ, để không bị đẩy sang trang riêng gần trống;
+% trên trang chỉ có hình thì xếp từ đầu trang xuống, không giãn đều ra cả trang.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{14pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
 \usepackage{hyperref}
+\hypersetup{hidelinks}   % liên kết vẫn bấm được, không có khung màu quanh chữ
+
+% ---------- Ngôn ngữ của các nhãn tự sinh ----------
+% Báo cáo tiếng Việt: giữ \reportvitrue (Bảng, Hình, Mục lục, Tài liệu tham khảo, Chương).
+% Bản tiếng Anh: đổi thành \reportvifalse (Table, Figure, Contents, References, Chapter).
+\newif\ifreportvi
+\reportvitrue
+\ifreportvi
+  \renewcommand{\tablename}{Bảng}
+  \renewcommand{\figurename}{Hình}
+  \renewcommand{\contentsname}{Mục lục}
+  \renewcommand{\refname}{Tài liệu tham khảo}
+  \newcommand{\smxchaptername}{Chương}
+\else
+  \newcommand{\smxchaptername}{Chapter}
+\fi
 
 % Tiêu đề chương (\section) và mục (\subsection)
 \titleformat{\section}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont\centering}
-  {Chương \thesection.}{0.5em}{\MakeUppercase}
+  {\smxchaptername{} \thesection.}{0.5em}{\MakeUppercase}
 \titleformat{\subsection}
   {\normalfont\bfseries\fontsize{13pt}{16pt}\selectfont}
   {\thesubsection}{0.5em}{}
-\titlespacing*{\section}{0pt}{12pt}{6pt}
+% Mỗi chương bắt đầu ở một trang mới
+\newcommand{\sectionbreak}{\clearpage}
+\titlespacing*{\section}{0pt}{0pt}{14pt}
 \titlespacing*{\subsection}{0pt}{6pt}{0pt}
 
 \begin{document}
@@ -51,19 +96,33 @@
 % ---------- Trang bìa ----------
 \begin{titlepage}
 \begin{center}
-\textbf{BÁO CÁO BÀI TẬP LỚN}\\[0.3em]
-Môn: Cấu trúc phần cứng cho giải thuật học máy\\[0.3em]
-Nhóm 6\\[3em]
-\textbf{THIẾT KẾ VÀ HIỆN THỰC FPGA BỘ TĂNG TỐC SOFTMAX NGUYÊN THUẦN\\CHO ATTENTION TRANSFORMER}\\[0.3em]
-\textit{Design and FPGA Implementation of an Integer-Only Softmax Accelerator for Transformer Attention}\\[4em]
-Sinh viên thực hiện: [Họ và tên]\\[1em]
-Giảng viên hướng dẫn: [Họ và tên]\\[4em]
+ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\\[0.2em]
+\textbf{TRƯỜNG ĐẠI HỌC BÁCH KHOA}\\[2em]
+% Logo trường: đặt file docs/figures/logo_bk.png; chưa có file thì trang bìa vẫn biên dịch được
+\IfFileExists{../figures/logo_bk.png}{\includegraphics[height=4.2cm]{logo_bk.png}\\[2em]}{\vspace*{3em}}
+\textbf{BÁO CÁO TIẾN ĐỘ BÀI TẬP LỚN}\\[0.3em]
+Môn: Cấu trúc phần cứng cho giải thuật học máy\\[2.5em]
+\textbf{THIẾT KẾ VÀ HIỆN THỰC TRÊN FPGA\\BỘ TĂNG TỐC SOFTMAX THUẦN SỐ NGUYÊN\\CHO CƠ CHẾ ATTENTION CỦA TRANSFORMER}\\[0.3em]
+\textit{Design and FPGA Implementation of an\\Integer-Only Softmax Accelerator for Transformer Attention}\\[3em]
+Nhóm 6\\[0.6em]
+\begin{tabular}{ll}
+\toprule
+Họ và tên & MSSV \\
+\midrule
+Ngô Minh Châu     & 2470212 \\
+Trần Gia Tuấn     & 2470214 \\
+Đặng Phước Tiến   & 2470455 \\
+\bottomrule
+\end{tabular}\\[2em]
+Giảng viên hướng dẫn: PGS.TS. Trương Quang Vinh\\
+\vfill
 Thành phố Hồ Chí Minh, 2026
 \end{center}
 \end{titlepage}
 
-\tableofcontents
-\newpage
+% Mục lục: giãn dòng đơn và không cách đoạn, để không tràn trang
+{\setlength{\parskip}{0pt}\singlespacing\tableofcontents}
+\clearpage
 
 \input{chapters/01-gioi-thieu}
 \input{chapters/02-co-so-khao-sat}
@@ -72,7 +131,7 @@ Thành phố Hồ Chí Minh, 2026
 \input{chapters/05-thiet-ke-khoi}
 \input{chapters/06-kiem-thu}
 \input{chapters/07-tong-hop-danh-gia}
-\input{chapters/08-ket-luan}
+\input{chapters/08-tinh-hinh-ke-hoach}
 
 \input{chapters/99-tai-lieu-tham-khao}
 

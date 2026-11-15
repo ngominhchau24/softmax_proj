@@ -5,6 +5,10 @@
 #   make testname=tb_smx_exp2 N_SEG=16      same, for another test or parameter
 #   make regress                            compile, run every PS x N_SEGS combination
 #   make regress PS="4 8 16" N_SEGS=8       sweep P instead of N_SEG
+#   make dv                                 compile, run the whole DV suite (tb/dv/README.md)
+#   make run testname=tb_smx_dv_random SEED=7   another seed: new vectors, +SEED=7 to the bench
+#   make run testname=tb_smx_dv_proto VCD=1     DV tests only: dump the DUT ports to wave/<run>.vcd
+#   make dvview testname=tb_smx_dv_proto        DV tests only: run, then open the wave in the GUI
 #   make run WAVE=1                         run without recompiling, log wave/<run>.wlf
 #   make dump                               compile, open the GUI with main_wave.do
 #   make view                               compile, run with wave logging, open the .wlf
@@ -15,6 +19,9 @@
 # Every model/gen_vectors.py subcommand takes --p, --n-seg, --seed and --out.
 # Run one job at a time per checkout: all of them share sim/work.
 # The tools can be overridden from the environment, e.g. export vlog=/path/to/vlog.exe
+# setup.sh does that. Under WSL the Windows tools do not find their own install folder, so they
+# neither copy the default modelsim.ini nor resolve $$MODEL_TECH in it. setup.sh then sets
+# SMX_MODELSIM_INI and SMX_MODELSIM_ROOT, and build writes modelsim.ini here with absolute paths.
 
 testname ?= tb_smx_exp2
 P        ?= 8
@@ -23,6 +30,9 @@ PS       ?= 8
 N_SEGS   ?= 4 8 16
 WAVE     ?= 0
 REGEN    ?= 0
+SEED     ?= 1
+VCD      ?= 0
+DV_TESTS ?= tb_smx_dv_sanity tb_smx_dv_ver02 tb_smx_dv_proto tb_smx_dv_latency tb_smx_dv_reg tb_smx_dv_random tb_smx_dv_corner
 
 vlib ?= vlib
 vmap ?= vmap
@@ -34,9 +44,16 @@ PYTHON ?= $(if $(wildcard $(HOME)/venvs/ml/bin/python),$(HOME)/venvs/ml/bin/pyth
 
 TESTNAME := $(testname)
 BLOCK    := $(patsubst tb_smx_%,%,$(TESTNAME))
-VECDIR   := ../tb/vectors/smx_$(BLOCK)/p$(P)_n$(N_SEG)
-RUN      := $(TESTNAME)_p$(P)_n$(N_SEG)
-SIMARGS  := -gP=$(P) -gN_SEG=$(N_SEG) work.$(TESTNAME) +VECDIR=$(VECDIR)
+# SEED = 1 keeps the plain names; another seed gets its own vectors and log
+SEEDTAG  := $(if $(filter-out 1,$(SEED)),_s$(SEED))
+VECDIR   := ../tb/vectors/smx_$(BLOCK)/p$(P)_n$(N_SEG)$(SEEDTAG)
+RUN      := $(TESTNAME)_p$(P)_n$(N_SEG)$(SEEDTAG)
+SIMARGS  := -gP=$(P) -gN_SEG=$(N_SEG) work.$(TESTNAME) +VECDIR=$(VECDIR) +SEED=$(SEED)
+
+# VCD=1: the DV environment dumps the DUT ports to wave/<run>.vcd (docs/report/tools/dv_waves.py)
+ifeq ($(VCD),1)
+  SIMARGS += +VCD=wave/$(RUN).vcd
+endif
 
 # Logging every signal over 1.2M+ vectors makes a large .wlf, so plain runs log nothing
 ifeq ($(WAVE),1)
@@ -44,7 +61,7 @@ ifeq ($(WAVE),1)
   LOG_CMD := log -r /*;
 endif
 
-.PHONY: all build vectors run regress dump view clean
+.PHONY: all build vectors run regress dv dvview dump view clean
 
 all: clean build run
 
@@ -52,6 +69,10 @@ build:
 	mkdir -p log
 	mkdir -p wave
 	$(vlib) work
+	@if [ -n "$(SMX_MODELSIM_INI)" ]; then \
+	  echo "writing modelsim.ini from $(SMX_MODELSIM_INI), libraries under $(SMX_MODELSIM_ROOT)"; \
+	  sed 's|\$$MODEL_TECH/\.\.|$(SMX_MODELSIM_ROOT)|g' "$(SMX_MODELSIM_INI)" > modelsim.ini; \
+	fi
 	$(vmap) work work
 	$(vlog) -f compile.f
 
@@ -60,7 +81,7 @@ build:
 vectors:
 	@if [ "$(BLOCK)" = exp2 ] || [ -f ../model/vec_$(BLOCK).py ]; then \
 	  if [ "$(REGEN)" = 1 ] || [ ! -f $(VECDIR)/.done ]; then \
-	    $(PYTHON) ../model/gen_vectors.py $(BLOCK) --p $(P) --n-seg $(N_SEG) --out $(VECDIR); \
+	    $(PYTHON) ../model/gen_vectors.py $(BLOCK) --p $(P) --n-seg $(N_SEG) --seed $(SEED) --out $(VECDIR); \
 	  fi; \
 	fi
 
@@ -77,6 +98,24 @@ regress: build
 	done; done; \
 	if [ $$fail = 0 ]; then echo "ALL PASS: $(TESTNAME) P = $(PS) N_SEG = $(N_SEGS)"; \
 	else echo "SOME FAILED, see sim/log/"; exit 1; fi
+
+# The DV suite (tb/dv/README.md): compile once, run every test of DV_TESTS, list the verdicts
+dv: build
+	@fail=0; for t in $(DV_TESTS); do \
+	  $(MAKE) --no-print-directory run testname=$$t || fail=1; \
+	done; \
+	echo; echo "DV suite P=$(P) N_SEG=$(N_SEG) SEED=$(SEED):"; \
+	for t in $(DV_TESTS); do \
+	  grep -h "TB_RESULT" log/$${t}_p$(P)_n$(N_SEG)$(SEEDTAG).log || echo "TB_RESULT: MISSING $$t"; \
+	done; \
+	if [ $$fail = 0 ]; then echo "DV ALL PASS"; else echo "DV SOME FAILED, see sim/log/"; exit 1; fi
+
+# Wave of one DV test: log only the DUT ports and the checker (small .wlf), open it with wave_dv.do.
+# Compile first (make build). The GUI stays open until you close it.
+dvview:
+	$(MAKE) --no-print-directory run ACC='-voptargs="+acc"' \
+	  LOG_CMD='log /$(TESTNAME)/env/*; log /$(TESTNAME)/env/dut/u_dv_chk/*;'
+	$(vsim) -view wave/$(RUN).wlf -do "set TOP $(TESTNAME); do wave_dv.do"
 
 dump: build vectors
 	$(vsim) -gui -voptargs="+acc" $(SIMARGS) -do "do main_wave.do"

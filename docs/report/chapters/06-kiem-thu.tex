@@ -1,25 +1,257 @@
-\section{Kế hoạch kiểm thử}
+\section{Kiểm thử}
 
-\subsection{Golden model làm scoreboard}
+Chương này trình bày kế hoạch kiểm thử lõi, môi trường và bộ testcase của nhóm kiểm thử, rồi đến kết quả mô phỏng.
 
-Golden model \texttt{softmax\_row} là chuẩn so sánh. Mọi kết quả RTL phải khớp bit-exact trên từng hàng. Vector kiểm thử được sinh từ golden model và lưu trong thư mục \texttt{tb/vectors/}.
+\subsection{Golden model làm chuẩn so sánh}
+
+Hàm \texttt{softmax\_row} của golden model là chuẩn so sánh: mọi kết quả của RTL phải khớp bit-exact trên từng phần tử của từng hàng. Vector kiểm thử, gồm đầu vào và đầu ra mong đợi, được sinh từ golden model vào thư mục \texttt{tb/vectors/}; testbench không tự tính lại softmax.
 
 \subsection{Kịch bản tối thiểu}
 
-Các kịch bản bắt buộc gồm:
+Tài liệu yêu cầu quy định các kịch bản bắt buộc sau:
 \begin{itemize}
   \item Độ dài $L = 1$, $L = P$, $L = P \pm 1$ và $L = L_{\max}$.
   \item Số hàng $R = 1$ và $R = R_{\max}$.
   \item Hệ số $K = 0$, $K = 1$ và $K = 65535$.
-  \item Hàng toàn $-128$, toàn $127$, đồng nhất, và one-hot ở cực trị.
-  \item Hàng có max nằm ở nhóm cuối, để kiểm tra phép dịch hiệu chỉnh.
-  \item Vector ngẫu nhiên.
+  \item Hàng toàn $-128$, hàng toàn $127$, hàng đồng nhất và hàng one-hot ở hai giá trị cực trị.
+  \item Hàng có giá trị lớn nhất nằm ở nhóm cuối, để kiểm tra phép dịch hiệu chỉnh tổng.
+  \item Hàng ngẫu nhiên.
 \end{itemize}
 
-\subsection{Khẳng định}
+\subsection{Khẳng định về giao thức}
 
-Các khẳng định đề xuất cho nhóm verification gồm: lệnh START khi BUSY bị bỏ qua; DONE chỉ lên sau khi BUSY xuống; LEN hoặc ROWS ngoài khoảng làm ERR lên; không có X hoặc Z trên đường đọc khi \texttt{readdatavalid}.
+Tài liệu yêu cầu đề xuất bốn khẳng định: lệnh START khi BUSY bị bỏ qua; DONE chỉ lên sau khi BUSY xuống; LEN hoặc ROWS ngoài khoảng cho phép làm ERR lên; không có X hoặc Z trên đường đọc khi \texttt{readdatavalid}.
 
-\subsection{Kết quả kiểm thử}
+\subsection{Môi trường kiểm thử}
 
-Chưa có kết quả mô phỏng tại thời điểm viết báo cáo. Kết quả từng khối sẽ được ghi sau khi unit test chạy trên ModelSim hoặc Questa.
+Đối tượng kiểm thử là lõi \texttt{smx\_core}. Lõi chỉ được điều khiển qua cổng \texttt{acc\_*}, theo đúng trình tự mà phần mềm sẽ dùng: ghi X\_BUF, LEN, ROWS và SCALE\_K, ghi START, chờ DONE rồi đọc Y\_BUF. Môi trường kiểm thử đặt trong thư mục \texttt{tb/dv/}, tách khỏi các testbench tự kiểm của người thiết kế, và gồm bốn thành phần:
+\begin{itemize}
+  \item mô hình bus cho cổng \texttt{acc\_*};
+  \item scoreboard, đọc vector sinh từ golden model và so sánh kết quả;
+  \item bộ kiểm giao thức, gắn vào lõi bằng \texttt{bind};
+  \item phần môi trường chung, chứa clock, reset và các trình tự dùng lại.
+\end{itemize}
+Địa chỉ thanh ghi, các giới hạn và công thức độ trễ dùng trong môi trường được chép từ tài liệu yêu cầu và đặc tả, không lấy từ mã RTL. Nhờ vậy, nếu RTL lệch khỏi tài liệu thì test sẽ báo lỗi.
+
+Mô phỏng chạy trên ModelSim Intel FPGA Edition 10.5b. Phiên bản này không hỗ trợ UVM, khẳng định đồng thời (SVA) và \texttt{covergroup}. Vì vậy, bộ kiểm giao thức được viết bằng khối \texttt{always} xét từng chu kỳ; độ phủ chức năng được đếm bằng biến, và test tự báo lỗi nếu còn tổ hợp chưa được chạy.
+
+\subsection{Bộ testcase}
+
+Bộ kiểm thử gồm bảy testcase, liệt kê trong Bảng \ref{tab:dv-tests}. Ngoài phần kiểm riêng của từng test, mọi lần chạy đều được kiểm bốn điểm chung: trạng thái BUSY, DONE và ERR ngay sau START và khi kết thúc; giới hạn độ trễ; giá trị \texttt{CYCLE\_CNT} so với số chu kỳ BUSY quan sát trên chân trạng thái; và mọi phần tử $Y[r][i]$ với $i < L$ so bit-exact với golden model.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{clp{2.8cm}p{7.0cm}}
+\toprule
+\# & Testcase & Yêu cầu & Nội dung \\
+\midrule
+1 & \texttt{sanity}  & VER-01, FUN-01 & Giá trị sau reset, HW\_PARAM, đọc ghi thanh ghi, 9 lần chạy cơ bản \\
+2 & \texttt{ver02}   & VER-01, VER-02, FUN-01 đến 03 & Ma trận kiểu hàng $\times$ $L$ $\times$ $K$; $R = 1$ và $R_{\max}$; $L_{\max}$ cùng $R_{\max}$; phần đuôi $i \ge L$ chứa giá trị rác \\
+3 & \texttt{proto}   & VER-03, FUN-04, IF-09 & START với LEN hoặc ROWS sai; START khi BUSY ở chu kỳ đầu, giữa, áp chót và cuối; ghi thanh ghi và buffer khi BUSY \\
+4 & \texttt{latency} & VER-04, PRF-03 & \texttt{CYCLE\_CNT} so với công thức độ trễ, với ba kiểu dữ liệu cho mỗi cặp $(L, R)$ \\
+5 & \texttt{reg}     & IF-03, IF-07, IF-08 & 16 mẫu \texttt{byteenable} trên thanh ghi và X\_BUF; địa chỉ không định nghĩa; ghi X\_BUF từng phần tử \\
+6 & \texttt{random}  & VER-01, FUN-05 & 60 lần chạy ngẫu nhiên, lặp lại hai lượt; reset bất đồng bộ giữa lần chạy \\
+7 & \texttt{corner}  & VER-01, ARI-05, ARI-06, FUN-02 & Tổng của hàng ở cận dưới $2^{14}$ và cận trên $2^{24}$; giá trị lớn nhất nhảy 254 đơn vị; mọi độ dài hàng từ 1 đến 512 \\
+\bottomrule
+\end{tabular}
+\caption{Bộ testcase của nhóm kiểm thử. Tên đầy đủ có tiền tố \texttt{tb\_smx\_dv\_}.}
+\label{tab:dv-tests}
+\end{table}
+
+Bộ kiểm giao thức xét tám luật ở mọi chu kỳ của mọi test:
+\begin{enumerate}
+  \item không có X hoặc Z trên các chân trạng thái;
+  \item BUSY và DONE không cùng bằng 1, và ERR không bằng 1 khi BUSY;
+  \item START hợp lệ làm BUSY lên ở chu kỳ kế tiếp, đồng thời xoá DONE và ERR;
+  \item START khi LEN hoặc ROWS ngoài khoảng cho phép làm DONE và ERR lên, lõi không chạy;
+  \item START khi BUSY bị bỏ qua;
+  \item lõi đang rảnh không tự chạy, và DONE, ERR giữ nguyên giá trị;
+  \item khi kết thúc, BUSY xuống và DONE lên trong cùng một chu kỳ;
+  \item dữ liệu đọc từ thanh ghi, trả về sau đúng hai chu kỳ, không chứa X.
+\end{enumerate}
+
+\subsection{Kết quả mô phỏng}
+
+Bảng \ref{tab:dv-results} ghi kết quả trên ModelSim ở cấu hình mặc định $P = 8$, $N_{\text{SEG}} = 8$. Cả bảy test đạt, với tổng cộng 458\,837 phép so và không có sai khác nào.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lrp{7.4cm}l}
+\toprule
+Testcase & Số phép so & Khối lượng & Kết quả \\
+\midrule
+\texttt{sanity}  &   2\,337 & 9 lần chạy & Đạt \\
+\texttt{ver02}   &  69\,412 & 267 lần chạy, độ phủ 43/43 tổ hợp & Đạt \\
+\texttt{proto}   &   3\,287 & 7 lần START sai cấu hình, 5 lần START khi BUSY & Đạt \\
+\texttt{latency} &  68\,604 & 168 lần chạy trên 56 cặp $(L, R)$ & Đạt \\
+\texttt{reg}     &   2\,003 & 1\,533 lệnh ghi, 809 lệnh đọc & Đạt \\
+\texttt{random}  & 167\,267 & 120 lần chạy, 20 lần reset giữa chừng & Đạt \\
+\texttt{corner}  & 145\,927 & 526 lần chạy, đủ 512/512 độ dài hàng & Đạt \\
+\midrule
+Tổng             & 458\,837 & & Đạt \\
+\bottomrule
+\end{tabular}
+\caption{Kết quả bộ testcase trên ModelSim, $P = 8$, $N_{\text{SEG}} = 8$, seed 1.}
+\label{tab:dv-results}
+\end{table}
+
+Bộ test được chạy lại trên ModelSim ở các giá trị tham số khác; kết quả ghi ở Bảng \ref{tab:dv-sweep}. Testcase \texttt{corner} thực hiện 146\,339 phép so ở $P = 4$ và 145\,863 phép so ở $P = 16$, và chạy đủ 512/512 độ dài hàng ở mọi tổ hợp. Riêng test ngẫu nhiên được chạy thêm với seed 2 và 3 ở cấu hình mặc định, và đều đạt. Testbench tự kiểm của người thiết kế, \texttt{tb\_smx\_core}, cũng đạt trên cùng trình mô phỏng, với 783 lần chạy và 354\,324 phần tử $Y$ được so sánh.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{ccccccccc}
+\toprule
+$P$ & $N_{\text{SEG}}$ & \texttt{sanity} & \texttt{ver02} & \texttt{proto} & \texttt{latency} & \texttt{reg} & \texttt{random} & \texttt{corner} \\
+\midrule
+4  & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+8  & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+16 & 8  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+8  & 4  & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+8  & 16 & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt & Đạt \\
+\bottomrule
+\end{tabular}
+\caption{Kết quả trên ModelSim khi quét tham số $P$ và $N_{\text{SEG}}$.}
+\label{tab:dv-sweep}
+\end{table}
+
+Về độ trễ, \texttt{CYCLE\_CNT} khớp công thức $R \cdot (2\lceil L/P \rceil + 54) + 1$ ở mọi cặp $(L, R)$ đã chạy, và không phụ thuộc vào dữ liệu hay hệ số $K$. Với $L = 512$, một hàng mất 310, 182 và 118 chu kỳ lần lượt ở $P = 4$, 8 và 16. Các giá trị này nằm trong giới hạn $2\lceil L/P \rceil + 64$ của yêu cầu, tương ứng là 320, 192 và 128 chu kỳ.
+
+\subsection{Nhật ký mô phỏng}
+
+Mỗi testcase in ba dòng vào nhật ký: cấu hình của lần chạy, thống kê của bộ kiểm giao thức, và dòng kết luận bắt đầu bằng \texttt{TB\_RESULT} kèm số phép so và khối lượng đã chạy. Lệnh \texttt{make dv} chạy cả bộ rồi gom các dòng kết luận lại. Các nhật ký dưới đây lấy từ lần chạy trên ModelSim ở cấu hình mặc định và là nguồn của các số trong Bảng \ref{tab:dv-results}; dấu \texttt{\#} ở đầu dòng do ModelSim thêm vào.
+
+\noindent\textit{Tổng kết của \texttt{make dv}:}
+\lstinputlisting{logs/dv_suite_p8_n8.txt}
+
+Với từng testcase, phần trích gồm ba dòng nói trên, thời điểm kết thúc mô phỏng và dòng tổng kết của ModelSim. Trong dòng thống kê của bộ kiểm giao thức, bốn số lần lượt là số lệnh START đã thấy, số lệnh START khi BUSY, số lệnh START với LEN hoặc ROWS sai, và số lệnh đọc đã được kiểm không chứa X. Riêng \texttt{proto} có 5 lệnh START khi BUSY và 7 lệnh START với cấu hình sai, đúng bằng số tình huống mà test tạo ra.
+
+\smxlog{dv_sanity.txt}{Nhật ký của \texttt{tb\_smx\_dv\_sanity}:}
+\smxlog{dv_ver02.txt}{Nhật ký của \texttt{tb\_smx\_dv\_ver02}:}
+\smxlog{dv_proto.txt}{Nhật ký của \texttt{tb\_smx\_dv\_proto}:}
+\smxlog{dv_latency.txt}{Nhật ký của \texttt{tb\_smx\_dv\_latency}:}
+\smxlog{dv_reg.txt}{Nhật ký của \texttt{tb\_smx\_dv\_reg}:}
+\smxlog{dv_random.txt}{Nhật ký của \texttt{tb\_smx\_dv\_random}:}
+\smxlog{dv_corner.txt}{Nhật ký của \texttt{tb\_smx\_dv\_corner}:}
+
+\subsection{Kiểm chứng khả năng bắt lỗi}
+
+Một bộ test chỉ có giá trị khi nó phát hiện được lỗi. Để kiểm chứng điều này, mười ba lỗi được cố ý cài vào bản sao của mã RTL, mỗi lần một lỗi, rồi testcase phụ trách phần tương ứng được chạy lại. Cả mười ba lỗi đều bị phát hiện (Bảng \ref{tab:dv-mutation}). Lỗi thứ 13, làm mất bit cao nhất của $\mathit{Rcp}$, chỉ lộ ra khi tổng của hàng bằng đúng $2^{14}$: nó lọt qua \texttt{ver02} và chỉ bị \texttt{corner} phát hiện, đây là lý do testcase này được bổ sung. Phần này chạy bằng Verilator 5.020 ở $P = 8$, $N_{\text{SEG}} = 8$; mã RTL trong kho mã không bị thay đổi.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{cp{8.2cm}ll}
+\toprule
+\# & Lỗi được cài & Khối & Test phát hiện \\
+\midrule
+1  & Bỏ bước làm tròn khi chuẩn hoá & \texttt{smx\_norm}   & \texttt{ver02} \\
+2  & Bỏ phép dịch hiệu chỉnh tổng khi max tăng & \texttt{smx\_sumacc} & \texttt{ver02}, \texttt{random} \\
+3  & Tổng của hàng trước mang sang hàng sau & \texttt{smx\_sumacc} & \texttt{ver02} \\
+4  & Không che các lane ở phần đuôi $i \ge L$ & \texttt{smx\_ctrl}   & \texttt{ver02} \\
+5  & \texttt{CYCLE\_CNT} đếm sai bước & \texttt{smx\_csr}    & \texttt{latency} \\
+6  & Nhận START khi đang BUSY & \texttt{smx\_csr}    & \texttt{proto} \\
+7  & Không báo ERR khi LEN hoặc ROWS ngoài khoảng & \texttt{smx\_csr}    & \texttt{proto} \\
+8  & Cho ghi LEN khi đang BUSY & \texttt{smx\_csr}    & \texttt{proto} \\
+9  & Cho ghi X\_BUF khi đang BUSY & \texttt{smx\_csr}    & \texttt{proto} \\
+10 & Bỏ qua \texttt{byteenable} của byte cao LEN & \texttt{smx\_csr}    & \texttt{reg} \\
+11 & Giải mã địa chỉ thanh ghi thiếu một bit (alias) & \texttt{smx\_csr}    & \texttt{reg} \\
+12 & LEN không được xoá khi reset & \texttt{smx\_csr}    & \texttt{random} \\
+13 & Mất bit cao nhất của $\mathit{Rcp}$ & \texttt{smx\_divider} & \texttt{corner} \\
+\bottomrule
+\end{tabular}
+\caption{Các lỗi cố ý cài vào bản sao RTL và testcase phát hiện.}
+\label{tab:dv-mutation}
+\end{table}
+
+\subsection{Truy vết yêu cầu}
+
+Bảng \ref{tab:dv-trace} liên kết từng yêu cầu kiểm được ở mức lõi với testcase tương ứng. Các yêu cầu về bus Avalon chưa được kiểm: lớp bao \texttt{smx\_avalon} đã có, nhưng testbench ở mức bus chưa được viết.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lp{6.5cm}p{3.4cm}l}
+\toprule
+Yêu cầu & Nội dung & Testcase & Trạng thái \\
+\midrule
+VER-01 & Khớp bit-exact với golden model & cả bảy test & Đạt \\
+VER-02 & Danh sách kịch bản tối thiểu & \texttt{ver02} & Đạt \\
+VER-03 & Khẳng định giao thức & \texttt{proto}, bộ kiểm giao thức & Đạt ở mức lõi \\
+VER-04 & \texttt{CYCLE\_CNT} theo công thức độ trễ & \texttt{latency} & Đạt \\
+FUN-01, 02 & Tính đúng với $L$, $R$ lập trình được & \texttt{ver02}, \texttt{random} & Đạt \\
+FUN-03 & Phần tử $i \ge L$ không ảnh hưởng kết quả & \texttt{ver02} & Đạt \\
+FUN-04 & Cấu hình sai: không chạy, DONE và ERR lên & \texttt{proto} & Đạt \\
+FUN-05 & Kết quả không phụ thuộc lần chạy trước & \texttt{random}, \texttt{proto} & Đạt \\
+IF-03 & \texttt{byteenable} khi ghi & \texttt{reg} & Đạt \\
+IF-07 & Đóng gói little-endian, 4 phần tử mỗi word & \texttt{reg} & Đạt \\
+IF-08 & Địa chỉ không định nghĩa đọc 0, ghi bị bỏ qua & \texttt{reg} & Đạt \\
+IF-09 & Truy cập khi BUSY & \texttt{proto} & Đạt \\
+PRF-03 & Độ trễ mỗi hàng $\le 2\lceil L/P \rceil + 64$ & \texttt{latency} & Đạt \\
+ARI-05, 06 & Cận của tổng, độ rộng của $\mathit{Rcp}$ & \texttt{corner} & Đạt \\
+IF-01, 02, 11 & Bus Avalon-MM, khai báo component & chưa có test mức bus & [Chưa đo] \\
+\bottomrule
+\end{tabular}
+\caption{Truy vết yêu cầu sang testcase.}
+\label{tab:dv-trace}
+\end{table}
+
+\subsection{Dạng sóng minh hoạ}
+
+Các Hình \ref{fig:dv-sanity} đến \ref{fig:dv-random} là ảnh chụp cửa sổ Wave của ModelSim, trích dạng sóng trên các cổng của \texttt{smx\_core} quanh sự kiện mà từng testcase nhắm tới, ở cấu hình $P = 8$, $N_{\text{SEG}} = 8$. Các giá trị bus ghi ở hệ thập lục phân, riêng \texttt{acc\_byteenable} ở hệ nhị phân. Nhóm \texttt{DV} ở dưới cùng của mỗi ảnh gồm \texttt{busy\_cnt}, là số chu kỳ BUSY mà môi trường kiểm thử đếm được, và bốn bộ đếm của bộ kiểm giao thức: số lỗi (\texttt{n\_err}), số lệnh START (\texttt{n\_start}), số lệnh START khi BUSY (\texttt{n\_start\_busy}) và số lệnh START với cấu hình sai (\texttt{n\_start\_bad}). Ở mọi ảnh, \texttt{n\_err} bằng 0.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_sanity_run_modelsim.png}
+  \caption{\texttt{sanity} trên ModelSim: lần chạy đầu tiên, $L = 8$, $R = 1$. Lệnh START là lệnh ghi 00000001h vào địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp và kéo dài 57 chu kỳ, \texttt{busy\_cnt} dừng ở 57. Khi BUSY xuống, \texttt{status\_done} lên. Sau đó testbench đọc STATUS, \texttt{CYCLE\_CNT} và Y\_BUF, rồi nạp lần chạy thứ hai.}
+  \label{fig:dv-sanity}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_ver02_tail_modelsim.png}
+  \caption{\texttt{ver02} trên ModelSim: nạp một lần chạy có phần đuôi chứa giá trị rác, $L = 1$, $R = 2$. Word đầu của hàng 0 được ghi vào địa chỉ 0800h với giá trị 59807F80h: byte thấp 80h là phần tử duy nhất của hàng, ba byte còn lại (7Fh, 80h và 59h) nằm ngoài độ dài $L$. Tiếp theo là word thứ hai của hàng 0, hai word của hàng 1 (0880h, 0881h), rồi $\text{LEN} = 1$, $\text{ROWS} = 2$, $\text{SCALE\_K} = 0$ và lệnh START ở địa chỉ 0000h; \texttt{status\_busy} lên ở chu kỳ kế tiếp. Kết quả $Y$ vẫn phải khớp golden model.}
+  \label{fig:dv-ver02}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_proto_err_modelsim.png}
+  \caption{\texttt{proto} trên ModelSim: START với cấu hình sai. Testbench ghi $\text{LEN} = 0$ (địa chỉ 0002h), $\text{ROWS} = 1$ (0003h), rồi ghi START (0000h). Ở chu kỳ kế tiếp \texttt{status\_done} và \texttt{status\_err} cùng lên, còn \texttt{status\_busy} giữ ở 0 và \texttt{busy\_cnt} không tăng: lõi không chạy. Bộ kiểm giao thức ghi nhận một lệnh START với cấu hình sai (\texttt{n\_start\_bad} = 1). Lệnh đọc sau đó ở địa chỉ 0001h lấy STATUS.}
+  \label{fig:dv-proto-err}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_proto_start_busy_modelsim.png}
+  \caption{\texttt{proto} trên ModelSim: START khi đang BUSY. Lệnh START (ghi 00000001h vào địa chỉ 0000h) được đưa vào đúng chu kỳ BUSY cuối cùng của một lần chạy dài 189 chu kỳ. Lệnh bị bỏ qua: \texttt{status\_busy} xuống và \texttt{status\_done} lên như bình thường, \texttt{busy\_cnt} dừng ở 189 và không có lần chạy mới. Bộ kiểm giao thức đếm đây là lệnh START khi BUSY thứ năm (\texttt{n\_start\_busy} = 5). Lệnh đọc sau đó ở địa chỉ 0005h trả về $\texttt{CYCLE\_CNT} = \text{BDh} = 189$, bằng lần chạy không bị quấy rầy; hai lệnh đọc tiếp theo lấy Y\_BUF.}
+  \label{fig:dv-proto-busy}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_latency_cycle_cnt_modelsim.png}
+  \caption{\texttt{latency} trên ModelSim: lần chạy ngắn nhất, $L = 1$, $R = 1$. Sau lệnh START, \texttt{status\_busy} kéo dài đúng $2 \cdot 1 + 54 + 1 = 57$ chu kỳ, thể hiện ở \texttt{busy\_cnt} đếm từ 1 đến 57. Khi BUSY xuống, \texttt{status\_done} lên. Bốn lệnh đọc sau đó lần lượt lấy STATUS (0001h), \texttt{CYCLE\_CNT} (0005h), Y\_BUF (1000h) và \texttt{CYCLE\_CNT} lần nữa; test so cả hai lần đọc \texttt{CYCLE\_CNT} với công thức.}
+  \label{fig:dv-latency}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_reg_byteenable_modelsim.png}
+  \caption{\texttt{reg} trên ModelSim: \texttt{byteenable} trên thanh ghi LEN (địa chỉ 0002h). Giá trị F0F0F0F0h được ghi với \texttt{byteenable} = 1111, rồi 0F0F0F0Fh được ghi với \texttt{byteenable} = 0101, tức chỉ byte 0 và byte 2. Lệnh đọc ngay sau đó trả về 0000000Fh sau hai chu kỳ: byte 0 nhận giá trị mới 0Fh, còn hai bit 9 và 8 của LEN, thuộc byte 1, giữ giá trị cũ; các bit ngoài trường $[9{:}0]$ đọc về 0. Phía sau là mẫu \texttt{byteenable} kế tiếp, 0110.}
+  \label{fig:dv-reg}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\wavew]{dv_random_reset_modelsim.png}
+  \caption{\texttt{random} trên ModelSim: reset bất đồng bộ giữa lần chạy. \texttt{rst\_n} xuống ở giữa hai cạnh clock khi lõi đang BUSY, lúc \texttt{busy\_cnt} bằng 63; \texttt{status\_busy} về 0 ngay lập tức, không chờ cạnh clock, và \texttt{busy\_cnt} dừng lại. Sau khi reset được thả, năm lệnh đọc ở các địa chỉ 0001h đến 0005h lấy STATUS, LEN, ROWS, SCALE\_K và \texttt{CYCLE\_CNT}; \texttt{acc\_readdata} giữ nguyên 00000000h, tức mọi thanh ghi đã về 0. Lõi không tự chạy lại sau reset.}
+  \label{fig:dv-random}
+\end{figure}
+
+\FloatBarrier
+\subsection{Giới hạn của kết quả}
+
+Kết quả trên có ba giới hạn. Thứ nhất, kiểm thử dừng ở ranh giới của lõi: khẳng định ``không có X hoặc Z khi \texttt{readdatavalid}'' mới được kiểm ở dạng tương đương trên \texttt{acc\_readdata}, chưa qua bus Avalon. Thứ hai, độ phủ đã đo là độ phủ chức năng theo danh sách kịch bản; độ phủ mã chưa được đo, vì phiên bản ModelSim đang dùng không hỗ trợ. Thứ ba, phần cài lỗi chạy trên Verilator, một trình mô phỏng hai trạng thái, nên không phản ánh các lỗi chỉ lộ ra qua giá trị X.

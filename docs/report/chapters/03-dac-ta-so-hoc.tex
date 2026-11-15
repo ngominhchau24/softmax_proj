@@ -17,11 +17,16 @@ Với $u_k = q_k \cdot K$ (25 bit, Q8.16) và $c_k = \lceil u_k / 2^{16} \rceil$
   E_0 &= C[\mathit{idx}] + \left((\tilde{M}[\mathit{idx}] \cdot r) \gg 13\right), \\
   E   &= \begin{cases} 0, & -I > 15, \\ E_0 \gg (-I), & \text{ngược lại,} \end{cases}
 \end{align}
-trong đó $E_0$ là số UQ1.15 16 bit, $C[i] = \operatorname{round}(2^{i/N} \cdot 2^{15})$ và $\tilde{M}[i] = \operatorname{round}((2^{(i+1)/N} - 2^{i/N}) \cdot 2^{15})$. Hai bảng này được sinh bằng \texttt{python3 model/softmax\_ref.py --gen-pwl 8}.
+trong đó $E_0$ là số UQ1.15 rộng 16 bit. Hai bảng hệ số của xấp xỉ tuyến tính từng đoạn được định nghĩa bởi
+\begin{align}
+  C[i] &= \operatorname{round}\left(2^{i/N} \cdot 2^{15}\right), \\
+  \tilde{M}[i] &= \operatorname{round}\left(\left(2^{(i+1)/N} - 2^{i/N}\right) \cdot 2^{15}\right),
+\end{align}
+với $N = N_{\text{SEG}}$ và $i = 0, \dots, N-1$. Hai bảng này được sinh bằng lệnh \texttt{python3 model/softmax\_ref.py --gen-pwl 8}, không sửa tay.
 
 \subsection{Lượt 1: chuẩn hoá trực tuyến với IntMax}
 
-Duyệt các nhóm $g = 0, 1, \dots$ gồm $P = 8$ phần tử liên tiếp theo thứ tự tăng dần. Với nhóm $g$, $M_g = \max_k c_k$. Cập nhật
+Hàng được duyệt theo các nhóm $g = 0, 1, \dots$, mỗi nhóm gồm $P$ phần tử liên tiếp ($P = 8$ ở cấu hình mặc định), theo thứ tự chỉ số tăng dần. Với nhóm $g$, đặt $M_g = \max_{k \in g} c_k$. Các đại lượng được cập nhật như sau:
 \begin{align}
   M_{\text{mới}} &= \begin{cases} M_g, & g = 0, \\ \max(M, M_g), & g > 0, \end{cases} \\
   \mathit{sum} &\leftarrow \left(\mathit{sum} \gg (M_{\text{mới}} - M)\right) + \sum_{k \in g} E(u_k - M_{\text{mới}} \cdot 2^{16}), \\
@@ -41,14 +46,14 @@ là số không dấu 27 bit. Phép chia này được thực hiện bằng bộ
 
 Với mỗi $k < L$, tính lại $e = E(u_k - M \cdot 2^{16})$, trong đó $M$ là giá trị cuối của lượt 1, rồi
 \begin{equation}
-  y_k = \min\left(255, \; \frac{e \cdot \mathit{Rcp} + 2^{31}}{2^{32}}\right),
+  y_k = \min\left(255, \; \left\lfloor \frac{e \cdot \mathit{Rcp} + 2^{31}}{2^{32}} \right\rfloor\right),
 \end{equation}
-với phép chia là dịch phải số học. Giá trị thực của đầu ra là $y_k / 256$. Trường hợp xác suất bằng 1 không biểu diễn được và được bão hoà về 255.
+trong đó phép chia lấy phần nguyên được thực hiện bằng dịch phải 32 bit, còn số hạng $2^{31}$ làm tròn về số gần nhất. Giá trị thực của đầu ra là $y_k / 256$. Xác suất bằng 1 không biểu diễn được trong 8 bit nên được bão hoà về 255.
 
 \subsection{Sai số}
 
 Golden model được kiểm trên hàng ngẫu nhiên $L = 128$ với $S \in \{0{,}02;\, 0{,}0625;\, 0{,}2\}$. Sai số tuyệt đối tối đa so với softmax float64 khoảng $0{,}00195$ đến $0{,}0020$ với $N_{\text{SEG}} = 8$, tức bằng nửa LSB đầu ra. Sai số của xấp xỉ PWL theo số đoạn là $0{,}376\%$, $0{,}094\%$ và $0{,}025\%$ với 4, 8 và 16 đoạn. Với 8 đoạn, sai số xấp xỉ đã nằm dưới sàn lượng tử hoá UINT8, nên lượng tử hoá là yếu tố chi phối.
 
-\subsection{Giới hạn độ dài và độ chính xác}
+\subsection{Giới hạn độ dài và số hàng}
 
-Độ dài hàng tối đa $L_{\max} = 512$. Số hàng tối đa $R_{\max} = 16$. Các giá trị này xuất hiện trong thanh ghi \texttt{HW\_PARAM} để phần mềm kiểm tra.
+Độ dài hàng tối đa là $L_{\max} = 512$ và số hàng tối đa là $R_{\max} = 16$. Hai giá trị này được ghi trong thanh ghi \texttt{HW\_PARAM} để phần mềm đọc và kiểm tra.

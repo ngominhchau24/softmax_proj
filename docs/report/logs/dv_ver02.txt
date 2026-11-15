@@ -1,0 +1,5 @@
+# tb_smx_dv_ver02: P=8 N_SEG=8 SEED=1 VECDIR=../tb/vectors/smx_dv_ver02/p8_n8
+# tb_smx_dv_ver02: checker saw 267 START, 0 while BUSY, 0 with bad LEN/ROWS, 534 reads checked for X
+# TB_RESULT: PASS tb_smx_dv_ver02 P=8 N_SEG=8: 69412 checks, 267 runs, 104 of them with both tail modes, coverage 43/43 bins
+#    Time: 932550 ns  Iteration: 1  Instance: /tb_smx_dv_ver02
+# Errors: 0, Warnings: 0

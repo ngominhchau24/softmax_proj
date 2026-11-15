@@ -1,0 +1,5 @@
+# tb_smx_dv_reg: P=8 N_SEG=8 SEED=1 VECDIR=../tb/vectors/smx_dv_reg/p8_n8
+# tb_smx_dv_reg: checker saw 10 START, 0 while BUSY, 0 with bad LEN/ROWS, 138 reads checked for X
+# TB_RESULT: PASS tb_smx_dv_reg P=8 N_SEG=8: 2003 checks, 5 runs written element by element, 1533 writes, 809 reads
+#    Time: 66240 ns  Iteration: 1  Instance: /tb_smx_dv_reg
+# Errors: 0, Warnings: 0

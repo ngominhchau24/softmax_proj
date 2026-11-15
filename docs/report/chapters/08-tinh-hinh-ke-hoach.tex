@@ -1,0 +1,52 @@
+\section{Tình hình thực hiện và kế hoạch tiếp theo}
+
+Đề tài đang ở giữa tiến độ, nên chương này không đưa ra kết luận cuối cùng mà tổng kết những gì đã làm được và nêu các việc của giai đoạn còn lại.
+
+\subsection{Kết quả đến thời điểm báo cáo}
+
+Đề tài đã xây dựng thuật toán softmax thuần số nguyên cho attention, với đặc tả số học bit-exact, golden model làm chuẩn so sánh và giao diện đóng băng ở phiên bản 1.0. Việc chọn cơ số 2, IntMax, PWL 8 đoạn và tính lại $E$ ở lượt hai giúp datapath không cần hàm log và chỉ có một phép chia mỗi hàng.
+
+Lõi \texttt{smx\_core} đã được hiện thực bằng SystemVerilog và tích hợp đủ mười khối. Trong mô phỏng, lõi khớp bit-exact với golden model trên toàn bộ bảy testcase của nhóm kiểm thử, ở năm tổ hợp tham số: $P = 4$, 8, 16 với $N_{\text{SEG}} = 8$, và $N_{\text{SEG}} = 4$, 16 với $P = 8$. Sau Fitter ở $P = 8$, lõi dùng 1\,681 ALUT, 24 DSP và 21 khối M10K, đạt từ 122 MHz trở lên qua ba seed, và xử lý một hàng 512 phần tử trong 182 chu kỳ. Lớp bao Avalon-MM, thành phần Platform Designer và hệ thống demo cho kit DE10-Standard đã được viết và biên dịch thành công, nhưng chưa chạy trên board. Bảng \ref{tab:status} tóm tắt tình hình từng hạng mục và người phụ trách.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{6.4cm}ll}
+\toprule
+Hạng mục & Phụ trách & Tình hình \\
+\midrule
+Thuật toán, golden model, đặc tả & Ngô Minh Châu & Hoàn thành \\
+RTL lõi \texttt{smx\_core} và tổng hợp lõi & Ngô Minh Châu & Hoàn thành \\
+Kiểm thử lõi bằng mô phỏng & Đặng Phước Tiến & Hoàn thành ở mức lõi \\
+Lớp bao Avalon, hệ thống demo DE10 & Trần Gia Tuấn & Đã biên dịch, chưa chạy trên board \\
+Kiểm thử mức bus Avalon & Đặng Phước Tiến & Chưa thực hiện \\
+Đo đạc trên board, đánh giá trên DeiT-Tiny & Cả nhóm & Chưa thực hiện \\
+\bottomrule
+\end{tabular}
+\caption{Tình hình các hạng mục tại thời điểm báo cáo.}
+\label{tab:status}
+\end{table}
+
+\subsection{Kế hoạch cho giai đoạn còn lại}
+
+Bảng \ref{tab:plan} liệt kê các việc còn lại theo kế hoạch của đề tài. Các số liệu đang ghi [Chưa đo] trong báo cáo này sẽ được bổ sung khi các việc tương ứng hoàn thành; nhận xét tổng kết và kết luận sẽ nằm trong báo cáo cuối kỳ.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lp{8.6cm}l}
+\toprule
+Hạng mục & Nội dung & Thời gian \\
+\midrule
+Tích hợp & Đối chiếu gán chân, nạp thiết kế lên board, điều khiển bằng System Console & 30/11 -- 06/12 \\
+Kiểm thử mức bus & Chạy bộ testcase qua lớp bao \texttt{smx\_avalon}; kiểm khai báo thành phần & 30/11 -- 06/12 \\
+Đo đạc & Fitter ở $N_{\text{SEG}} = 4$ và 16, thêm seed ở $P = 4$; ràng buộc timing cho cổng \texttt{acc\_*}; tài nguyên và timing của toàn hệ thống; số liệu trên board & 07/12 -- 13/12 \\
+Đánh giá độ chính xác & Đánh giá trên mô hình mục tiêu DeiT-Tiny bằng golden model & 07/12 -- 13/12 \\
+Báo cáo và demo & Báo cáo cuối kỳ, demo trên board & 14/12 -- 21/12 \\
+\bottomrule
+\end{tabular}
+\caption{Các việc của giai đoạn còn lại.}
+\label{tab:plan}
+\end{table}
+
+Mở rộng tuỳ chọn, chỉ xét khi các việc trên đã xong, gồm masking và các hàm sigmoid, GELU.
